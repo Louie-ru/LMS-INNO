@@ -1,12 +1,9 @@
 #include <QString>
 #include <QVector>
 
-//can't use AV, but can VA
-//QString and QVector instead of string and vector
-//need special namespace (sk)
-
 namespace sk {
     class Document{
+    public:
         QString title, keywords;
         int copies, id, price, room, level;
     };
@@ -20,15 +17,53 @@ namespace sk {
         QString publisher, authors;
         int year;
         bool bestseller;
+        Book(QString authors_, QString title_, QString keywords_, QString publisher_, int id_, int year_, int copies_, int price_, int room_, int level_, bool bestseller_){
+            authors = authors_;
+            title = title_;
+            keywords = keywords_;
+            publisher = publisher_;
+            year = year_;
+            copies = copies_;
+            bestseller = bestseller_;
+            id = id_;
+            price = price_;
+            room = room_;
+            level = level_;
+        }
     };
 
     class Article : Document{
         QString journal_title, publisher, editors, authors;
         int year, month;
+        Article(QString authors_, QString title_, QString journal_title_, QString keywords_, QString publisher_, QString editors_, int id_, int year_, int month_, int copies_, int price_, int room_, int level_){
+            authors = authors_;
+            title = title_;
+            journal_title = journal_title_;
+            keywords = keywords_;
+            publisher = publisher_;
+            editors = editors_;
+            year = year_;
+            month = month_;
+            copies = copies_;
+            id = id_;
+            price = price_;
+            room = room_;
+            level = level_;
+        }
     };
 
     class VA : Document{
         QString authors;
+        VA(QString authors_, QString title_, QString keywords_, int id_, int copies_, int price_, int room_, int level_){
+            authors = authors_;
+            title = title_;
+            keywords = keywords_;
+            copies = copies_;
+            id = id_;
+            price = price_;
+            room = room_;
+            level = level_;
+        }
     };
 
     class Check_out {
@@ -44,7 +79,7 @@ namespace sk {
         QString name, address, phone;
         int id;//id in Patrons/Librarians table
 
-        QVector<Book> search_books(QString authors, QString title, QString keywords, QString publisher, QString editors, int year, int bestseller, int available, bool or_and);
+        QVector<Book> search_books(QString authors, QString title, QString keywords, QString publisher, int year, int bestseller, int available, bool or_and);
         QVector<Article> search_articles(QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int available, bool or_and);
         QVector<VA> search_av(QString authors, QString title, QString keywords, int available, bool or_and);
     };
@@ -72,7 +107,7 @@ namespace sk {
     //can search/add/delete/modify users, search/add/delete/modify documents, search overdue documents
     class Librarian : User{
         //search in Check_outs table
-        QVector<Book> search_books_checked_out(int user_id, QString authors, QString title, QString keywords, QString publisher, QString editors, int year, int bestseller, int available, bool or_and);
+        QVector<Book> search_books_checked_out(int user_id, QString authors, QString title, QString keywords, QString publisher, int year, int bestseller, int available, bool or_and);
         QVector<Article> search_articles_checked_out(int user_id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int available, bool or_and);
         QVector<VA> search_av_checked_out(int user_id, QString authors, QString title, QString keywords, int available, bool or_and);
 
@@ -98,7 +133,7 @@ namespace sk {
         bool delete_article(int id, int copies);
         bool delete_av(int id, int copies);
 
-        bool modify_book(int id, QString authors, QString title, QString keywords, QString publisher, QString editors, int year, bool bestseller, int copies);
+        bool modify_book(int id, QString authors, QString title, QString keywords, QString publisher, int year, bool bestseller, int copies);
         bool modify_article(int id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int copies);
         bool modify_av(int id, QString authors, QString title, QString keywords, bool available, int copies);
     };
