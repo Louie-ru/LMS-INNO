@@ -46,9 +46,9 @@ class User{
 	string name, address, phone;
 	int id;//id in Patrons/Librarians table
 
-	vector<Book> search_books(string author, string title, string keywords, string publisher, string editors, int year, int bestseller, int available, bool or_and);
-	vector<Article> search_articles(string author, string title, string keywords, string journal_title, string publisher, string editors, int year, int month, int available, bool or_and);
-	vector<AV> search_av(string author, string title, string keywords, int available, bool or_and);
+	vector<Book> search_books(string authors, string title, string keywords, string publisher, string editors, int year, int bestseller, int available, bool or_and);
+	vector<Article> search_articles(string authors, string title, string keywords, string journal_title, string publisher, string editors, int year, int month, int available, bool or_and);
+	vector<AV> search_av(string authors, string title, string keywords, int available, bool or_and);
 }
 
 //can search/check_out documents, renew/return check_outed documents
@@ -74,9 +74,9 @@ class Patron : User{
 //can search/add/delete/modify users, search/add/delete/modify documents, search overdue documents
 class Librarian : User{
 	//search in Check_outs table
-	vector<Book> search_books_checked_out(int user_id, string author, string title, string keywords, string publisher, string editors, int year, int bestseller, int available, bool or_and);
-	vector<Article> search_articles_checked_out(int user_id, string author, string title, string keywords, string journal_title, string publisher, string editors, int year, int month, int available, bool or_and);
-	vector<AV> search_av_checked_out(int user_id, string author, string title, string keywords, int available, bool or_and);
+	vector<Book> search_books_checked_out(int user_id, string authors, string title, string keywords, string publisher, string editors, int year, int bestseller, int available, bool or_and);
+	vector<Article> search_articles_checked_out(int user_id, string authors, string title, string keywords, string journal_title, string publisher, string editors, int year, int month, int available, bool or_and);
+	vector<AV> search_av_checked_out(int user_id, string authors, string title, string keywords, int available, bool or_and);
 
 	//return TRUE if success, FALSE if error
 	vector<Patron> search_patrons(string name, string address, string phone, bool faculty, bool has_overdues, bool or_and);
@@ -89,42 +89,21 @@ class Librarian : User{
 	bool delete_librarian(int user_id);
 	bool modify_librarian(int user_id, string name, string address, string phone);
 
-	bool add_book_new(string author, string title, string keywords, string publisher, string editors, int year, bool bestseller, int copies);
+	bool add_book_new(string authors, string title, string keywords, string publisher, string editors, int year, bool bestseller, int copies);
 	bool add_book_copy(int id, int copies);
-	bool add_article_new(string author, string title, string keywords, string journal_title, string publisher, string editors, int year, int month, int copies);
+	bool add_article_new(string authors, string title, string keywords, string journal_title, string publisher, string editors, int year, int month, int copies);
 	bool add_article_copy(int id, int copies);
-	bool add_av_new(string author, string title, string keywords, int available, int copies);
+	bool add_av_new(string authors, string title, string keywords, int available, int copies);
 	bool add_av_copy(int id, int copies);
 
 	bool delete_book(int id, int copies);
 	bool delete_article(int id, int copies);
 	bool delete_av(int id, int copies);
 
-	bool modify_book(int id, string author, string title, string keywords, string publisher, string editors, int year, bool bestseller, int copies);
-	bool modify_article(int id, string author, string title, string keywords, string journal_title, string publisher, string editors, int year, int month, int copies);
-	bool modify_av(int id, string author, string title, string keywords, bool available, int copies);
+	bool modify_book(int id, string authors, string title, string keywords, string publisher, string editors, int year, bool bestseller, int copies);
+	bool modify_article(int id, string authors, string title, string keywords, string journal_title, string publisher, string editors, int year, int month, int copies);
+	bool modify_av(int id, string authors, string title, string keywords, bool available, int copies);
 }
 
 //return 0-error 1-patron 2-librarian
 int login(string username, string password);
-
-DATABASE TABLES
-----------------------------------------------------------------------------------------------------------------
-Table: Books
-Columns: string authors, string title, string keywords, string publisher, int copies, int id, int price, int room, int level, int year, bool bestseller;
-
-Table: Articles
-Columns: string authors, string title, string keywords, string journal_title, string publisher, string editors, int copies, int id, int price, int year, int month, int room, int level;
-
-Table: AVs
-Columns: string authors, string title, string keywords, int copies, int id, int price, int room, int level;
-
-Table: Patrons
-Columns: string name, string address, string phone, int id, bool faculty, string check_outs;
-
-Table: Librarians
-Columns: string name, string address, string phone, int id;
-
-Table: Check_outs
-Columns: int user_id, int document_type, int document_id, check_out_id, int year_start, int month_start, int day_start, int year_end, int month_end, int day_end;
-----------------------------------------------------------------------------------------------------------------

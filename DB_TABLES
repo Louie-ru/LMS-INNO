@@ -1,0 +1,20 @@
+DATABASE TABLES
+----------------------------------------------------------------------------------------------------------------
+Table: Books
+Columns: string authors, string title, string keywords, string publisher, int copies, int id, int price, int room, int level, int year, bool bestseller;
+
+Table: Articles
+Columns: string authors, string title, string keywords, string journal_title, string publisher, string editors, int copies, int id, int price, int year, int month, int room, int level;
+
+Table: AVs
+Columns: string authors, string title, string keywords, int copies, int id, int price, int room, int level;
+
+Table: Patrons
+Columns: string name, string address, string phone, int id, bool faculty, string check_outs;
+
+Table: Librarians
+Columns: string name, string address, string phone, int id;
+
+Table: Check_outs
+Columns: int user_id, int document_type, int document_id, check_out_id, int year_start, int month_start, int day_start, int year_end, int month_end, int day_end;
+----------------------------------------------------------------------------------------------------------------
