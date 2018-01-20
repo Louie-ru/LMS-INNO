@@ -20,3 +20,10 @@ void MainWindow::on_pushButton_clicked()
     patron->show();
     this->close();
 }
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    librarian = new Librarian();
+    librarian->show();
+    this->close();
+}

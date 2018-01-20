@@ -46,14 +46,14 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>130</x>
+      <x>70</x>
       <y>160</y>
       <width>83</width>
       <height>28</height>
      </rect>
     </property>
     <property name="text">
-     <string>login</string>
+     <string>patron</string>
     </property>
    </widget>
    <widget class="QLabel" name="label">
@@ -67,6 +67,19 @@
     </property>
     <property name="text">
      <string>LMS-INNO login</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_2">
+    <property name="geometry">
+     <rect>
+      <x>209</x>
+      <y>161</y>
+      <width>83</width>
+      <height>28</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>librarian</string>
     </property>
    </widget>
   </widget>
