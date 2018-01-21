@@ -135,11 +135,8 @@ public:
     bool modify_librarian(int user_id, QString name, QString address, QString phone);
 
     bool add_book_new(QString authors, QString title, QString keywords, QString publisher, QString editors, int year, bool bestseller, int copies);
-    bool add_book_copy(int id, int copies);
     bool add_article_new(QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int copies);
-    bool add_article_copy(int id, int copies);
     bool add_av_new(QString authors, QString title, QString keywords, int available, int copies);
-    bool add_av_copy(int id, int copies);
 
     bool delete_book(int id, int copies);
     bool delete_article(int id, int copies);
