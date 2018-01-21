@@ -84,7 +84,7 @@ public:
 
 class User{
 public:
-    QString name, address, phone;
+    QString name, address, phone, login, password;
     int id;//id in Patrons/Librarians table
 
     QVector<Book> search_books(QString authors, QString title, QString keywords, QString publisher, int year, int bestseller, int available, bool or_and);
