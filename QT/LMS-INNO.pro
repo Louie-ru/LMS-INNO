@@ -27,7 +27,8 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     patron.cpp \
-    librarian.cpp
+    librarian.cpp \
+    skeleton.cpp
 
 HEADERS += \
         mainwindow.h \

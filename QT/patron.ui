@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>718</width>
-    <height>430</height>
+    <width>870</width>
+    <height>524</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,22 +19,12 @@
      <item row="1" column="0">
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>3</number>
+        <number>2</number>
        </property>
-       <widget class="QWidget" name="book_tab">
+       <widget class="QWidget" name="tab_books">
         <attribute name="title">
          <string>books</string>
         </attribute>
-        <widget class="QListView" name="listView">
-         <property name="geometry">
-          <rect>
-           <x>1</x>
-           <y>123</y>
-           <width>691</width>
-           <height>251</height>
-          </rect>
-         </property>
-        </widget>
         <widget class="QLabel" name="label_12">
          <property name="geometry">
           <rect>
@@ -61,7 +51,7 @@
           <string>publisher:</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_12">
+        <widget class="QLineEdit" name="line_publisher_books">
          <property name="geometry">
           <rect>
            <x>413</x>
@@ -84,7 +74,7 @@
           <string>editors:</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_4">
+        <widget class="QLineEdit" name="line_authors_books">
          <property name="geometry">
           <rect>
            <x>81</x>
@@ -92,19 +82,6 @@
            <width>241</width>
            <height>21</height>
           </rect>
-         </property>
-        </widget>
-        <widget class="Line" name="line_3">
-         <property name="geometry">
-          <rect>
-           <x>1</x>
-           <y>114</y>
-           <width>681</width>
-           <height>16</height>
-          </rect>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
          </property>
         </widget>
         <widget class="QLabel" name="label_16">
@@ -120,10 +97,10 @@
           <string>author:</string>
          </property>
         </widget>
-        <widget class="QCheckBox" name="checkBox_5">
+        <widget class="QCheckBox" name="checkbox_criteria_books">
          <property name="geometry">
           <rect>
-           <x>480</x>
+           <x>120</x>
            <y>90</y>
            <width>201</width>
            <height>26</height>
@@ -133,7 +110,7 @@
           <string>all criteria must be satisfied</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_14">
+        <widget class="QLineEdit" name="line_title_books">
          <property name="geometry">
           <rect>
            <x>413</x>
@@ -143,7 +120,7 @@
           </rect>
          </property>
         </widget>
-        <widget class="QCheckBox" name="checkBox_6">
+        <widget class="QCheckBox" name="checkbox_bestseller_books">
          <property name="geometry">
           <rect>
            <x>480</x>
@@ -169,7 +146,7 @@
           <string>book title:</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_15">
+        <widget class="QLineEdit" name="line_year_books">
          <property name="geometry">
           <rect>
            <x>413</x>
@@ -185,7 +162,7 @@
           <string/>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_16">
+        <widget class="QLineEdit" name="line_keywords_books">
          <property name="geometry">
           <rect>
            <x>81</x>
@@ -195,7 +172,7 @@
           </rect>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_17">
+        <widget class="QLineEdit" name="line_editors_books">
          <property name="geometry">
           <rect>
            <x>80</x>
@@ -218,10 +195,10 @@
           <string>year:</string>
          </property>
         </widget>
-        <widget class="QCheckBox" name="checkBox">
+        <widget class="QCheckBox" name="checkbox_available_books">
          <property name="geometry">
           <rect>
-           <x>380</x>
+           <x>20</x>
            <y>90</y>
            <width>81</width>
            <height>26</height>
@@ -231,16 +208,110 @@
           <string>available</string>
          </property>
         </widget>
+        <widget class="QTableWidget" name="table_search_books">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>120</y>
+           <width>1041</width>
+           <height>341</height>
+          </rect>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustIgnored</enum>
+         </property>
+         <attribute name="horizontalHeaderCascadingSectionResizes">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="verticalHeaderCascadingSectionResizes">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="verticalHeaderStretchLastSection">
+          <bool>false</bool>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>title</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>authors</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>publisher</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>year</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>price</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>room</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>level</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>copies</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>bestseller</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>check out</string>
+          </property>
+         </column>
+        </widget>
+        <widget class="QPushButton" name="button_search_books">
+         <property name="geometry">
+          <rect>
+           <x>600</x>
+           <y>85</y>
+           <width>83</width>
+           <height>28</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>search</string>
+         </property>
+        </widget>
        </widget>
-       <widget class="QWidget" name="article_tab">
+       <widget class="QWidget" name="tab_articles">
         <attribute name="title">
          <string>articles</string>
         </attribute>
-        <widget class="QCheckBox" name="checkBox_3">
+        <widget class="QCheckBox" name="checkbox_criteria_articles">
          <property name="geometry">
           <rect>
-           <x>480</x>
-           <y>90</y>
+           <x>340</x>
+           <y>88</y>
            <width>201</width>
            <height>26</height>
           </rect>
@@ -249,7 +320,7 @@
           <string>all criteria must be satisfied</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_7">
+        <widget class="QLineEdit" name="line_title_articles">
          <property name="geometry">
           <rect>
            <x>413</x>
@@ -272,7 +343,7 @@
           <string>author:</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_3">
+        <widget class="QLineEdit" name="line_author_articles">
          <property name="geometry">
           <rect>
            <x>81</x>
@@ -282,7 +353,7 @@
           </rect>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_8">
+        <widget class="QLineEdit" name="line_keywords_articles">
          <property name="geometry">
           <rect>
            <x>81</x>
@@ -295,14 +366,14 @@
         <widget class="QLabel" name="label_7">
          <property name="geometry">
           <rect>
-           <x>334</x>
+           <x>376</x>
            <y>6</y>
-           <width>71</width>
+           <width>31</width>
            <height>20</height>
           </rect>
          </property>
          <property name="text">
-          <string>article title:</string>
+          <string>title:</string>
          </property>
         </widget>
         <widget class="QLabel" name="label_8">
@@ -331,7 +402,7 @@
           <string>year:</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_9">
+        <widget class="QLineEdit" name="line_publisher_articles">
          <property name="geometry">
           <rect>
            <x>413</x>
@@ -354,20 +425,7 @@
           <string>keywords:</string>
          </property>
         </widget>
-        <widget class="Line" name="line_2">
-         <property name="geometry">
-          <rect>
-           <x>1</x>
-           <y>114</y>
-           <width>681</width>
-           <height>16</height>
-          </rect>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-        <widget class="QLineEdit" name="lineEdit_10">
+        <widget class="QLineEdit" name="line_year_articles">
          <property name="geometry">
           <rect>
            <x>413</x>
@@ -396,7 +454,7 @@
           <string>editors:</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_11">
+        <widget class="QLineEdit" name="line_editors_articles">
          <property name="geometry">
           <rect>
            <x>80</x>
@@ -409,17 +467,17 @@
         <widget class="QLabel" name="label_13">
          <property name="geometry">
           <rect>
-           <x>0</x>
+           <x>28</x>
            <y>90</y>
-           <width>81</width>
+           <width>51</width>
            <height>20</height>
           </rect>
          </property>
          <property name="text">
-          <string>journal title:</string>
+          <string>journal:</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_13">
+        <widget class="QLineEdit" name="line_journal_articles">
          <property name="geometry">
           <rect>
            <x>80</x>
@@ -429,7 +487,7 @@
           </rect>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_18">
+        <widget class="QLineEdit" name="line_month_articles">
          <property name="geometry">
           <rect>
            <x>524</x>
@@ -458,11 +516,11 @@
           <string>month:</string>
          </property>
         </widget>
-        <widget class="QCheckBox" name="checkBox_7">
+        <widget class="QCheckBox" name="checkbox_available_articles">
          <property name="geometry">
           <rect>
-           <x>380</x>
-           <y>90</y>
+           <x>595</x>
+           <y>59</y>
            <width>89</width>
            <height>26</height>
           </rect>
@@ -471,35 +529,95 @@
           <string>available</string>
          </property>
         </widget>
-        <widget class="QListView" name="listView_2">
+        <widget class="QTableWidget" name="table_search_articles">
          <property name="geometry">
           <rect>
            <x>1</x>
            <y>123</y>
-           <width>691</width>
-           <height>251</height>
+           <width>701</width>
+           <height>321</height>
           </rect>
+         </property>
+         <column>
+          <property name="text">
+           <string>title</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>authors</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>publisher</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>journal</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>editors</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>year</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>month</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>price</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>room</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>level</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>copies</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>check out</string>
+          </property>
+         </column>
+        </widget>
+        <widget class="QPushButton" name="button_search_articles">
+         <property name="geometry">
+          <rect>
+           <x>590</x>
+           <y>90</y>
+           <width>83</width>
+           <height>28</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>search</string>
          </property>
         </widget>
        </widget>
-       <widget class="QWidget" name="av_tab">
+       <widget class="QWidget" name="tab_vas">
         <attribute name="title">
          <string>audio/video</string>
         </attribute>
-        <widget class="Line" name="line_4">
-         <property name="geometry">
-          <rect>
-           <x>1</x>
-           <y>114</y>
-           <width>681</width>
-           <height>16</height>
-          </rect>
-         </property>
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-        </widget>
-        <widget class="QCheckBox" name="checkBox_8">
+        <widget class="QCheckBox" name="checkbox_bestseller_va">
          <property name="geometry">
           <rect>
            <x>480</x>
@@ -538,7 +656,7 @@
           <string>keywords:</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_5">
+        <widget class="QLineEdit" name="line_authors_va">
          <property name="geometry">
           <rect>
            <x>81</x>
@@ -548,11 +666,11 @@
           </rect>
          </property>
         </widget>
-        <widget class="QCheckBox" name="checkBox_9">
+        <widget class="QCheckBox" name="checkbox_criteria_va">
          <property name="geometry">
           <rect>
-           <x>480</x>
-           <y>90</y>
+           <x>117</x>
+           <y>87</y>
            <width>201</width>
            <height>26</height>
           </rect>
@@ -564,30 +682,17 @@
         <widget class="QLabel" name="label_22">
          <property name="geometry">
           <rect>
-           <x>338</x>
+           <x>375</x>
            <y>6</y>
-           <width>71</width>
-           <height>20</height>
-          </rect>
-         </property>
-         <property name="text">
-          <string>book title:</string>
-         </property>
-        </widget>
-        <widget class="QLabel" name="label_23">
-         <property name="geometry">
-          <rect>
-           <x>374</x>
-           <y>62</y>
            <width>31</width>
            <height>20</height>
           </rect>
          </property>
          <property name="text">
-          <string>year:</string>
+          <string>title:</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_19">
+        <widget class="QLineEdit" name="line_publisher_va">
          <property name="geometry">
           <rect>
            <x>413</x>
@@ -597,7 +702,7 @@
           </rect>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_20">
+        <widget class="QLineEdit" name="line_keywords_va">
          <property name="geometry">
           <rect>
            <x>81</x>
@@ -607,7 +712,7 @@
           </rect>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_21">
+        <widget class="QLineEdit" name="line_editors_va">
          <property name="geometry">
           <rect>
            <x>80</x>
@@ -617,11 +722,11 @@
           </rect>
          </property>
         </widget>
-        <widget class="QCheckBox" name="checkBox_2">
+        <widget class="QCheckBox" name="checkbox_available_va">
          <property name="geometry">
           <rect>
-           <x>380</x>
-           <y>90</y>
+           <x>17</x>
+           <y>87</y>
            <width>81</width>
            <height>26</height>
           </rect>
@@ -630,7 +735,7 @@
           <string>available</string>
          </property>
         </widget>
-        <widget class="QLineEdit" name="lineEdit_22">
+        <widget class="QLineEdit" name="line_title_va">
          <property name="geometry">
           <rect>
            <x>413</x>
@@ -638,22 +743,6 @@
            <width>271</width>
            <height>21</height>
           </rect>
-         </property>
-        </widget>
-        <widget class="QLineEdit" name="lineEdit_23">
-         <property name="geometry">
-          <rect>
-           <x>413</x>
-           <y>62</y>
-           <width>51</width>
-           <height>21</height>
-          </rect>
-         </property>
-         <property name="inputMask">
-          <string>9999</string>
-         </property>
-         <property name="text">
-          <string/>
          </property>
         </widget>
         <widget class="QLabel" name="label_24">
@@ -682,30 +771,344 @@
           <string>publisher:</string>
          </property>
         </widget>
-        <widget class="QListView" name="listView_3">
+        <widget class="QTableWidget" name="table_search_va">
          <property name="geometry">
           <rect>
            <x>1</x>
-           <y>123</y>
+           <y>120</y>
            <width>691</width>
            <height>251</height>
           </rect>
          </property>
+         <column>
+          <property name="text">
+           <string>title</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>authors</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>price</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>room</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>level</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>copies</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>check out</string>
+          </property>
+         </column>
+        </widget>
+        <widget class="QPushButton" name="button_search_va">
+         <property name="geometry">
+          <rect>
+           <x>603</x>
+           <y>83</y>
+           <width>83</width>
+           <height>28</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>search</string>
+         </property>
         </widget>
        </widget>
-       <widget class="QWidget" name="checked_out_tab">
+       <widget class="QWidget" name="tab_checked_out">
         <attribute name="title">
          <string>checked out</string>
         </attribute>
-        <widget class="QListView" name="listView_4">
+        <widget class="QToolBox" name="toolBox">
          <property name="geometry">
           <rect>
-           <x>1</x>
+           <x>0</x>
            <y>0</y>
-           <width>691</width>
-           <height>371</height>
+           <width>1041</width>
+           <height>461</height>
           </rect>
          </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="currentIndex">
+          <number>2</number>
+         </property>
+         <widget class="QWidget" name="page_books">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>1041</width>
+            <height>359</height>
+           </rect>
+          </property>
+          <attribute name="label">
+           <string>books</string>
+          </attribute>
+          <widget class="QTableWidget" name="table_my_books">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>1</y>
+             <width>1041</width>
+             <height>351</height>
+            </rect>
+           </property>
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="sizeAdjustPolicy">
+            <enum>QAbstractScrollArea::AdjustIgnored</enum>
+           </property>
+           <attribute name="horizontalHeaderCascadingSectionResizes">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="horizontalHeaderStretchLastSection">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="verticalHeaderCascadingSectionResizes">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="verticalHeaderStretchLastSection">
+            <bool>false</bool>
+           </attribute>
+           <column>
+            <property name="text">
+             <string>title</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>authors</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>publisher</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>year</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>price</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>room</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>level</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>bestseller</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>date checked out</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>date to return</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>renew</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>return</string>
+            </property>
+           </column>
+          </widget>
+         </widget>
+         <widget class="QWidget" name="page_articles">
+          <property name="geometry">
+           <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>1041</width>
+            <height>359</height>
+           </rect>
+          </property>
+          <attribute name="label">
+           <string>articles</string>
+          </attribute>
+          <widget class="QTableWidget" name="table_my_articles">
+           <property name="geometry">
+            <rect>
+             <x>0</x>
+             <y>1</y>
+             <width>1011</width>
+             <height>351</height>
+            </rect>
+           </property>
+           <column>
+            <property name="text">
+             <string>title</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>authors</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>publisher</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>journal</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>editors</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>year</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>month</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>price</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>room</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>level</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>date checked out</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>date to return</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>renew</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>return</string>
+            </property>
+           </column>
+          </widget>
+         </widget>
+         <widget class="QWidget" name="page_vas">
+          <attribute name="label">
+           <string>audio/video</string>
+          </attribute>
+          <widget class="QTableWidget" name="table_my_vas">
+           <property name="geometry">
+            <rect>
+             <x>2</x>
+             <y>0</y>
+             <width>921</width>
+             <height>351</height>
+            </rect>
+           </property>
+           <column>
+            <property name="text">
+             <string>title</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>authors</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>price</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>room</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>level</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>date checked out</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>date to return</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>renew</string>
+            </property>
+           </column>
+           <column>
+            <property name="text">
+             <string>return</string>
+            </property>
+           </column>
+          </widget>
+         </widget>
         </widget>
        </widget>
       </widget>
