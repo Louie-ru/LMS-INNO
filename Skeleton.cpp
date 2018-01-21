@@ -119,9 +119,9 @@ public:
 class LibrarianUser : public User{
 public:
     //search in Check_outs table
-    QVector<Book> search_books_checked_out(int user_id, QString authors, QString title, QString keywords, QString publisher, int year, int bestseller, int available, bool or_and);
-    QVector<Article> search_articles_checked_out(int user_id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int available, bool or_and);
-    QVector<VA> search_av_checked_out(int user_id, QString authors, QString title, QString keywords, int available, bool or_and);
+    QVector<pair<Check_out, Book>> search_books_checked_out(int user_id, QString authors, QString title, QString keywords, QString publisher, int year, int bestseller, int available, bool or_and);
+    QVector<pair<Check_out, Article>> search_articles_checked_out(int user_id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int available, bool or_and);
+    QVector<pair<Check_out, VA>> search_av_checked_out(int user_id, QString authors, QString title, QString keywords, int available, bool or_and);
 
     //return TRUE if success, FALSE if error
     QVector<PatronUser> search_patrons(QString name, QString address, QString phone, bool faculty, bool has_overdues, bool or_and);
