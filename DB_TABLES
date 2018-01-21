@@ -10,10 +10,10 @@ Table: AVs
 Columns: string authors, string title, string keywords, int copies, int id, int price, int room, int level;
 
 Table: Patrons
-Columns: string name, string address, string phone, int id, bool faculty, string check_outs;
+Columns: string name, string address, string phone, string login, string password, int id, bool faculty, string check_outs;
 
 Table: Librarians
-Columns: string name, string address, string phone, int id;
+Columns: string name, string address, string phone, string login, string password, int id;
 
 Table: Check_outs
 Columns: int user_id, int document_type, int document_id, check_out_id, int year_start, int month_start, int day_start, int year_end, int month_end, int day_end;
