@@ -13,7 +13,7 @@ public:
 #define ARTICLE 2
 #define AV 3
 
-class Book : Document{
+class Book : public Document{
 public:
     QString publisher, authors;
     int year;
@@ -31,9 +31,10 @@ public:
         room = room_;
         level = level_;
     }
+    Book(){}
 };
 
-class Article : Document{
+class Article : public Document{
 public:
     QString journal_title, publisher, editors, authors;
     int year, month;
@@ -52,9 +53,10 @@ public:
         room = room_;
         level = level_;
     }
+    Article(){}
 };
 
-class VA : Document{
+class VA : public Document{
 public:
     QString authors;
     VA(QString authors_, QString title_, QString keywords_, int id_, int copies_, int price_, int room_, int level_){
@@ -67,9 +69,11 @@ public:
         room = room_;
         level = level_;
     }
+    VA(){}
 };
 
 class Check_out {
+public:
     int document_type;//1-book 2-article 3-av
     int document_id;//id in Books/Articles/AVs table
     int check_out_id;//id in Check_outs table
@@ -107,6 +111,8 @@ public:
     int return_book(int id);
     int return_article(int id);
     int return_av(int id);
+    
+    PatronUser(){}
 };
 
 //can search/add/delete/modify users, search/add/delete/modify documents, search overdue documents
@@ -142,6 +148,8 @@ public:
     bool modify_book(int id, QString authors, QString title, QString keywords, QString publisher, int year, bool bestseller, int copies);
     bool modify_article(int id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int copies);
     bool modify_av(int id, QString authors, QString title, QString keywords, bool available, int copies);
+    
+    LibrarianUser(){}
 };
 
 //return 0-error 1-patron 2-librarian
