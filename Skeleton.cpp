@@ -152,5 +152,33 @@ public:
     LibrarianUser(){}
 };
 
+namespace db {
+    
+    //false if there are exist equal document
+    bool add_book(Book*);
+    bool add_article(Article*);
+    bool add_av(AV*);
+    bool add_checkout(Document*, int type);
+    
+    // false if there nothing to delete
+    bool delete_book(int id);
+    bool delete_article(int id);
+    bool delete_av(int id);
+    bool delete_checkout(int id);
+    
+    bool modify_book(Book*);
+    bool modify_article(Article*);
+    bool modify_av(VA*);
+    
+    //return null if there are no appropriate documents
+    QVector*<Book> search_books(QString authors, QString title, QString keywords, QString publisher, int year, int bestseller, int available, bool or_and);
+    QVector*<Article> search_articles(QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int available, bool or_and);
+    QVector*<VA> search_av(QString authors, QString title, QString keywords, int available, bool or_and);
+    
+    Book* get_book(int id);
+    Article* get_article(int id);
+    VA* get_AV(int id);
+}
+
 //return 0-error 1-patron 2-librarian
 int login(QString username, QString password);
