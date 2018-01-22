@@ -78,7 +78,7 @@ public:
     int check_out_id;//id in Check_outs table
     int year_start, month_start, day_start;//taken date
     int year_end, month_end, day_end;//need to return date
-    int fine;
+    int fine, user_id;
 };
 
 
