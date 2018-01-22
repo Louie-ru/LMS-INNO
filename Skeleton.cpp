@@ -79,6 +79,7 @@ public:
     int check_out_id;//id in Check_outs table
     int year_start, month_start, day_start;//taken date
     int year_end, month_end, day_end;//need to return date
+    int fine;
 };
 
 
@@ -87,9 +88,9 @@ public:
     QString name, address, phone, login, password;
     int id;//id in Patrons/Librarians table
 
-    QVector<Book> search_books(QString authors, QString title, QString keywords, QString publisher, int year, int bestseller, int available, bool or_and);
-    QVector<Article> search_articles(QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int available, bool or_and);
-    QVector<VA> search_av(QString authors, QString title, QString keywords, int available, bool or_and);
+    QVector<Book> search_books(QString authors, QString title, QString keywords, QString publisher, int year, bool bestseller, bool available, bool or_and);
+    QVector<Article> search_articles(QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, bool available, bool or_and);
+    QVector<VA> search_av(QString authors, QString title, QString keywords, bool available, bool or_and);
 };
 
 //can search/check_out documents, renew/return check_outed documents
@@ -103,9 +104,9 @@ public:
     int check_out_av(int id);
 
     //return QVector of my documents
-    QVector<Book> get_checked_out_books();
-    QVector<Article> get_checked_out_articles();
-    QVector<VA> get_checked_out_avs();
+    QVector<std::pair<Check_out, Book>> get_checked_out_books();
+    QVector<std::pair<Check_out, Article>> get_checked_out_articles();
+    QVector<std::pair<Check_out, VA>> get_checked_out_avs();
 
     //return fine size or 0
     int return_book(int id);
@@ -119,9 +120,9 @@ public:
 class LibrarianUser : public User{
 public:
     //search in Check_outs table
-    QVector<pair<Check_out, Book>> search_books_checked_out(int user_id, QString authors, QString title, QString keywords, QString publisher, int year, int bestseller, int available, bool or_and);
-    QVector<pair<Check_out, Article>> search_articles_checked_out(int user_id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int available, bool or_and);
-    QVector<pair<Check_out, VA>> search_av_checked_out(int user_id, QString authors, QString title, QString keywords, int available, bool or_and);
+    QVector<pair<Check_out, Book>> search_books_checked_out(int user_id, QString authors, QString title, QString keywords, QString publisher, int year, bool bestseller, bool available, bool or_and);
+    QVector<pair<Check_out, Article>> search_articles_checked_out(int user_id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, bool available, bool or_and);
+    QVector<pair<Check_out, VA>> search_av_checked_out(int user_id, QString authors, QString title, QString keywords, bool available, bool or_and);
 
     //return TRUE if success, FALSE if error
     QVector<PatronUser> search_patrons(QString name, QString address, QString phone, bool faculty, bool has_overdues, bool or_and);
