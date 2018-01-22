@@ -103,9 +103,9 @@ public:
     int check_out_av(int id);
 
     //return QVector of my documents
-    QVector<Book> get_checked_out_books();
-    QVector<Article> get_checked_out_articles();
-    QVector<VA> get_checked_out_avs();
+    QVector<pair<Check_out, Book>> get_checked_out_books();
+    QVector<pair<Check_out, Article>> get_checked_out_articles();
+    QVector<pair<Check_out, VA>> get_checked_out_avs();
 
     //return fine size or 0
     int return_book(int id);
