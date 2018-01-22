@@ -103,9 +103,9 @@ public:
     int check_out_av(int id);
 
     //return QVector of my documents
-    QVector<pair<Check_out, Book>> get_checked_out_books();
-    QVector<pair<Check_out, Article>> get_checked_out_articles();
-    QVector<pair<Check_out, VA>> get_checked_out_avs();
+    QVector<Book> get_checked_out_books();
+    QVector<Article> get_checked_out_articles();
+    QVector<VA> get_checked_out_avs();
 
     //return fine size or 0
     int return_book(int id);
@@ -151,11 +151,16 @@ public:
 
 namespace db {
     
-    //false if there are exist equal document
+    // false if there are exist equal document
     bool add_book(Book*);
     bool add_article(Article*);
     bool add_av(AV*);
     bool add_checkout(Document*, int type);
+    
+    // false if there nothing to modify
+    bool modify_book(Book*);
+    bool modify_article(Article*);
+    bool modify_av(VA*);
     
     // false if there nothing to delete
     bool delete_book(int id);
@@ -163,19 +168,33 @@ namespace db {
     bool delete_av(int id);
     bool delete_checkout(int id);
     
-    bool modify_book(Book*);
-    bool modify_article(Article*);
-    bool modify_av(VA*);
-    
-    //return null if there are no appropriate documents
-    QVector*<Book> search_books(QString authors, QString title, QString keywords, QString publisher, int year, int bestseller, int available, bool or_and);
-    QVector*<Article> search_articles(QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int available, bool or_and);
-    QVector*<VA> search_av(QString authors, QString title, QString keywords, int available, bool or_and);
-    
+    // return null if there are no appropriate document
     Book* get_book(int id);
     Article* get_article(int id);
     VA* get_AV(int id);
+    
+    //these functions under question
+    //return null if there are no appropriate documents
+    //QVector*<Book> search_books(QString authors, QString title, QString keywords, QString publisher, int year, int bestseller, int available, bool or_and);
+    //QVector*<Article> search_articles(QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int available, bool or_and);
+    //QVector*<VA> search_av(QString authors, QString title, QString keywords, int available, bool or_and);
+    
+    // false if there are exist user with such id
+    bool add_patron(PatronUser*);
+    bool add_librarian(LibrarianUser*);
+    
+    // false if there are no user with such id or types is not coincides
+    bool modify_patron(PatronUser*);
+    bool modify_librarian(LibrarianUser*);
+    
+    // false if there are no user with such id or types is not coincides
+    bool delete_patron(int id);
+    bool delete_librarian(int id);
+    
+    // return null if there are no user with such id or types is not concides
+    PatronUser* get_patron(int id);
+    LibrarianUser* get_librarian(int id);
 }
 
 //return 0-error 1-patron 2-librarian
-int login(QString username, QString password);
+pair<User,int> login(QString username, QString password);
