@@ -172,6 +172,16 @@
          <string>password</string>
         </property>
        </column>
+       <column>
+        <property name="text">
+         <string>modify</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>delete</string>
+        </property>
+       </column>
       </widget>
       <widget class="QLabel" name="label_14">
        <property name="geometry">
@@ -323,6 +333,16 @@
        <column>
         <property name="text">
          <string>password</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>modify</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>delete</string>
         </property>
        </column>
       </widget>
@@ -595,11 +615,6 @@
        </attribute>
        <column>
         <property name="text">
-         <string>id</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
          <string>title</string>
         </property>
        </column>
@@ -641,6 +656,16 @@
        <column>
         <property name="text">
          <string>bestseller</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>modify</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>delete</string>
         </property>
        </column>
       </widget>
@@ -895,11 +920,6 @@
        </property>
        <column>
         <property name="text">
-         <string>id</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
          <string>title</string>
         </property>
        </column>
@@ -955,7 +975,12 @@
        </column>
        <column>
         <property name="text">
-         <string>check out</string>
+         <string>modify</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>delete</string>
         </property>
        </column>
       </widget>
@@ -1142,11 +1167,6 @@
        </property>
        <column>
         <property name="text">
-         <string>id</string>
-        </property>
-       </column>
-       <column>
-        <property name="text">
          <string>title</string>
         </property>
        </column>
@@ -1177,7 +1197,12 @@
        </column>
        <column>
         <property name="text">
-         <string>check out</string>
+         <string>modify</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>delete</string>
         </property>
        </column>
       </widget>
@@ -1461,12 +1486,7 @@
            </attribute>
            <column>
             <property name="text">
-             <string>user_id</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>book_id</string>
+             <string>user id</string>
             </property>
            </column>
            <column>
@@ -1813,12 +1833,7 @@
            </property>
            <column>
             <property name="text">
-             <string>user_id</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>article_id</string>
+             <string>user id</string>
             </property>
            </column>
            <column>
@@ -2107,12 +2122,7 @@
            </property>
            <column>
             <property name="text">
-             <string>user_id</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>audio/video_id</string>
+             <string>user id</string>
             </property>
            </column>
            <column>
