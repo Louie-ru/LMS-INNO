@@ -20,6 +20,8 @@ private slots:
     void on_button_show_checked_out_books_clicked();
     void on_button_show_checked_out_articles_clicked();
     void on_button_show_checked_out_vas_clicked();
+    void on_pushButton_clicked();
+
 private:
     Ui::Librarian *ui;
 };

@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QVector>
 #include <skeleton.cpp>
+#include <mainwindow.h>
 
 PatronUser p;
 
@@ -198,4 +199,11 @@ void Patron::show_my_vas(){
         ui->table_my_vas->setCellWidget(i, 8, btn_return);
     }
     ui->table_my_vas->resizeColumnsToContents();
+}
+
+void Patron::on_pushButton_clicked()
+{
+    MainWindow *mainwindow = new MainWindow();
+    mainwindow->show();
+    this->close();
 }

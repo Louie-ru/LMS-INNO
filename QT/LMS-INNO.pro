@@ -39,3 +39,6 @@ FORMS += \
         mainwindow.ui \
     patron.ui \
     librarian.ui
+
+RESOURCES += \
+    resource.qrc

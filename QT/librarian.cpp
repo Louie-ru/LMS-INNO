@@ -2,6 +2,7 @@
 #include "ui_librarian.h"
 #include <skeleton.cpp>
 #include <QSignalMapper>
+#include <mainwindow.h>
 
 Librarian::Librarian(QWidget *parent) :
     QWidget(parent),
@@ -193,24 +194,8 @@ void Librarian::on_button_show_checked_out_books_clicked(){
         ui->table_checked_out_books->setItem(i, 4, new QTableWidgetItem(QString::number(found[i].second.year)));
         ui->table_checked_out_books->setItem(i, 5, new QTableWidgetItem(QString::number(found[i].second.price)));
         ui->table_checked_out_books->setItem(i, 6, new QTableWidgetItem(QString::number(found[i].second.room)));
-        ui->table_checked_out_books->setItem(i, 7, new QTableWidgetItem(QString::number(found[i].second.level)));
-        ui->table_checked_out_books->insertRow(i);
-        QString date_start = QString::number(found[i].first.day_start)+"."+QString::number(found[i].first.month_start)+"."+QString::number(found[i].first.year_start);
-        QString date_end =ii->table_checked_out_books->insertRow(i);
-        QString date_start = QString::number(found[i].first.day_start)+"."+QString::number(found[i].first.month_start)+"."+QString::number(found[i].first.year_start);
-        QString date_end = QString::number(found[i].first.day_end)+"."+QString::number(found[i].first.month_end)+"."+QString::number(found[i].first.year_end);
-        ui->table_checked_out_books->setItem(i, 0, new QTableWidgetItem(QString::number(found[i].first.user_id)));
-      ->table_checked_out_books->insertRow(i);
-        QStringng date_start = QString::number(found[i].first.day_start)+"."+QString::number(found[i].first.month_start)+"."+QString::number(found[i].first.year_start);
-        QString i->table_checked_out_books->insertRow(i);
-        QString date_start = QString::number(found[i].first.day_start)+"."+QString::number(found[i].first.month_start)+"."+QString::number(found[i].first.year_start);
-        QString date_end = QString::number(found[i].first.day_end)+"."+QString::number(found[i].first.month_end)+"."+QString::number(found[i].first.year_end);
-        ui->table_checked_out_books->setItem(i, 0, new QTableWidgetItem(QString::number(found[i].first.user_id)));
-      date_end = QString::number(found[i].first.day_end)+"."+QString::number(found[i].first.month_end)+"."+QString::number(found[i].first.year_end);
-        ui->table_checked_out_books->setItem(i, 0, new QTableWidgetItem(QString::number(found[i].first.user_id)));
-       QString::number(found[i].first.day_end)+"."+QString::number(found[i].first.month_end)+"."+QString::number(found[i].first.year_end);
-        ui->table_checked_out_books->setItem(i, 0, new QTableWidgetItem(QString::number(found[i].first.user_id)));
-      i->table_checked_out_books->setItem(i, 8, new QTableWidgetItem(found[i].second.bestseller ? "yes" : "no"));
+        ui->table_checked_out_books->setItem(i, 7, new QTableWidgetItem(QString::number(found[i].second.level)));\
+        ui->table_checked_out_books->setItem(i, 8, new QTableWidgetItem(found[i].second.bestseller ? "yes" : "no"));
         ui->table_checked_out_books->setItem(i, 9, new QTableWidgetItem(QString::number(found[i].second.copies)));
         ui->table_checked_out_books->setItem(i, 10, new QTableWidgetItem(date_start));
         ui->table_checked_out_books->setItem(i, 11, new QTableWidgetItem(date_end));
@@ -262,4 +247,11 @@ void Librarian::on_button_show_checked_out_vas_clicked(){
         ui->table_checked_out_vas->setItem(i, 8, new QTableWidgetItem(QString::number(found[i].first.fine)));
     }
     ui->table_checked_out_vas->resizeColumnsToContents();
+}
+
+void Librarian::on_pushButton_clicked()
+{
+    MainWindow *mainwindow = new MainWindow();
+    mainwindow->show();
+    this->close();
 }

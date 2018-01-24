@@ -21,6 +21,7 @@ private slots:
     void show_my_books();
     void show_my_articles();
     void show_my_vas();
+    void on_pushButton_clicked();
 };
 
 #endif // PATRON_H
