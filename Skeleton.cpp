@@ -203,7 +203,7 @@ namespace db {
     LibrarianUser* get_librarian(int id);
     
     // return null if password don't coincides
-    pair<User*,int>* get_user(string login, string password);
+    pair<User*,int>* get_user(string login);
 }
 
 //return 0-error 1-patron 2-librarian
