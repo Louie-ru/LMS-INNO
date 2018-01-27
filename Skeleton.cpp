@@ -1,5 +1,6 @@
 #include <QString>
 #include <QVector>
+#include <time.h>
 
 class Document{
 public:
@@ -8,9 +9,9 @@ public:
 };
 
 //defined type constants
-#define BOOK     1
-#define ARTICLE  2
-#define AV       3
+#define BOOK       1
+#define ARTICLE    2
+#define AV         3
 
 #define PATRON     11
 #define LIBRARIAN  12
@@ -90,13 +91,17 @@ public:
     QString name, address, phone, login, password;
     int id;//id in Patrons/Librarians table
 
-    QVector<Book> search_books(QString *authors, QString *title, QString *keywords, QString *publisher, int *year, bool bestseller, bool available, bool or_and);
-    QVector<Article> search_articles(QString *authors, QString *title, QString *keywords, QString *journal_title, QString *publisher, QString *editors, int *year, int *month, bool available, bool or_and);
-    QVector<VA> search_av(QString *authors, QString *title, QString *keywords, bool available, bool or_and);
+    QVector<Book>* search_books(QString *authors, QString *title, QString *keywords, QString *publisher, int *year, bool bestseller, bool available, bool or_and);
+    QVector<Article>* search_articles(QString *authors, QString *title, QString *keywords, QString *journal_title, QString *publisher, QString *editors, int *year, int *month, bool available, bool or_and);
+    QVector<VA>* search_av(QString *authors, QString *title, QString *keywords, bool available, bool or_and);
 };
 
 //can search/check_out documents, renew/return check_outed documents
 class PatronUser : public User{
+private:
+	tm getDate();
+	void add_weeks(const tm&, int weeks);
+	int calculate_fine(Check_out *ch, int price);
 public:
     bool faculty;//is faculty member
 
@@ -106,9 +111,9 @@ public:
     int check_out_av(int id);
 
     //return QVector of my documents
-    QVector<std::pair<Check_out, Book>> get_checked_out_books();
-    QVector<std::pair<Check_out, Article>> get_checked_out_articles();
-    QVector<std::pair<Check_out, VA>> get_checked_out_avs();
+    QVector<std::pair<Check_out, Book>>* get_checked_out_books();
+    QVector<std::pair<Check_out, Article>>* get_checked_out_articles();
+    QVector<std::pair<Check_out, VA>>* get_checked_out_avs();
 
     //return fine size or 0
     int return_book(int id);
@@ -157,8 +162,8 @@ namespace db {
     // false if there are exist equal document
     bool add_book(Book*);
     bool add_article(Article*);
-    bool add_av(AV*);
-    bool add_checkout(Document*, int type);
+    bool add_av(VA*);
+    bool add_checkout(Document*, int type, tm&begin, tm&end);
     
     // false if there nothing to modify
     bool modify_book(Book*);
@@ -176,12 +181,12 @@ namespace db {
     Article* get_article(int id);
     VA* get_AV(int id);
     
-    //return null if there are no appropriate documents
+    //return empty vector if there are no appropriate documents
     QVector<Book>* search_books(QString *authors, QString *title, QString *keywords, QString *publisher, int *year, bool bestseller, bool available, bool or_and);
     QVector<Article>* search_articles(QString *authors, QString *title, QString *keywords, QString *journal_title, QString *publisher, QString *editors, int *year, int *month, bool available, bool or_and);
     QVector<VA>* search_av(QString *authors, QString *title, QString *keywords, bool available, bool or_and);
     
-    //return null if there are no appropriate documents
+    //return empty vector if there are no appropriate documents
     QVector<pair<Check_out, Book>>* search_books_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, QString *publisher, int *year, bool bestseller, bool or_and);
     QVector<pair<Check_out, Article>>* search_articles_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, QString *journal_title, QString *publisher, QString *editors, int *year, int *month, bool or_and);
     QVector<pair<Check_out, VA>>* search_av_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, bool or_and);
@@ -203,8 +208,8 @@ namespace db {
     LibrarianUser* get_librarian(int id);
     
     // return null if password don't coincides
-    pair<User*,int>* get_user(string login);
+    pair<User,int>* get_user(string login);
 }
 
 //return 0-error 1-patron 2-librarian
-pair<User*,int>* login(QString username, QString password);
+pair<User,int>* login(QString username, QString password);
