@@ -1,5 +1,8 @@
 #include <QString>
 #include <QVector>
+#include <pair>
+#include <time.h>
+using namespace std;
 
 class Document{
 public:
@@ -8,9 +11,12 @@ public:
 };
 
 //defined type constants
-#define BOOK 1
-#define ARTICLE 2
-#define AV 3
+#define BOOK       1
+#define ARTICLE    2
+#define AV         3
+
+#define PATRON     11
+#define LIBRARIAN  12
 
 class Book : public Document{
 public:
@@ -87,30 +93,180 @@ public:
     QString name, address, phone, login, password;
     int id;//id in Patrons/Librarians table
 
-    QVector<Book> search_books(QString authors, QString title, QString keywords, QString publisher, int year, bool bestseller, bool available, bool or_and);
-    QVector<Article> search_articles(QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, bool available, bool or_and);
-    QVector<VA> search_av(QString authors, QString title, QString keywords, bool available, bool or_and);
+	QVector<Book>* search_books(QString *authors, QString *title, QString *keywords, QString *publisher, int *year, bool bestseller, bool available, bool or_and) {
+		return db::search_books(authors, title, keywords, publisher, year, bestseller, available, or_and);
+	}
+	QVector<Article>* search_articles(QString *authors, QString *title, QString *keywords, QString *journal_title, QString *publisher, QString *editors, int *year, int *month, bool available, bool or_and) {
+		return db::search_articles(authors, title, keywords, publisher, year, bestseller, available, or_and);
+	}
+	QVector<VA>* search_av(QString *authors, QString *title, QString *keywords, bool available, bool or_and) {
+		return db::search_av(authors, title, keywords, available, or_and);
+	}
 };
 
 //can search/check_out documents, renew/return check_outed documents
 class PatronUser : public User{
+private:
+	const int sec_in_day = 60 * 60 * 24;
+	const int fine_per_day = 100;
+
+	tm getDate() {
+		time_t t = time(NULL);
+		tm *d = localtime(t);
+		tm r = *d;
+		delete d;
+		return r;
+	}
+	tm add_weeks(const tm& d, int weeks) {
+		d->tm_yday += weeks * 7;
+		time_t t = mktime(&d);
+		tm *d2 = localtime(&t);
+		tm r = *d2;
+		delete d2;
+		return r
+	}
+	int calculate_fine(Check_out *ch, int price) { 
+		time_t t1 = time(NULL);
+		time_t t0;
+		tm *d = localtime(&t0);
+		d->tm_year = ch->year_end - 1900;
+		d->tm_mon = ch->month_end;
+		d->tm_mday = ch->day_end;
+		time_t t2 = mktime(d);
+		delete d;
+		int fine = ((t2 - t1) / sec_in_day) * fine_per_day;
+		if (fine > 0)
+			if (fine > price)
+				return price;
+			else
+				return fine;
+		else
+			return 0;
+	}
+
 public:
     bool faculty;//is faculty member
 
     //return number of weeks for check_out or -1 for error
-    int check_out_book(int id);
-    int check_out_article(int id);
-    int check_out_av(int id);
+	int check_out_book(int id) {
+		Book *book = db::get_book(id);
+		if (book != null) {
+			if (book->copies > 0) {
+				book->copies -= 1;
+				db::modify_book(book);
+				int weeks = 0;
+				if (faculty)
+					weeks = 4;
+				else if (book->bestseller)
+					weeks = 2;
+				else
+					weeks = 3;
+				
+				tm tm1 = getDate();
+				tm tm2 = add_weeks(tm1, weeks);
+				db::add_checkout(book, BOOK, tm1, tm2);
+				delete book;
+				return weeks;
+			}
+			else {
+				return -1
+			}
+		}
+		else {
+			return -1;
+		}
+	}
+
+	int check_out_article(int id) {
+		Article *article = db::get_article(id);
+		if (article != null) {
+			if (article->copies > 0) {
+				book->copies -= 1;
+				db::modify_article(article);
+				int weeks = 2;
+				tm tm1 = getDate();
+				tm tm2 = add_weeks(tm1, weeks);
+				db::add_checkout(article, ARTICLE, tm1, add_weeks();
+				delete article;
+				return weeks;
+			}
+			else {
+				return -1;
+			}
+		}
+		else {
+			return -1;
+		}
+	}
+
+	int check_out_av(int id) {
+		VA *av = db::get_av(id);
+		if (av != null) {
+			if (av->copies > 0) {
+				av->copies -= 1;
+				db::modify_article(av);
+				int weeks = 2;
+				tm tm1 date = getDate();
+				tm tm2 = add_weeks(tm1, weeks);
+				db::add_checkout(av, AV, tm1, tm2);
+				delete av;
+				return weeks;
+			}
+			else {
+				return -1;
+			}
+		}
+		else {
+			return -1;
+		}
+	}
 
     //return QVector of my documents
-    QVector<std::pair<Check_out, Book>> get_checked_out_books();
-    QVector<std::pair<Check_out, Article>> get_checked_out_articles();
-    QVector<std::pair<Check_out, VA>> get_checked_out_avs();
+	QVector<pair<Check_out, Book>>* get_checked_out_books() {
+		return db::search_books_checked_out(&id, nullptr, nullptr, nullptr, nullptr, nullptr, false, false);
+	}
+
+	QVector<pair<Check_out, Article>>* get_checked_out_articles() {
+		return db::search_articles_checked_out(&id, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, false);
+	}
+	QVector<pair<Check_out, VA>> get_checked_out_avs() {
+		return db::search_av_checked_out(&id, nullptr, nullptr, nullptr, false);
+	}
 
     //return fine size or 0
-    int return_book(int id);
-    int return_article(int id);
-    int return_av(int id);
+	int return_book(int check_id) {
+		Check_out *ch = db::get_check_out(check_id);
+		Book *book = db::get_book(ch->document_id);
+		int fine = calculate_fine(ch, book->price);
+		db::delete_checkout(check_id);
+		book->copies += 1;
+		db::modify_book(book);
+		delete ch;
+		delete book;
+		return fine;
+	}
+	int return_article(int check_id) {
+		Check_out *ch = db::get_check_out(check_id);
+		Article *article = db::get_article(ch->document_id);
+		int fine = calculate_fine(ch, article->price);
+		db::delete_checkout(check_id);
+		article->copies += 1;
+		db::modify_article(article);
+		delete ch;
+		delete article;
+		return fine;
+	}
+	int return_av(int check_id) {
+		Check_out *ch = db::get_check_out(check_id);
+		VA *av = db::get_article(ch->document_id);
+		int fine = calculate_fine(ch, av->price);
+		db::delete_checkout(check_id);
+		av->copies += 1;
+		db::modify_av(av);
+		delete ch;
+		delete av;
+		return fine;
+	}
 
     PatronUser(){}
 };
@@ -188,10 +344,13 @@ public:
 namespace db {
     
     // false if there are exist equal document
-    bool add_book(Book*);
+	// TO-DO:
+	// generate unique id for new book
+	// add it to database
+	bool add_book(Book*);
     bool add_article(Article*);
-    bool add_av(AV*);
-    bool add_checkout(Document*, int type);
+    bool add_av(VA*);
+    bool add_checkout(Document*, int type, tm&begin, tm&end);
     
     // false if there nothing to modify
     bool modify_book(Book*);
@@ -208,11 +367,17 @@ namespace db {
     Book* get_book(int id);
     Article* get_article(int id);
     VA* get_AV(int id);
+	Check_out* get_check_out(int id);
     
-    //return null if there are no appropriate documents
-    QVector<Book>* search_books(Book*, bool available, bool or_and);
-    QVector<Article>* search_articles(Article*, bool available, bool or_and);
-    QVector<VA>* search_av(VA*, bool available, bool or_and);
+    //return empty vector if there are no appropriate documents
+    QVector<Book>* search_books(QString *authors, QString *title, QString *keywords, QString *publisher, int *year, bool bestseller, bool available, bool or_and);
+    QVector<Article>* search_articles(QString *authors, QString *title, QString *keywords, QString *journal_title, QString *publisher, QString *editors, int *year, int *month, bool available, bool or_and);
+    QVector<VA>* search_av(QString *authors, QString *title, QString *keywords, bool available, bool or_and);
+
+	//return empty vector if there are no appropriate documents
+	QVector<pair<Check_out, Book>>* search_books_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, QString *publisher, int *year, bool bestseller, bool or_and);
+	QVector<pair<Check_out, Article>>* search_articles_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, QString *journal_title, QString *publisher, QString *editors, int *year, int *month, bool or_and);
+	QVector<pair<Check_out, VA>>* search_av_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, bool or_and);
     
     // false if there are exist user with such id
     bool add_patron(PatronUser*);
@@ -229,7 +394,10 @@ namespace db {
     // return null if there are no user with such id or types is not concides
     PatronUser* get_patron(int id);
     LibrarianUser* get_librarian(int id);
+
+	// return null if password don't coincides
+	pair<User, int>* get_user(string login);
 }
 
-//return 0-error 1-patron 2-librarian
-pair<User,int> login(QString username, QString password);
+// return null in case of error
+pair<User,int>* login(QString username, QString password);
