@@ -1,6 +1,9 @@
 #include <QString>
 #include <QVector>
 #include <time.h>
+#include <pair>
+#include <string>
+
 
 class Document{
 public:
@@ -88,12 +91,15 @@ public:
 
 class User{
 public:
-    QString name, address, phone, login, password;
+    QString name, address, phone, login;
+	string password;
     int id;//id in Patrons/Librarians table
 
     QVector<Book>* search_books(QString *authors, QString *title, QString *keywords, QString *publisher, int *year, bool bestseller, bool available, bool or_and);
     QVector<Article>* search_articles(QString *authors, QString *title, QString *keywords, QString *journal_title, QString *publisher, QString *editors, int *year, int *month, bool available, bool or_and);
     QVector<VA>* search_av(QString *authors, QString *title, QString *keywords, bool available, bool or_and);
+
+	User(QString &name, QString &address, QString &phone, QString &login, string &password, int id);
 };
 
 //can search/check_out documents, renew/return check_outed documents
@@ -121,21 +127,24 @@ public:
     int return_av(int id);
 
     PatronUser(){}
+	PatronUser(QString name, QString address, QString phone, int id, bool faculty, QString login, string password);
 };
 
 //can search/add/delete/modify users, search/add/delete/modify documents, search overdue documents
 class LibrarianUser : public User{
+private:
+	string hashPassword(const string &password, int id);
 public:
     //search in Check_outs table
-    QVector<pair<Check_out, Book>> search_books_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, QString *publisher, int *year, bool bestseller, bool or_and);
-    QVector<pair<Check_out, Article>> search_articles_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, QString *journal_title, QString *publisher, QString *editors, int *year, int *month, bool or_and);
-    QVector<pair<Check_out, VA>> search_av_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, bool or_and);
+    QVector<pair<Check_out, Book>>* search_books_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, QString *publisher, int *year, bool bestseller, bool or_and);
+    QVector<pair<Check_out, Article>>* search_articles_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, QString *journal_title, QString *publisher, QString *editors, int *year, int *month, bool or_and);
+    QVector<pair<Check_out, VA>>* search_av_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, bool or_and);
 
     //return TRUE if success, FALSE if error
-    QVector<PatronUser> search_patrons(QString name, QString address, QString phone, bool faculty, bool has_overdues, bool or_and);
-    bool add_patron(QString name, QString address, QString phone, bool faculty);
+    QVector<PatronUser>* search_patrons(QString *name, QString *address, QString *phone, bool *faculty, bool has_overdues, bool or_and);
+    bool add_patron(QString name, QString address, QString phone, int id, bool faculty, QString login, string password);
     bool delete_patron(int user_id);
-    bool modify_patron(int user_id, QString name, QString address, QString phone, bool faculty);
+    bool modify_patron(int user_id, QString name, QString address, QString phone, bool faculty, QString login, string password);
 
     QVector<LibrarianUser> search_librarians(QString name, QString address, QString phone, bool or_and);
     bool add_librarian(QString name, QString address, QString phone);
@@ -206,10 +215,12 @@ namespace db {
     // return null if there are no user with such id or types is not concides
     PatronUser* get_patron(int id);
     LibrarianUser* get_librarian(int id);
+
+	QVector<PatronUser>* search_patrons(QString *name, QString *address, QString *phone, bool *faculty, bool has_overdues, bool or_and);
     
     // return null if password don't coincides
     pair<User,int>* get_user(string login);
 }
 
 //return 0-error 1-patron 2-librarian
-pair<User,int>* login(QString username, QString password);
+pair<User,int>* login(QString login, QString password);
