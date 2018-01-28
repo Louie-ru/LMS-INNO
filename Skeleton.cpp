@@ -169,6 +169,9 @@ public:
 namespace db {
     
     // false if there are exist equal document
+    // TO-DO:
+	// generate unique id for new book
+	// add it to database
     bool add_book(Book*);
     bool add_article(Article*);
     bool add_av(VA*);
@@ -189,6 +192,7 @@ namespace db {
     Book* get_book(int id);
     Article* get_article(int id);
     VA* get_AV(int id);
+	Check_out* get_check_out(int id);
     
     //return empty vector if there are no appropriate documents
     QVector<Book>* search_books(QString *authors, QString *title, QString *keywords, QString *publisher, int *year, bool bestseller, bool available, bool or_and);
