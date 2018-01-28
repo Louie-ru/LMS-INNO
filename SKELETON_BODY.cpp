@@ -1,7 +1,8 @@
 #include <QString>
 #include <QVector>
-#include <pair>
 #include <time.h>
+#include <pair>
+#include <string>
 using namespace std;
 
 class Document{
@@ -17,6 +18,12 @@ public:
 
 #define PATRON     11
 #define LIBRARIAN  12
+
+#define localsolt "rnksrlhwdrrohbdr"
+
+string hashPassword(const string &password, int id) {
+	return sha512(password + localsolt + to_string(id));
+}
 
 class Book : public Document{
 public:
@@ -90,7 +97,8 @@ public:
 
 class User{
 public:
-    QString name, address, phone, login, password;
+    QString name, address, phone, login;
+	string password;
     int id;//id in Patrons/Librarians table
 
 	QVector<Book>* search_books(QString *authors, QString *title, QString *keywords, QString *publisher, int *year, bool bestseller, bool available, bool or_and) {
@@ -101,6 +109,15 @@ public:
 	}
 	QVector<VA>* search_av(QString *authors, QString *title, QString *keywords, bool available, bool or_and) {
 		return db::search_av(authors, title, keywords, available, or_and);
+	}
+
+	User(QString &name, QString &address, QString &phone, int id, QString &login, string &password) {
+		this.name = name;
+		this.address = address;
+		this.phone = phone;
+		this.login = login;
+		this.password = password;
+		this.id = id;
 	}
 };
 
@@ -269,24 +286,45 @@ public:
 	}
 
     PatronUser(){}
+	PatronUser(QString &name, QString &address, QString &phone, int id, bool faculty, QString &login, string &password) : User(name, address, phone, id, login, password) {
+		this.faculty = faculty;
+	}
 };
 
 //can search/add/delete/modify users, search/add/delete/modify documents, search overdue documents
 class LibrarianUser : public User{
 public:
     //search in Check_outs table
-    QVector<std::pair<Check_out, Book>> search_books_checked_out(int user_id, QString authors, QString title, QString keywords, QString publisher, int year, bool bestseller, bool available, bool or_and);
-    QVector<std::pair<Check_out, Article>> search_articles_checked_out(int user_id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, bool available, bool or_and);
-    QVector<std::pair<Check_out, VA>> search_av_checked_out(int user_id, QString authors, QString title, QString keywords, bool available, bool or_and);
+    QVector<std::pair<Check_out, Book>>* search_books_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, QString *publisher, int *year, bool bestseller, bool or_and);
+    QVector<std::pair<Check_out, Article>>* search_articles_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, QString *journal_title, QString *publisher, QString *editors, int *year, int *month, bool or_and);
+    QVector<std::pair<Check_out, VA>>* search_av_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, bool or_and);
 
-    //return TRUE if success, FALSE if error
-    QVector<PatronUser> search_patrons(QString name, QString address, QString phone, bool faculty, bool has_overdues, bool or_and);
-    bool add_patron(QString name, QString address, QString phone, bool faculty);
-    bool delete_patron(int user_id);
+    //return empty vector if there are no such users
+	QVector<PatronUser>* search_patrons(QString *name, QString *address, QString *phone, bool *faculty, bool has_overdues, bool or_and) {
+		return db::search_patrons(name, address, phone, faculty, has_overdues, or_and);
+	}
+	//return TRUE if success, FALSE if error
+	bool add_patron(QString name, QString address, QString phone, int id, bool faculty, QString login, string password) {
+		password = hashPassword(password, id);
+		PatronUser *user = new PatronUser(name, address, phone, id, faculty, login, password);
+		bool r = db::add_patron(user);
+		delete user;
+		return r;
+	}
+	bool delete_patron(int user_id) {
+	}
     bool modify_patron(int user_id, QString name, QString address, QString phone, bool faculty);
 
+	//return empty vector if there are no such librarians
     QVector<LibrarianUser> search_librarians(QString name, QString address, QString phone, bool or_and);
-    bool add_librarian(QString name, QString address, QString phone);
+	//return TRUE if success, FALSE if error
+	bool add_librarian(QString name, QString address, QString phone, int id, QString login, string password) {
+		password = hashPassword(password, id);
+		LibrarianUser *user = new LibrarianUser(name, address, phone, id, login, password);
+		bool r = db::add_librarian(user);
+		delete user;
+		return r;
+	}
     bool delete_librarian(int user_id);
     bool modify_librarian(int user_id, QString name, QString address, QString phone);
 
@@ -339,65 +377,75 @@ public:
     bool modify_av(int id, QString authors, QString title, QString keywords, bool available, int copies);
 
     LibrarianUser(){}
+	LibrarianUser(QString &name, QString &address, QString &phone, int id, QString &login, string &password) : User(name, address, phone, id, login, password) {}
 };
 
 namespace db {
-    
-    // false if there are exist equal document
+
+	// false if there are exist equal document
 	// TO-DO:
 	// generate unique id for new book
 	// add it to database
 	bool add_book(Book*);
-    bool add_article(Article*);
-    bool add_av(VA*);
-    bool add_checkout(Document*, int type, tm&begin, tm&end);
-    
-    // false if there nothing to modify
-    bool modify_book(Book*);
-    bool modify_article(Article*);
-    bool modify_av(VA*);
-    
-    // false if there nothing to delete
-    bool delete_book(int id);
-    bool delete_article(int id);
-    bool delete_av(int id);
-    bool delete_checkout(int id);
-    
-    // return null if there are no appropriate document
-    Book* get_book(int id);
-    Article* get_article(int id);
-    VA* get_AV(int id);
+	bool add_article(Article*);
+	bool add_av(VA*);
+	bool add_checkout(Document*, int type, tm&begin, tm&end);
+
+	// false if there nothing to modify
+	bool modify_book(Book*);
+	bool modify_article(Article*);
+	bool modify_av(VA*);
+
+	// false if there nothing to delete
+	bool delete_book(int id);
+	bool delete_article(int id);
+	bool delete_av(int id);
+	bool delete_checkout(int id);
+
+	// return null if there are no appropriate document
+	Book* get_book(int id);
+	Article* get_article(int id);
+	VA* get_AV(int id);
 	Check_out* get_check_out(int id);
-    
-    //return empty vector if there are no appropriate documents
-    QVector<Book>* search_books(QString *authors, QString *title, QString *keywords, QString *publisher, int *year, bool bestseller, bool available, bool or_and);
-    QVector<Article>* search_articles(QString *authors, QString *title, QString *keywords, QString *journal_title, QString *publisher, QString *editors, int *year, int *month, bool available, bool or_and);
-    QVector<VA>* search_av(QString *authors, QString *title, QString *keywords, bool available, bool or_and);
+
+	//return empty vector if there are no appropriate documents
+	QVector<Book>* search_books(QString *authors, QString *title, QString *keywords, QString *publisher, int *year, bool bestseller, bool available, bool or_and);
+	QVector<Article>* search_articles(QString *authors, QString *title, QString *keywords, QString *journal_title, QString *publisher, QString *editors, int *year, int *month, bool available, bool or_and);
+	QVector<VA>* search_av(QString *authors, QString *title, QString *keywords, bool available, bool or_and);
 
 	//return empty vector if there are no appropriate documents
 	QVector<pair<Check_out, Book>>* search_books_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, QString *publisher, int *year, bool bestseller, bool or_and);
 	QVector<pair<Check_out, Article>>* search_articles_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, QString *journal_title, QString *publisher, QString *editors, int *year, int *month, bool or_and);
 	QVector<pair<Check_out, VA>>* search_av_checked_out(int *user_id, QString *authors, QString *title, QString *keywords, bool or_and);
-    
-    // false if there are exist user with such id
-    bool add_patron(PatronUser*);
-    bool add_librarian(LibrarianUser*);
-    
-    // false if there are no user with such id or types is not coincides
-    bool modify_patron(PatronUser*);
-    bool modify_librarian(LibrarianUser*);
-    
-    // false if there are no user with such id or types is not coincides
-    bool delete_patron(int id);
-    bool delete_librarian(int id);
-    
-    // return null if there are no user with such id or types is not concides
-    PatronUser* get_patron(int id);
-    LibrarianUser* get_librarian(int id);
+
+	// false if there are exist user with such id or login
+	bool add_patron(PatronUser*);
+	bool add_librarian(LibrarianUser*);
+
+	// false if there are no user with such id or types is not coincides
+	bool modify_patron(PatronUser*);
+	bool modify_librarian(LibrarianUser*);
+
+	// false if there are no user with such id or types is not coincides
+	bool delete_patron(int id);
+	bool delete_librarian(int id);
+
+	// return null if there are no user with such id or types is not concides
+	PatronUser* get_patron(int id);
+	LibrarianUser* get_librarian(int id);
+
+	QVector<PatronUser>* search_patrons(QString *name, QString *address, QString *phone, bool *faculty, bool has_overdues, bool or_and);
 
 	// return null if password don't coincides
-	pair<User, int>* get_user(string login);
+	pair<User, int>* get_user(QString login);
 }
 
 // return null in case of error
-pair<User,int>* login(QString username, QString password);
+pair<User, int>* login(QString login, string password) {
+	pair<User, int>* user = db::get_user(login);
+	password = hashPassword(password, user->first.id);
+	if (user->first.password == password)
+		return pair;
+	else
+		return null;
+}
