@@ -368,13 +368,62 @@ public:
         return false;
     }
 
-    bool delete_book(int id, int copies);
-    bool delete_article(int id, int copies);
-    bool delete_av(int id, int copies);
+    bool delete_book(int id, int copies){
+        if (copies == 0){
+            db::delete_book(id);
+            return true;
+        }
+        Book* book = db::get_book(id);
+        modify_book(book->id,book->authors,book->title,book->keywords,book->publisher,book->year,book->bestseller,copies);
+        return true;
+    }
+    bool delete_article(int id, int copies){
+        if(copies == 0){
+            db::delete_article(id);
+            return true;
+        }
+        Article* article = db::get_article(id);
+        modify_article(article->id,article->authors,article->title,article->keywords,article->journal_title,article->publisher,article->editors,article->year,article->month,copies);
+        return true;
+    }
+    bool delete_av(int id, int copies){
+        if(copies == 0){
+            db::delete_av(id);
+            return true;
+        }
+        VA* av = db::get_av(id);
+        modify_av(av->id,av->authors,av->title,av->keywords,true,copies);
+        return true;
+    }
 
-    bool modify_book(int id, QString authors, QString title, QString keywords, QString publisher, int year, bool bestseller, int copies);
-    bool modify_article(int id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int copies);
-    bool modify_av(int id, QString authors, QString title, QString keywords, bool available, int copies);
+    bool modify_book(int id, QString authors, QString title, QString keywords, QString publisher, int year, bool bestseller, int copies){
+        db::get_book(id)->authors = authors;
+        db::get_book(id)->title = title;
+        db::get_book(id)->keywords = keywords;
+        db::get_book(id)->publisher = publisher;
+        db::get_book(id)->year = year;
+        db::get_book(id)->bestseller = bestseller;
+        db::get_book(id)->copies = copies;
+        
+    }
+    bool modify_article(int id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int copies){
+        db::get_article(id)->authors = authors;
+        db::get_article(id)->title = title;
+        db::get_article(id)->keywords = keywords;
+        db::get_article(id)->journal_title = journal_title;
+        db::get_article(id)->publisher = publisher;
+        db::get_article(id)->editors = editors;
+        db::get_article(id)->year = year;
+        db::get_article(id)->month = month;
+        db::get_article(id)->copies = copies;
+    }
+    bool modify_av(int id, QString authors, QString title, QString keywords, bool available, int copies){
+        db::get_av(id)->authors = authors;
+        db::get_av(id)->title = title;
+        db::get_av(id)->keywords = keywords;
+        db::get_av(id)->available = available;
+        db::get_av(id)->copies = copies;
+    }
 
     LibrarianUser(){}
 	LibrarianUser(QString &name, QString &address, QString &phone, int id, QString &login, string &password) : User(name, address, phone, id, login, password) {}
