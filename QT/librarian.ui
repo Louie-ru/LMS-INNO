@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>865</width>
-    <height>604</height>
+    <width>1004</width>
+    <height>478</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1260,15 +1260,15 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="page">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>825</width>
-            <height>396</height>
+            <width>964</width>
+            <height>270</height>
            </rect>
           </property>
           <attribute name="label">
@@ -1497,7 +1497,7 @@
                   </spacer>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="button_search_books_checked">
+                  <widget class="QPushButton" name="button_show_checked_out_books">
                    <property name="text">
                     <string>show</string>
                    </property>
@@ -1604,8 +1604,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>944</width>
-            <height>354</height>
+            <width>950</width>
+            <height>272</height>
            </rect>
           </property>
           <attribute name="label">
@@ -2017,8 +2017,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>685</width>
-            <height>344</height>
+            <width>964</width>
+            <height>270</height>
            </rect>
           </property>
           <attribute name="label">

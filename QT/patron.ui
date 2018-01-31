@@ -845,6 +845,9 @@
        </item>
        <item>
         <widget class="QTableWidget" name="table_search_va">
+         <attribute name="horizontalHeaderDefaultSectionSize">
+          <number>65</number>
+         </attribute>
          <column>
           <property name="text">
            <string>title</string>
@@ -905,7 +908,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>88</width>
+            <width>98</width>
             <height>88</height>
            </rect>
           </property>
@@ -1100,7 +1103,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>88</width>
+            <width>98</width>
             <height>88</height>
            </rect>
           </property>

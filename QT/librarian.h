@@ -20,10 +20,42 @@ private slots:
     void on_button_show_checked_out_books_clicked();
     void on_button_show_checked_out_articles_clicked();
     void on_button_show_checked_out_vas_clicked();
+    void on_button_new_patron_clicked();
+    void on_button_new_librarian_clicked();
+    void on_button_new_book_clicked();
+    void on_button_new_article_clicked();
+    void on_button_new_va_clicked();
     void on_pushButton_clicked();
+
+    void on_modify_patron_clicked(int id);
+    void on_modify_librarian_clicked(int id);
+    void on_modify_book_clicked(int id);
+    void on_modify_article_clicked(int id);
+    void on_modify_va_clicked(int id);
+
+    void on_delete_patron_clicked(int id);
+    void on_delete_librarian_clicked(int id);
+    void on_delete_book_clicked(int id);
+    void on_delete_article_clicked(int id);
+    void on_delete_va_clicked(int id);
+
+    void modifyBook();
+    void modifyArticle();
+    void modifyVA();
+    void modifyPatron();
+    void modifyLibrarian();
+
+    void createBook();
+    void createArticle();
+    void createVA();
+    void createPatron();
+    void createLibrarian();
+
+    void closeWidget();
 
 private:
     Ui::Librarian *ui;
+    void clearObjects();
 };
 
 #endif // LIBRARIAN_H
