@@ -329,10 +329,6 @@ public:
     bool modify_librarian(int user_id, QString name, QString address, QString phone);
 
     bool add_book_new(QString authors, QString title, QString keywords, QString publisher, QString editors, int year, bool bestseller, int copies, int price){
-        if(db::search_books(authors, title, publisher, editors, year).size != 0){
-            db::search_books(authors, title, publisher, editors, year)[0].copies += copies;
-            return true;
-        }
         if(db::search_books(authors, title, publisher, editors, year).size == 0){
             Book* book = new Book(authors, title, keywords, publisher, 0, year, copies, price, bestseller)
             db::add_book(book);
@@ -344,10 +340,6 @@ public:
     }
 
     bool add_article_new(QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int copies, int price){
-        if(db::search_articles(authors, title, publisher, editors, year, month).size != 0){
-            db::search_articles(authors, title, publisher, editors, year, month)[0].copies += copies;
-            return true;
-        }
         if(db::search_articles(authors, title, publisher, editors, year, month).size == 0){
             Article* article = new Article(authors, title, journal_title, keywords, publisher, editors, 0, year, month, copies, price)
             db::add_article(article);
@@ -358,11 +350,7 @@ public:
     }
 
     bool add_av_new(QString authors, QString title, QString keywords, int copies, int price){
-        if(db::search_av(authors,title,keywords).size != 0){
-            db::search_av(authors,title,keywords)[0].copies += copies;
-            return true;
-        }
-        if(db::search_av(authors,title,keywords).size == 0){
+	if(db::search_av(authors,title,keywords).size == 0){
             VA* av = new VA(authors, title, keywords, 0, copies, price);
             db::add_av(av);
             delete av;
