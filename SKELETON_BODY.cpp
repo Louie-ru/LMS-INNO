@@ -328,9 +328,9 @@ public:
     bool delete_librarian(int user_id);
     bool modify_librarian(int user_id, QString name, QString address, QString phone);
 
-    bool add_book_new(QString authors, QString title, QString keywords, QString publisher, QString editors, int year, bool bestseller, int copies, int price){
-        if(db::search_books(authors, title, publisher, editors, year).size == 0){
-            Book* book = new Book(authors, title, keywords, publisher, 0, year, copies, price, bestseller)
+    bool add_book_new(QString authors, QString title, QString keywords, QString publisher, QString editors, int year, bool bestseller, int copies, int price, int room, int level){
+       if(db::search_books(authors, title, publisher, editors, year).size == 0){
+            Book* book = new Book(authors,title,keywords,publisher,0,year,copies,price,room,level,bestseller);
             db::add_book(book);
             delete book;
             return true;
@@ -339,9 +339,9 @@ public:
 
     }
 
-    bool add_article_new(QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int copies, int price){
+    bool add_article_new(QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int copies, int price, int room, int level){
         if(db::search_articles(authors, title, publisher, editors, year, month).size == 0){
-            Article* article = new Article(authors, title, journal_title, keywords, publisher, editors, 0, year, month, copies, price)
+            Article* article = new Article(authors,title,journal_title,keywords,publisher,editors,0,year,month,copies,price,room,level);
             db::add_article(article);
             delete article;
             return true;
@@ -349,9 +349,9 @@ public:
         return false;
     }
 
-    bool add_av_new(QString authors, QString title, QString keywords, int copies, int price){
-	if(db::search_av(authors,title,keywords).size == 0){
-            VA* av = new VA(authors, title, keywords, 0, copies, price);
+    bool add_av_new(QString authors, QString title, QString keywords, int copies, int price, int room, inr level){
+        if(db::search_av(authors,title,keywords).size == 0){
+            VA* av = new VA(authors,title,keywords,0,copies,price,room,level);
             db::add_av(av);
             delete av;
             return true;
