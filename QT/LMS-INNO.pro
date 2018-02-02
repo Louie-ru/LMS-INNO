@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -28,12 +29,14 @@ SOURCES += \
         mainwindow.cpp \
     patron.cpp \
     librarian.cpp \
-    skeleton.cpp
+    skeleton.cpp \
+    SHA512.cpp
 
 HEADERS += \
         mainwindow.h \
     patron.h \
-    librarian.h
+    librarian.h \
+    SHA512.h
 
 FORMS += \
         mainwindow.ui \

@@ -667,8 +667,7 @@ void Librarian::on_button_new_va_clicked(){
     widget->show();
 }
 
-void Librarian::on_pushButton_clicked()
-{
+void Librarian::on_pushButton_clicked(){
     MainWindow *mainwindow = new MainWindow();
     mainwindow->show();
     this->close();
