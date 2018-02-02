@@ -1,0 +1,1 @@
+add documents(copies) can also be used to remove some of them

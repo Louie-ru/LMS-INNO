@@ -1,0 +1,12 @@
+INSERT INTO `journal_article` SET `title` = "Random",
+`authors` = "Dijkstra",
+`publisher` = 'New Publisher',
+`editor` = 'Floyd',
+journal = 'NY Times',
+keywords = 'new book',
+price = 1450,
+`month` = 'june',
+`year` = 2014,
+copies = 1,
+room = 5,
+`level` = 6 
