@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_books">
       <attribute name="title">
@@ -901,15 +901,15 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>0</number>
          </property>
          <widget class="QWidget" name="page_books">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>98</width>
-            <height>88</height>
+            <width>775</width>
+            <height>304</height>
            </rect>
           </property>
           <attribute name="label">
@@ -1011,8 +1011,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>777</width>
-            <height>270</height>
+            <width>89</width>
+            <height>89</height>
            </rect>
           </property>
           <attribute name="label">
@@ -1103,8 +1103,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>98</width>
-            <height>88</height>
+            <width>89</width>
+            <height>89</height>
            </rect>
           </property>
           <attribute name="label">
@@ -1174,7 +1174,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="status">
        <property name="text">
         <string>Logged in as patron: Ilnur Novarlić Romanovich</string>
        </property>
@@ -1194,7 +1194,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QPushButton" name="pushButton">
+      <widget class="QPushButton" name="button_logout">
        <property name="text">
         <string>Logout</string>
        </property>

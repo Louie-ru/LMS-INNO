@@ -1,6 +1,5 @@
 #include "librarian.h"
 #include "ui_librarian.h"
-#include <skeleton.cpp>
 #include <QSignalMapper>
 #include <mainwindow.h>
 #include <QWidget>
@@ -17,6 +16,7 @@ Librarian::~Librarian(){
     delete ui;
 }
 
+//those are widgets for data input(new/modify documents and users)
 QWidget *widget;
 QLineEdit *line1;
 QLineEdit *line2;
@@ -35,6 +35,7 @@ QPushButton *cancel;
 QFormLayout *w_layout;
 int global_id;
 
+//make new input fields
 void Librarian::clearObjects(){
     line1 = new QLineEdit();
     line2 = new QLineEdit();
@@ -217,7 +218,7 @@ void Librarian::on_button_search_vas_clicked(){
 }
 
 void Librarian::on_modify_patron_clicked(int user_id){
-    if (widget != nullptr && !widget->isHidden()) return;
+    if (widget != NULL && !widget->isHidden()) return;
     global_id = user_id;
     widget = new QWidget();
     QLabel *id = new QLabel("card id:");
@@ -237,7 +238,7 @@ void Librarian::on_modify_patron_clicked(int user_id){
     widget->show();
 }
 void Librarian::on_modify_librarian_clicked(int user_id){
-    if (widget != nullptr && !widget->isHidden()) return;
+    if (widget != NULL && !widget->isHidden()) return;
     global_id = user_id;
     widget = new QWidget();
     QLabel *id = new QLabel("card id:");
@@ -255,7 +256,7 @@ void Librarian::on_modify_librarian_clicked(int user_id){
     widget->show();
 }
 void Librarian::on_modify_book_clicked(int id){
-    if (widget != nullptr && !widget->isHidden()) return;
+    if (widget != NULL && !widget->isHidden()) return;
     widget = new QWidget();
     QLabel *title = new QLabel("title:");
     QLabel *authors = new QLabel("authors:");
@@ -283,7 +284,7 @@ void Librarian::on_modify_book_clicked(int id){
     widget->show();
 }
 void Librarian::on_modify_article_clicked(int id){
-    if (widget != nullptr && !widget->isHidden()) return;
+    if (widget != NULL && !widget->isHidden()) return;
     widget = new QWidget();
     QLabel *title = new QLabel("title:");
     QLabel *authors = new QLabel("authors:");
@@ -326,7 +327,7 @@ void Librarian::on_modify_article_clicked(int id){
     widget->show();
 }
 void Librarian::on_modify_va_clicked(int id){
-    if (widget != nullptr && !widget->isHidden()) return;
+    if (widget != NULL && !widget->isHidden()) return;
     widget = new QWidget();
     QLabel *title = new QLabel("title:");
     QLabel *authors = new QLabel("authors:");
@@ -370,7 +371,7 @@ void Librarian::on_delete_va_clicked(int id){
 
 void Librarian::on_button_show_checked_out_books_clicked(){
     ui->table_checked_out_books->setRowCount(0);
-    QVector<std::pair<Check_out, Book>> found;// = librarian.get_checked_out_books();//CHANGE LATER
+    QVector<std::pair<Check_out, Book> > found;// = librarian.get_checked_out_books();//CHANGE LATER
     for (int i = 0; i < found.size(); i++){
         ui->table_checked_out_books->insertRow(i);
         QString date_start = QString::number(found[i].first.day_start)+"."+QString::number(found[i].first.month_start)+"."+QString::number(found[i].first.year_start);
@@ -393,7 +394,7 @@ void Librarian::on_button_show_checked_out_books_clicked(){
 }
 void Librarian::on_button_show_checked_out_articles_clicked(){
     ui->table_checked_out_articles->setRowCount(0);
-    QVector<std::pair<Check_out, Article>> found;// = librarian.get_checked_out_articles();//CHANGE LATER
+    QVector<std::pair<Check_out, Article> > found;// = librarian.get_checked_out_articles();//CHANGE LATER
     for (int i = 0; i < found.size(); i++){
         QString date_start = QString::number(found[i].first.day_start)+"."+QString::number(found[i].first.month_start)+"."+QString::number(found[i].first.year_start);
         QString date_end = QString::number(found[i].first.day_end)+"."+QString::number(found[i].first.month_end)+"."+QString::number(found[i].first.year_end);
@@ -417,7 +418,7 @@ void Librarian::on_button_show_checked_out_articles_clicked(){
 }
 void Librarian::on_button_show_checked_out_vas_clicked(){
     ui->table_checked_out_vas->setRowCount(0);
-    QVector<std::pair<Check_out, VA>> found;// = librarian.get_checked_out_vas();//CHANGE LATER
+    QVector<std::pair<Check_out, VA> > found;// = librarian.get_checked_out_vas();//CHANGE LATER
     for (int i = 0; i < found.size(); i++){
         QString date_start = QString::number(found[i].first.day_start)+"."+QString::number(found[i].first.month_start)+"."+QString::number(found[i].first.year_start);
         QString date_end = QString::number(found[i].first.day_end)+"."+QString::number(found[i].first.month_end)+"."+QString::number(found[i].first.year_end);
@@ -539,7 +540,7 @@ void Librarian::createVA(){
 }
 
 void Librarian::on_button_new_patron_clicked(){
-    if (widget != nullptr && !widget->isHidden()) return;
+    if (widget != NULL && !widget->isHidden()) return;
     widget = new QWidget();
     QLabel *id = new QLabel("card id:");
     QLabel *name = new QLabel("name:");
@@ -558,7 +559,7 @@ void Librarian::on_button_new_patron_clicked(){
     widget->show();
 }
 void Librarian::on_button_new_librarian_clicked(){
-    if (widget != nullptr && !widget->isHidden()) return;
+    if (widget != NULL && !widget->isHidden()) return;
     widget = new QWidget();
     QLabel *id = new QLabel("card id:");
     QLabel *name = new QLabel("name:");
@@ -575,7 +576,7 @@ void Librarian::on_button_new_librarian_clicked(){
     widget->show();
 }
 void Librarian::on_button_new_book_clicked(){
-    if (widget != nullptr && !widget->isHidden()) return;
+    if (widget != NULL && !widget->isHidden()) return;
     widget = new QWidget();
     QLabel *title = new QLabel("title:");
     QLabel *authors = new QLabel("authors:");
@@ -603,7 +604,7 @@ void Librarian::on_button_new_book_clicked(){
     widget->show();
 }
 void Librarian::on_button_new_article_clicked(){
-    if (widget != nullptr && !widget->isHidden()) return;
+    if (widget != NULL && !widget->isHidden()) return;
     widget = new QWidget();
     QLabel *title = new QLabel("title:");
     QLabel *authors = new QLabel("authors:");
@@ -646,7 +647,7 @@ void Librarian::on_button_new_article_clicked(){
     widget->show();
 }
 void Librarian::on_button_new_va_clicked(){
-    if (widget != nullptr && !widget->isHidden()) return;
+    if (widget != NULL && !widget->isHidden()) return;
     widget = new QWidget();
     QLabel *title = new QLabel("title:");
     QLabel *authors = new QLabel("authors:");
@@ -667,7 +668,7 @@ void Librarian::on_button_new_va_clicked(){
     widget->show();
 }
 
-void Librarian::on_pushButton_clicked(){
+void Librarian::on_button_logout_clicked(){
     MainWindow *mainwindow = new MainWindow();
     mainwindow->show();
     this->close();

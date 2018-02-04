@@ -41,7 +41,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="resource.qrc">:/Изображения/library.png</pixmap>
+         <pixmap>:/Изображения/library.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -102,14 +102,26 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit">
+          <widget class="QLineEdit" name="line_login">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="toolTip">
             <string>login</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="lineEdit_2">
+          <widget class="QLineEdit" name="line_password">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="toolTip">
             <string>password</string>
            </property>
@@ -121,33 +133,29 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
-            <widget class="QPushButton" name="pushButton">
-             <property name="text">
-              <string>patron</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
+            <widget class="QPushButton" name="button_login">
+             <property name="maximumSize">
               <size>
-               <width>40</width>
-               <height>20</height>
+               <width>80</width>
+               <height>16777215</height>
               </size>
              </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_2">
              <property name="text">
-              <string>librarian</string>
+              <string>login</string>
              </property>
             </widget>
            </item>
           </layout>
+         </item>
+         <item>
+          <widget class="QLabel" name="status">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -171,8 +179,6 @@
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="resource.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

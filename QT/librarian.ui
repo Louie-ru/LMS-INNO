@@ -1267,8 +1267,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>964</width>
-            <height>270</height>
+            <width>629</width>
+            <height>208</height>
            </rect>
           </property>
           <attribute name="label">
@@ -1604,8 +1604,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>950</width>
-            <height>272</height>
+            <width>962</width>
+            <height>304</height>
            </rect>
           </property>
           <attribute name="label">
@@ -2017,8 +2017,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>964</width>
-            <height>270</height>
+            <width>442</width>
+            <height>206</height>
            </rect>
           </property>
           <attribute name="label">
@@ -2259,7 +2259,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="status">
        <property name="text">
         <string>Logged in as librarian: Stanley Kubrick</string>
        </property>

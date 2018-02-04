@@ -1,6 +1,8 @@
 #ifndef LIBRARIAN_H
 #define LIBRARIAN_H
 #include <QWidget>
+#include "skeleton.cpp"
+#include <librarian.h>
 
 namespace Ui {
 class Librarian;
@@ -8,9 +10,11 @@ class Librarian;
 class Librarian : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit Librarian(QWidget *parent = 0);
     ~Librarian();
+    LibrarianUser me;
 private slots:
     void on_button_search_patrons_clicked();
     void on_button_search_librarians_clicked();
@@ -25,7 +29,7 @@ private slots:
     void on_button_new_book_clicked();
     void on_button_new_article_clicked();
     void on_button_new_va_clicked();
-    void on_pushButton_clicked();
+    void on_button_logout_clicked();
 
     void on_modify_patron_clicked(int id);
     void on_modify_librarian_clicked(int id);
