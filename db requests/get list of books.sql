@@ -1,4 +1,0 @@
-SELECT 
-  title 
-FROM
-  `book` 
