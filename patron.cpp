@@ -10,6 +10,9 @@
 
 Patron::Patron(QWidget *parent) : QWidget(parent), ui(new Ui::Patron){
     ui->setupUi(this);
+    ui->line_year_books->setValidator(new QIntValidator(0, 2100, this));
+    ui->line_year_articles->setValidator(new QIntValidator(0, 2100, this));
+    ui->status->setText("Logged in as " + (me.faculty ? "faculty " : "") + "patron: " + me.name);
 }
 Patron::~Patron(){
     delete ui;
@@ -41,12 +44,6 @@ void Patron::on_button_search_books_clicked(){
     QVector<Book> found = me.search_books(authors, title, keywords, publisher, year, bestseller, available, or_and);
     for (int i = 0; i < found.size(); i++){
         ui->table_search_books->insertRow(i);
-        QPushButton *btn = new QPushButton(this);
-        btn->setText("check out");
-        QSignalMapper *sm = new QSignalMapper(this);
-        connect(sm, SIGNAL(mapped(int)), this, SLOT(check_out_book(int)));
-        connect(btn, SIGNAL(clicked()), sm, SLOT(map()));
-        sm->setMapping(btn, found[i].id);
         ui->table_search_books->setItem(i, 0, new QTableWidgetItem(found[i].title));
         ui->table_search_books->setItem(i, 1, new QTableWidgetItem(found[i].authors));
         ui->table_search_books->setItem(i, 2, new QTableWidgetItem(found[i].publisher));
@@ -56,7 +53,16 @@ void Patron::on_button_search_books_clicked(){
         ui->table_search_books->setItem(i, 6, new QTableWidgetItem(QString::number(found[i].level)));
         ui->table_search_books->setItem(i, 7, new QTableWidgetItem(QString::number(found[i].copies)));
         ui->table_search_books->setItem(i, 8, new QTableWidgetItem(found[i].bestseller ? "yes" : "no"));
-        ui->table_search_books->setCellWidget(i, 9, btn);
+        if (!found[i].reference){//dont make check_out button for references
+            QPushButton *btn;
+            btn = new QPushButton(this);
+            btn->setText("check out");
+            QSignalMapper *sm = new QSignalMapper(this);//mapper catch signal from button and direct to SLOT. Need this to transfer parameters
+            connect(sm, SIGNAL(mapped(int)), this, SLOT(check_out_book(int)));//set mapper SLOT function
+            connect(btn, SIGNAL(clicked()), sm, SLOT(map()));//connect button click to mapper triggering
+            sm->setMapping(btn, found[i].id);//set parameter to pass in mapper
+            ui->table_search_books->setCellWidget(i, 9, btn);//insert in table
+        }
     }
     ui->table_search_books->resizeColumnsToContents();
 }

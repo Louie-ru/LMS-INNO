@@ -252,7 +252,7 @@ public:
     QVector<std::pair<Check_out, Book> > get_checked_out_books(){
         QVector<std::pair<Check_out, Book> > ans;
         QSqlQuery query;
-        query.exec("SELECT * FROM check_outs WHERE document_type = 1 AND year_end IS NULL AND user_id = "+QString::number(id));
+        query.exec("SELECT * FROM check_outs WHERE document_type = 1 AND year_end IS NULL AND user_id = " + QString::number(id));
         while (query.next()) {
             int book_id = query.value(3).toInt();
             int year_start = query.value(4).toInt();
@@ -335,7 +335,8 @@ public:
     bool modify_article(int id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int copies);
     bool modify_av(int id, QString authors, QString title, QString keywords, bool available, int copies);
 
-    LibrarianUser(int id, QString name_, QString address_, QString phone_, QString login_, QString password_){
+    LibrarianUser(int id_, QString name_, QString address_, QString phone_, QString login_, QString password_){
+        id = id_;
         name = name_;
         address = address_;
         phone = phone_;
@@ -457,6 +458,7 @@ public:
     }
 };
 
+
 class Testing{
 public:
     Login mainLogin;
@@ -506,7 +508,6 @@ public:
         PatronUser patron1 = mainLogin.login_patron("1", "1");
         PatronUser patron2 = mainLogin.login_patron("11", "11");
         patron2.check_out_book(3);
-        QThread::sleep(3);
         patron1.check_out_book(3);
 
         QVector<Book> books = patron1.search_books("","","","",1983,0,0,1);
@@ -524,11 +525,12 @@ public:
     }
 
     void testAll(){
+        //start on special testing database. Ask Nikolai if you need it. But who cares about tests
         qDebug() << "testTC1: " << (testTC1() ? "OK" : "FAIL");
         qDebug() << "testTC2: " << (testTC2() ? "OK" : "FAIL");
         qDebug() << "testTC5: " << (testTC5() ? "OK" : "FAIL");
         qDebug() << "testTC6: " << (testTC6() ? "OK" : "FAIL");
-        //qDebug() << "testTC7: " << (testTC7() ? "OK" : "FAIL");
+        qDebug() << "testTC7: " << (testTC7() ? "OK" : "FAIL");
         qDebug() << "testTC10: " << (testTC10() ? "OK" : "FAIL");
     }
 

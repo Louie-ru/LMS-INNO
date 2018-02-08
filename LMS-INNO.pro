@@ -13,11 +13,13 @@ TARGET = LMS-INNO
 TEMPLATE = app
 DEFINES += QT_DEPRECATED_WARNINGS
 
+#Lines for Nikolai only
 CONFIG += release
 CONFIG += static
 QMAKE_LFLAGS_RELEASE += -static -static-libgcc
 QMAKE_LFLAGS += -static -static-libgcc
 LIBS += -static-libgcc
+#end
 
 SOURCES += \
         main.cpp \
