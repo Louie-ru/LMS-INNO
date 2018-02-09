@@ -220,7 +220,7 @@ void Patron::on_button_logout_clicked(){
     this->close();
 }
 
-
+//this is called when patron wants to see his check outs
 void Patron::on_tabWidget_tabBarClicked(int index){
     if (index != 3) return;
     ui->table_my_books->setRowCount(0);
