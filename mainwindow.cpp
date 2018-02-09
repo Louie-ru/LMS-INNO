@@ -10,7 +10,7 @@ Login mainLogin;
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
     ui->setupUi(this);
 
-    mainLogin.make_database();
+    mainLogin.make_database();//make database if not found
     //Testing testing; testing.testAll(); //no need in this =)
 }
 

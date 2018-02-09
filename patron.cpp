@@ -12,7 +12,7 @@ Patron::Patron(QWidget *parent) : QWidget(parent), ui(new Ui::Patron){
     ui->setupUi(this);
     ui->line_year_books->setValidator(new QIntValidator(0, 2100, this));
     ui->line_year_articles->setValidator(new QIntValidator(0, 2100, this));
-    ui->status->setText("Logged in as " + (me.faculty ? "faculty " : "") + "patron: " + me.name);
+    ui->status->setText("Logged in as " + QString(me.faculty ? "faculty " : "") + "patron: " + me.name);
 }
 Patron::~Patron(){
     delete ui;
@@ -25,8 +25,15 @@ void Patron::check_out_book(int id){
 void Patron::renew_book(int id){
     me.renew_book(id);
 }
-void Patron::return_book(int id){
-    me.return_book(id);
+void Patron::return_book(int check_out_id){
+    int fine = me.return_book(check_out_id);
+    if (fine == -1)
+        ui->status->setText("Error returning book");
+    else if (fine > 0)
+        QMessageBox::information(0, "Fine", "Fine size: " + QString::number(fine));
+    ui->status->setText("Book returned successfully");
+    on_tabWidget_tabBarClicked(3);//update table
+    ui->table_search_books->setRowCount(0);//clear search table
 }
 
 void Patron::on_button_search_books_clicked(){
@@ -215,7 +222,7 @@ void Patron::on_tabWidget_tabBarClicked(int index){
         QSignalMapper *sm2 = new QSignalMapper(this);
         connect(sm2, SIGNAL(mapped(int)), this, SLOT(return_book(int)));
         connect(btn_return, SIGNAL(clicked()), sm2, SLOT(map()));
-        sm2->setMapping(btn_return, found[i].second.id);
+        sm2->setMapping(btn_return, found[i].first.check_out_id);
 
         QString date_start = QString::number(found[i].first.day_start)+"."+QString::number(found[i].first.month_start)+"."+QString::number(found[i].first.year_start);
         QString date_end = QString::number(found[i].first.day_end)+"."+QString::number(found[i].first.month_end)+"."+QString::number(found[i].first.year_end);
