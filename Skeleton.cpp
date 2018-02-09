@@ -105,6 +105,7 @@ class User{
 public:
     QString name, address, phone, login, password;
     int id;
+    //bestseller can be any if not book given
     std::pair<QDate, int> calculate_check_out(int document_type, int year_start, int month_start, int day_start, bool faculty, bool bestseller, int price, int renew_state){
         QDate date_start;
         date_start.setDate(year_start, month_start, day_start);
@@ -119,9 +120,9 @@ public:
                 days_to_add = 21;
         }
         else days_to_add = 14;
-        if (renew_state == 2){
+        if (renew_state == 2){//if renewed
             QSqlQuery query;
-            query.exec("SELECT * FROM settings");
+            query.exec("SELECT * FROM settings");//need to know how many days to add
             query.next();
             days_to_add += query.value(0).toInt();
         }
@@ -144,7 +145,7 @@ public:
                 "year="+QString::number(year) + ins;
         if (bestseller) req += "bestseller = 1" + ins;
         if (available) req += "copies > 0 " + ins;
-        req += " 1 = 1";
+        req += " 1 = 1";//nice hack to finish statement correctly
         query.exec(req);
         QVector<Book> ans;
         while (query.next()) {
@@ -229,6 +230,7 @@ public:
         query.bindValue(":day_start", day_start);
         query.exec();
 
+        //get last check out id
         query.exec("SELECT check_out_id FROM check_outs ORDER BY check_out_id DESC LIMIT 1");
         query.next();
         int check_out_id = query.value(0).toInt();
@@ -238,6 +240,7 @@ public:
         query.bindValue(":user_id", id);
         query.exec();
     }
+    //parse string and add my check outs
     void add_check_outs(QString str){
         QString id = "";
         for (int i = 0; i < str.size(); i++){
@@ -273,6 +276,7 @@ public:
         query.bindValue(":day_end", end.first.day());
         query.exec();
 
+        //remove check out from my list
         query.prepare("UPDATE patrons SET check_outs = replace(check_outs, :check_out_id_str, '') WHERE id = :user_id");
         query.bindValue(":check_out_id_str", ";" + QString::number(check_out_id));
         query.bindValue(":user_id", id);
@@ -288,9 +292,9 @@ public:
     int return_av(int check_out_id);
 
     void want_book(int book_id){
-        qDebug() << book_id;
+        //set renew_state to 1
         QSqlQuery query;
-        query.prepare("UPDATE check_outs SET renew_state = 1 WHERE document_type = 1 AND renew_state = 0 AND document_id = :document_id");
+        query.prepare("UPDATE check_outs SET renew_state = 1 WHERE document_type = 1 AND renew_state = 0 AND year_end IS NULL AND document_id = :document_id");
         query.bindValue(":document_id", book_id);
         query.exec();
     }
@@ -304,8 +308,6 @@ public:
         query.exec();
         if (!query.next()) return 0; //no such check out
 
-        qDebug() << "check out found";
-
         int book_id = query.value(3).toInt();
         int year_start = query.value(4).toInt();
         int month_start = query.value(5).toInt();
@@ -313,8 +315,6 @@ public:
         int renew_state = query.value(10).toInt();
 
         if (renew_state != 0) return 1; //someone wants
-
-        qDebug() << "no one wants";
 
         Book book = get_book(book_id);
         std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, faculty, book.bestseller, book.price, renew_state);
@@ -368,7 +368,7 @@ public:
     QVector<std::pair<Check_out, Book> > search_books_checked_out(int user_id, QString authors, QString title, QString keywords, QString publisher, int year, bool bestseller, bool or_and){
         QSqlQuery query;
         QVector<std::pair<Check_out, Book> > ans;
-
+        //FINISH LATER
         QString ins = or_and ? " AND " : " OR ";
         QString req = "select * from check_outs where document_type = 1 and user_id = 1 and "
                 "instr((SELECT authors FROM books WHERE id = document_id),'Kevin') > 0 and"
