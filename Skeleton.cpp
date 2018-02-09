@@ -105,19 +105,28 @@ class User{
 public:
     QString name, address, phone, login, password;
     int id;
-    std::pair<QDate, int> calculate_check_out(int document_type, int year_start, int month_start, int day_start, bool faculty, bool bestseller, int price){
+    std::pair<QDate, int> calculate_check_out(int document_type, int year_start, int month_start, int day_start, bool faculty, bool bestseller, int price, int renew_state){
         QDate date_start;
         date_start.setDate(year_start, month_start, day_start);
         QDate date_end;
+        int days_to_add = 0;
         if (document_type == 1){
             if (faculty)
-                date_end = date_start.addDays(28);
+                days_to_add = 28;
             else if (bestseller)
-                date_end = date_start.addDays(14);
+                days_to_add = 14;
             else
-                date_end = date_start.addDays(21);
+                days_to_add = 21;
         }
-        else date_end = date_start.addDays(14);
+        else days_to_add = 14;
+        if (renew_state == 2){
+            QSqlQuery query;
+            query.exec("SELECT * FROM settings");
+            query.next();
+            days_to_add += query.value(0).toInt();
+        }
+        date_end = date_start.addDays(days_to_add);
+
         QDate date_now = QDate::currentDate();
         int days_overdue = date_end.daysTo(date_now);
         int fine = 0;
@@ -250,8 +259,10 @@ public:
         int year_start = query.value(4).toInt();
         int month_start = query.value(5).toInt();
         int day_start = query.value(6).toInt();
+        int renew_state = query.value(10).toInt();
+
         Book book = get_book(book_id);
-        std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, faculty, book.bestseller, book.price);
+        std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, faculty, book.bestseller, book.price, renew_state);
         int fine = end.second;
 
         QDate today = QDate::currentDate();
@@ -276,7 +287,46 @@ public:
     int return_article(int check_out_id);
     int return_av(int check_out_id);
 
-    bool renew_book(int document_id){return 1;}
+    void want_book(int book_id){
+        qDebug() << book_id;
+        QSqlQuery query;
+        query.prepare("UPDATE check_outs SET renew_state = 1 WHERE document_type = 1 AND renew_state = 0 AND document_id = :document_id");
+        query.bindValue(":document_id", book_id);
+        query.exec();
+    }
+
+    int renew_book(int check_out_id){
+        QSqlQuery query;
+        QDate today = QDate::currentDate();
+
+        query.prepare("SELECT * FROM check_outs WHERE check_out_id = :check_out_id");
+        query.bindValue(":check_out_id", check_out_id);
+        query.exec();
+        if (!query.next()) return 0; //no such check out
+
+        qDebug() << "check out found";
+
+        int book_id = query.value(3).toInt();
+        int year_start = query.value(4).toInt();
+        int month_start = query.value(5).toInt();
+        int day_start = query.value(6).toInt();
+        int renew_state = query.value(10).toInt();
+
+        if (renew_state != 0) return 1; //someone wants
+
+        qDebug() << "no one wants";
+
+        Book book = get_book(book_id);
+        std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, faculty, book.bestseller, book.price, renew_state);
+
+        if (today.daysTo(end.first) != 0 && today.daysTo(end.first) != 1)
+            return 2; //too late or early
+
+        query.prepare("UPDATE check_outs SET renew_state = 2 WHERE check_out_id = :check_out_id");
+        query.bindValue(":check_out_id", check_out_id);
+        query.exec();
+        return 3;
+    }
     bool renew_article(int document_id);
     bool renew_av(int document_id);
     QVector<std::pair<Check_out, Book> > get_checked_out_books(){
@@ -289,8 +339,9 @@ public:
             int year_start = query.value(4).toInt();
             int month_start = query.value(5).toInt();
             int day_start = query.value(6).toInt();
+            int state_renew = query.value(10).toInt();
             Book book = get_book(book_id);
-            std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, faculty, book.bestseller, book.price);
+            std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, faculty, book.bestseller, book.price, state_renew);
             ans.push_back(make_pair(Check_out(id, 1, book_id, check_out_id, year_start, month_start, day_start, end.first.year(), end.first.month(), end.first.day(), end.second), book));
         }
         return ans;
@@ -298,7 +349,7 @@ public:
     QVector<std::pair<Check_out, Article> > get_checked_out_articles();
     QVector<std::pair<Check_out, VA> > get_checked_out_avs();
 
-    PatronUser(int id_, QString name_, QString address_, QString phone_, bool faculty_, QString login_, QString password_, QString check_outs_){
+    PatronUser(int id_, QString name_, QString address_ , QString phone_, bool faculty_, QString login_, QString password_, QString check_outs_){
         id = id_;
         name = name_;
         address = address_;
@@ -486,7 +537,11 @@ public:
                      "day_start INTEGER, "
                      "year_end INTEGER, "
                      "month_end INTEGER, "
-                     "day_end INTEGER);");
+                     "day_end INTEGER, "
+                     "renew_state INTEGER DEFAULT 0)");
+
+        query.exec("CREATE TABLE IF NOT EXISTS settings ("
+                     "days_add_renew INTEGER DEFAULT 7)");
         //TODO: create basic librarian
     }
 };

@@ -17,13 +17,28 @@ Patron::~Patron(){
     delete ui;
 }
 
-void Patron::check_out_book(int id){
-    me.check_out_book(id);
+void Patron::check_out_book(int book_id){
+    me.check_out_book(book_id);
     on_button_search_books_clicked();
 }
-void Patron::renew_book(int id){
-    me.renew_book(id);
+void Patron::want_book(int book_id){
+    me.want_book(book_id);
 }
+void Patron::renew_book(int check_out_id){
+    int ret = me.renew_book(check_out_id);
+    if (ret == 0)
+        ui->status->setText("Error renewing book");
+    else if (ret == 1)
+        ui->status->setText("Error: this book is in demand");
+    else if (ret == 2)
+        ui->status->setText("Error: can renew only one day before return day");
+    else{
+        ui->status->setText("Book renewed successfully");
+        on_tabWidget_tabBarClicked(3);
+    }
+}
+
+
 void Patron::return_book(int check_out_id){
     int fine = me.return_book(check_out_id);
     if (fine == -1)
@@ -62,9 +77,12 @@ void Patron::on_button_search_books_clicked(){
         if (!found[i].reference){//dont make check_out button for references
             QPushButton *btn;
             btn = new QPushButton(this);
-            btn->setText("check out");
+            btn->setText(found[i].copies > 0 ? "check out" : "want it");
             QSignalMapper *sm = new QSignalMapper(this);//mapper catch signal from button and direct to SLOT. Need this to transfer parameters
-            connect(sm, SIGNAL(mapped(int)), this, SLOT(check_out_book(int)));//set mapper SLOT function
+            if (found[i].copies > 0)//set mapper SLOT function
+                connect(sm, SIGNAL(mapped(int)), this, SLOT(check_out_book(int)));
+            else
+                connect(sm, SIGNAL(mapped(int)), this, SLOT(want_book(int)));
             connect(btn, SIGNAL(clicked()), sm, SLOT(map()));//connect button click to mapper triggering
             sm->setMapping(btn, found[i].id);//set parameter to pass in mapper
             ui->table_search_books->setCellWidget(i, 9, btn);//insert in table
@@ -214,7 +232,7 @@ void Patron::on_tabWidget_tabBarClicked(int index){
         QSignalMapper *sm = new QSignalMapper(this);
         connect(sm, SIGNAL(mapped(int)), this, SLOT(renew_book(int)));
         connect(btn_renew, SIGNAL(clicked()), sm, SLOT(map()));
-        sm->setMapping(btn_renew, found[i].second.id);
+        sm->setMapping(btn_renew, found[i].first.check_out_id);
 
         QPushButton *btn_return = new QPushButton(this);
         btn_return->setText("return");
