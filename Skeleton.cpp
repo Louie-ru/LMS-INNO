@@ -138,14 +138,22 @@ public:
     QVector<Book> search_books(QString authors, QString title, QString keywords, QString publisher, int year, bool bestseller, bool available, bool or_and){
         QSqlQuery query;
         QString ins = or_and ? " AND " : " OR ";
-        QString req = "SELECT * FROM books WHERE instr(authors, '"+authors+"') > 0" + ins +
-                "instr(title, '"+title+"') > 0" + ins +
-                "instr(keywords, '"+keywords+"') > 0" + ins +
-                "instr(publisher, '"+publisher+"') > 0" + ins +
-                "year="+QString::number(year) + ins;
+        authors = authors.toLower();
+        title = title.toLower();
+        keywords = keywords.toLower();
+        publisher = publisher.toLower();
+        QString req = "SELECT * FROM books WHERE ";
+        if (authors != "") req += "instr(lower(authors), '"+authors+"') > 0" + ins;
+        if (title != "") req += "instr(lower(title), '"+title+"') > 0" + ins;
+        if (keywords != "") req += "instr(lower(keywords), '"+keywords+"') > 0" + ins;
+        if (publisher != "") req += "instr(lower(publisher), '"+publisher+"') > 0" + ins;
+        if (year != 0) req += "instr(year, '"+QString::number(year)+"') > 0" + ins;
         if (bestseller) req += "bestseller = 1" + ins;
-        if (available) req += "copies > 0 " + ins;
-        req += " 1 = 1";//nice hack to finish statement correctly
+        if (available) req += "copies > 0" + ins;
+        req += "1 = " + QString(or_and ? "1" : "0");//nice hack to finish statement correctly
+        if (req.length() == 31)//no parameters given
+            req = "SELECT * FROM books";
+        qDebug() << req;
         query.exec(req);
         QVector<Book> ans;
         while (query.next()) {
@@ -161,7 +169,6 @@ public:
             int copies = query.value(9).toInt();
             bool bestseller = query.value(10).toInt();
             bool reference = query.value(11).toInt();
-
             ans.push_back(Book(authors, title, keywords, publisher, id, year, copies, price, room ,level, bestseller, reference));
         }
         return ans;

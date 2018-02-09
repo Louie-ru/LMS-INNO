@@ -57,7 +57,7 @@ void Patron::on_button_search_books_clicked(){
     QString title = ui->line_title_books->text();
     QString keywords = ui->line_keywords_books->text();
     QString publisher = ui->line_publisher_books->text();
-    int year = ui->line_year_books->text().toInt();
+    int year = (ui->line_year_books->text() == "" ? 0 : ui->line_year_books->text().toInt());
     bool bestseller = ui->checkbox_bestseller_books->isChecked();
     bool available = ui->checkbox_available_books->isChecked();
     bool or_and = ui->checkbox_criteria_books->isChecked();
