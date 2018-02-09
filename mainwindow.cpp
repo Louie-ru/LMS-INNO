@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
 
     mainLogin.make_database();//make database if not found
-    //Testing testing; testing.testAll(); //no need in this =)
+    //Testing testing; testing.testAll(); //no need in this =) ask me for special database to for testing
 }
 
 MainWindow::~MainWindow(){
@@ -27,6 +27,7 @@ void MainWindow::on_button_login_clicked(){
         patron = new Patron();
         patron->me = patronUser;
         patron->show();
+        patron->showName();
         this->close();
         return;
     }
@@ -36,6 +37,7 @@ void MainWindow::on_button_login_clicked(){
         librarian = new Librarian();
         librarian->me = librarianUser;
         librarian->show();
+        //librarian->showName();
         this->close();
     }
 }

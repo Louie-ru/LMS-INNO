@@ -15,6 +15,7 @@ public:
     explicit Patron(QWidget *parent = 0);
     ~Patron();
     PatronUser me;
+    void showName();
 private:
     Ui::Patron *ui;
 private slots:

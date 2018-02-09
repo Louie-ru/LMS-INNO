@@ -12,7 +12,6 @@ Patron::Patron(QWidget *parent) : QWidget(parent), ui(new Ui::Patron){
     ui->setupUi(this);
     ui->line_year_books->setValidator(new QIntValidator(0, 2100, this));
     ui->line_year_articles->setValidator(new QIntValidator(0, 2100, this));
-    ui->status->setText("Logged in as " + QString(me.faculty ? "faculty " : "") + "patron: " + me.name);
 }
 Patron::~Patron(){
     delete ui;
@@ -240,4 +239,8 @@ void Patron::on_tabWidget_tabBarClicked(int index){
         ui->table_my_books->setCellWidget(i, 11, btn_return);
     }
     ui->table_my_books->resizeColumnsToContents();
+}
+
+void Patron::showName(){
+    ui->status->setText("Logged in as " + QString(me.faculty ? "faculty " : "") + "patron: " + me.name);
 }
