@@ -578,13 +578,16 @@ void Librarian::createBook(){
     QString title = line1->text();
     QString authors = line2->text();
     QString publisher = line3->text();
-    QString year = line4->text();
-    QString price = line5->text();
-    QString room = line6->text();
-    QString level = line7->text();
-    QString copies = line8->text();
+    QString keywords = line4->text();
+    int year = line5->text().toInt();
+    int price = line6->text().toInt();
+    int room = line7->text().toInt();
+    int level = line8->text().toInt();
+    int copies = line9->text().toInt();
     bool bestseller = check->isChecked();
+    me.add_book(title, authors, publisher, keywords, year, price, room, level, copies, bestseller);
     closeWidget();
+    on_button_search_books_clicked();
 }
 void Librarian::createArticle(){
     QString title = line1->text();
@@ -654,6 +657,7 @@ void Librarian::on_button_new_book_clicked(){
     QLabel *title = new QLabel("title:");
     QLabel *authors = new QLabel("authors:");
     QLabel *publisher = new QLabel("publisher:");
+    QLabel *keywords = new QLabel("keywords:");
     QLabel *year = new QLabel("year:");
     QLabel *price = new QLabel("price:");
     QLabel *room = new QLabel("room:");
@@ -662,14 +666,16 @@ void Librarian::on_button_new_book_clicked(){
     QLabel *bestseller = new QLabel("bestseller:");
     clearObjects();
     w_layout = new QFormLayout();
+    w_layout->setAlignment(Qt::AlignRight);
     w_layout->addRow(title, line1);
     w_layout->addRow(authors, line2);
     w_layout->addRow(publisher, line3);
-    w_layout->addRow(year, line4);
-    w_layout->addRow(price, line5);
-    w_layout->addRow(room, line6);
-    w_layout->addRow(level, line7);
-    w_layout->addRow(copies, line8);
+    w_layout->addRow(keywords, line4);
+    w_layout->addRow(year, line5);
+    w_layout->addRow(price, line6);
+    w_layout->addRow(room, line7);
+    w_layout->addRow(level, line8);
+    w_layout->addRow(copies, line9);
     w_layout->addRow(bestseller, check);
     w_layout->addRow(cancel, ok);
     connect(ok, SIGNAL (clicked()),this, SLOT (createBook()));

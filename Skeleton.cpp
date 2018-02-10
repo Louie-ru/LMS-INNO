@@ -484,7 +484,22 @@ public:
     }
     bool delete_librarian(int user_id);
 
-    bool add_book(QString authors, QString title, QString keywords, QString publisher, QString editors, int year, bool bestseller, int copies);
+    bool add_book(QString title, QString authors, QString publisher, QString keywords, int year, int price, int room, int level, int copies, int bestseller){
+        QSqlQuery query;
+        query.prepare("INSERT INTO books (title, authors, publisher, keywords, year, price, room, level, copies, bestseller) VALUES(:title, :authors, :publisher, :keywords, :year, :price, :room, :level, :copies, :bestseller)");
+        query.bindValue(":title", title);
+        query.bindValue(":authors", authors);
+        query.bindValue(":publisher", publisher);
+        query.bindValue(":keywords", keywords);
+        query.bindValue(":year", year);
+        query.bindValue(":price", price);
+        query.bindValue(":room", room);
+        query.bindValue(":level", level);
+        query.bindValue(":copies", copies);
+        query.bindValue(":bestseller", (bestseller ? 1 : 0));
+        query.exec();
+        return 1;
+    }
     bool add_article(QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int copies);
     bool add_av(QString authors, QString title, QString keywords, int available, int copies);
 
