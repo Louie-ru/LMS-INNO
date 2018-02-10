@@ -401,13 +401,70 @@ public:
     QVector<std::pair<Check_out, Article> > search_articles_checked_out(int user_id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, bool or_and);
     QVector<std::pair<Check_out, VA> > search_av_checked_out(int user_id, QString authors, QString title, QString keywords, bool or_and);
 
-    QVector<PatronUser> search_patrons(QString name, QString address, QString phone, bool faculty, bool has_overdues, bool or_and);
+    QVector<PatronUser> search_patrons(QString name, QString address, QString phone, bool faculty, bool or_and){
+        QSqlQuery query;
+        QString ins = or_and ? " AND " : " OR ";
+        name = name.toLower();
+        address = address.toLower();
+        phone = phone.toLower();
+        QString req = "SELECT * FROM patrons WHERE ";
+        if (name != "") req += "instr(lower(name), '"+name+"') > 0" + ins;
+        if (address != "") req += "instr(lower(address), '"+address+"') > 0" + ins;
+        if (phone != "") req += "instr(lower(phone), '"+phone+"') > 0" + ins;
+        if (faculty) req += "faculty = 1" + ins;
+        req += "1 = " + QString(or_and ? "1" : "0");//nice hack to finish statement correctly
+        if (req.length() == 33)//no parameters given
+            req = "SELECT * FROM patrons";
+        qDebug() << req;
+        query.exec(req);
+        QVector<PatronUser> ans;
+        while (query.next()) {
+            int user_id = query.value(0).toInt();
+            QString name = query.value(1).toString();
+            QString address = query.value(2).toString();
+            QString phone = query.value(3).toString();
+            bool faculty = query.value(4).toInt();
+            QString check_outs = query.value(5).toString();
+            QString login = query.value(6).toString();
+            QString password = query.value(7).toString();
+            ans.push_back(PatronUser(user_id, name, address, phone, faculty, login, password, check_outs));
+        }
+        return ans;
+    }
+
     QVector<LibrarianUser> search_librarians(QString name, QString address, QString phone, bool or_and);
 
     bool add_patron(QString name, QString address, QString phone, int id, bool faculty, QString login, QString password);
     bool add_librarian(QString name, QString address, QString phone);
 
-    bool modify_patron(int user_id, QString name, QString address, QString phone, bool faculty, QString login, QString password);
+    bool modify_patron(int user_id, QString name, QString address, QString phone, bool faculty, QString login, QString password){
+        QSqlQuery query;
+        query.prepare("UPDATE patrons SET name = :name, address = :address, phone = :phone, faculty = :faculty, login = :login, password = :password WHERE user_id = :user_id");
+        query.bindValue(":name", name);
+        query.bindValue(":address", address);
+        query.bindValue(":phone", phone);
+        query.bindValue(":faculty", (faculty ? 1 : 0));
+        query.bindValue(":login", login);
+        query.bindValue(":password", password);
+        query.bindValue(":user_id", user_id);
+        query.exec();
+        return 1;//mb change to void
+    }
+
+    PatronUser getPatron(int user_id){
+        QSqlQuery query;
+        query.exec("SELECT * FROM patrons WHERE id = " + QString::number(user_id));
+        if (!query.next()) return PatronUser(-1, "", "", "", 0, "", "", "");
+        QString name = query.value(1).toString();
+        QString address = query.value(2).toString();
+        QString phone = query.value(3).toString();
+        bool faculty = query.value(4).toInt();
+        QString check_outs = query.value(5).toString();
+        QString login = query.value(6).toString();
+        QString password = query.value(7).toString();
+        return PatronUser(user_id, name, address, phone, faculty, login, password, check_outs);
+    }
+
     bool modify_librarian(int user_id, QString name, QString address, QString phone);
 
     bool delete_patron(int user_id);

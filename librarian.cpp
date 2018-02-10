@@ -33,7 +33,6 @@ QCheckBox *check;
 QPushButton *ok;
 QPushButton *cancel;
 QFormLayout *w_layout;
-int global_id;
 
 //make new input fields
 void Librarian::clearObjects(){
@@ -59,7 +58,15 @@ void Librarian::clearObjects(){
 
 void Librarian::on_button_search_patrons_clicked(){
     ui->table_patrons->setRowCount(0);
-    QVector<PatronUser> found;// = librarian.get_patrons();//CHANGE LATER
+
+    QString name = ui->line_patrons_name->text();
+    QString phone = ui->line_patrons_phone->text();
+    QString address = ui->line_patrons_address->text();
+    int id = ui->line_patrons_id->text().toInt();
+    bool faculty = ui->checkbox_patrons_faculty->isChecked();
+    bool or_and = ui->checkbox_patrons_criteria->isChecked();
+
+    QVector<PatronUser> found = me.search_patrons(name, address, phone, faculty, or_and);
     for (int i = 0; i < found.size(); i++){
         ui->table_patrons->insertRow(i);
         QPushButton *btn_modify = new QPushButton(this);
@@ -219,27 +226,39 @@ void Librarian::on_button_search_vas_clicked(){
 
 void Librarian::on_modify_patron_clicked(int user_id){
     if (widget != NULL && !widget->isHidden()) return;
-    global_id = user_id;
+    PatronUser patron = me.getPatron(user_id);
     widget = new QWidget();
     QLabel *id = new QLabel("card id:");
     QLabel *name = new QLabel("name:");
     QLabel *address = new QLabel("address:");
     QLabel *phone = new QLabel("phone:");
     QLabel *faculty = new QLabel("faculty:");
+    QLabel *login = new QLabel("login:");
+    QLabel *password = new QLabel("password:");
     clearObjects();
+    line1->setText(QString::number(patron.id));
+    line2->setText(patron.name);
+    line3->setText(patron.address);
+    line4->setText(patron.phone);
+    check->setChecked(patron.faculty);
+    line5->setText(patron.login);
+    line6->setText(patron.password);
+    line1->setEnabled(false);
     w_layout->addRow(id, line1);
     w_layout->addRow(name, line2);
     w_layout->addRow(address, line3);
     w_layout->addRow(phone, line4);
     w_layout->addRow(faculty, check);
+    w_layout->addRow(login, line5);
+    w_layout->addRow(password, line6);
     w_layout->addRow(cancel, ok);
+    w_layout->setLabelAlignment(Qt::AlignRight);
     connect(ok, SIGNAL (clicked()),this, SLOT (modifyPatron()));
     widget->setLayout(w_layout);
     widget->show();
 }
 void Librarian::on_modify_librarian_clicked(int user_id){
     if (widget != NULL && !widget->isHidden()) return;
-    global_id = user_id;
     widget = new QWidget();
     QLabel *id = new QLabel("card id:");
     QLabel *name = new QLabel("name:");
@@ -437,11 +456,17 @@ void Librarian::on_button_show_checked_out_vas_clicked(){
 }
 
 void Librarian::modifyPatron(){
+    int id = line1->text().toInt();
     QString name = line2->text();
     QString address = line3->text();
     QString phone = line4->text();
+    QString login = line5->text();
+    QString password = line6->text();
     bool faculty = check->isChecked();
+
+    me.modify_patron(id, name, address, phone, faculty, login, password);
     closeWidget();
+
 }
 void Librarian::modifyLibrarian(){
     QString name = line2->text();
