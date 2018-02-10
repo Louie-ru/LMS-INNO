@@ -15,6 +15,7 @@ public:
     explicit Librarian(QWidget *parent = 0);
     ~Librarian();
     LibrarianUser me;
+    void showName();
 private slots:
     void on_button_search_patrons_clicked();
     void on_button_search_librarians_clicked();

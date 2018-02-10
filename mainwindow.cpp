@@ -37,7 +37,7 @@ void MainWindow::on_button_login_clicked(){
         librarian = new Librarian();
         librarian->me = librarianUser;
         librarian->show();
-        //librarian->showName();
+        librarian->showName();
         this->close();
     }
 }

@@ -706,3 +706,7 @@ void Librarian::on_button_logout_clicked(){
     mainwindow->show();
     this->close();
 }
+
+void Librarian::showName(){
+    ui->status->setText("Logged in as librarian: " + me.name);
+}
