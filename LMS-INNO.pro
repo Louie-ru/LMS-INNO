@@ -38,4 +38,7 @@ FORMS += \
     patron.ui \
     librarian.ui
 
-RESOURCES +=
+RESOURCES += \
+    logo_name.qrc
+
+OTHER_FILES +=
