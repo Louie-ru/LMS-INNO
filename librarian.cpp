@@ -241,7 +241,7 @@ void Librarian::on_button_search_vas_clicked(){
 
 void Librarian::on_modify_patron_clicked(int user_id){
     if (widget != NULL && !widget->isHidden()) return;
-    PatronUser patron = me.getPatron(user_id);
+    PatronUser patron = me.get_patron(user_id);
     widget = new QWidget();
     QLabel *id = new QLabel("card id:");
     QLabel *name = new QLabel("name:");
@@ -401,7 +401,7 @@ void Librarian::on_modify_va_clicked(int id){
 }
 
 void Librarian::on_delete_patron_clicked(int id){
-    PatronUser patron = me.getPatron(id);
+    PatronUser patron = me.get_patron(id);
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this patron?\nname: " + patron.name + "\nlogin: " + patron.login, QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
     me.delete_patron(id);
@@ -429,7 +429,17 @@ void Librarian::on_delete_va_clicked(int id){
 
 void Librarian::on_button_show_checked_out_books_clicked(){
     ui->table_checked_out_books->setRowCount(0);
-    QVector<std::pair<Check_out, Book> > found;// = librarian.get_checked_out_books();//CHANGE LATER
+    QString authors = ui->line_authors_books_checked->text();
+    QString title = ui->line_title_books_checked->text();
+    QString keywords = ui->line_keywords_books_checked->text();
+    QString publisher = ui->line_publisher_books_checked->text();
+    int year = (ui->line_year_books_checked->text() == "" ? 0 : ui->line_year_books_checked->text().toInt());
+    bool bestseller = ui->checkbox_bestseller_books_checked->isChecked();
+    bool overdue = ui->checkbox_overdue_books_checked->isChecked();
+    bool or_and = ui->checkbox_criteria_books_checked->isChecked();
+    int user_id = ui->line_user_id_books_checked->text().toInt();
+
+    QVector<std::pair<Check_out, Book> > found = me.search_books_checked_out(user_id, authors, title, keywords, publisher, year, bestseller, overdue, or_and);
     for (int i = 0; i < found.size(); i++){
         ui->table_checked_out_books->insertRow(i);
         QString date_start = QString::number(found[i].first.day_start)+"."+QString::number(found[i].first.month_start)+"."+QString::number(found[i].first.year_start);
@@ -550,10 +560,6 @@ void Librarian::modifyVA(){
     QString level = line5->text();
     QString copies = line6->text();
     closeWidget();
-}
-
-void Librarian::closeWidget(){
-    widget->close();
 }
 
 void Librarian::createPatron(){
@@ -752,11 +758,12 @@ void Librarian::on_button_logout_clicked(){
     mainwindow->show();
     this->close();
 }
-
 void Librarian::showName(){
     ui->status->setText("Logged in as librarian: " + me.name);
 }
-
 void Librarian::on_button_settings_clicked(){
 
+}
+void Librarian::closeWidget(){
+    widget->close();
 }

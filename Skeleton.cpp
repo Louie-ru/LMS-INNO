@@ -372,30 +372,31 @@ public:
 //search/add/delete/modify users, search/add/delete/modify documents, search overdue documents
 class LibrarianUser : public User{
 public:
-    QVector<std::pair<Check_out, Book> > search_books_checked_out(int user_id, QString authors, QString title, QString keywords, QString publisher, int year, bool bestseller, bool or_and){
+    QVector<std::pair<Check_out, Book> > search_books_checked_out(int user_id, QString authors, QString title, QString keywords, QString publisher, int year, bool bestseller, bool overdue, bool or_and){
         QSqlQuery query;
+        QVector<Book> books = search_books(authors, title, keywords, publisher, year, bestseller, 0, or_and);
         QVector<std::pair<Check_out, Book> > ans;
-        //FINISH LATER
-        QString ins = or_and ? " AND " : " OR ";
-        QString req = "select * from check_outs where document_type = 1 and user_id = 1 and "
-                "instr((SELECT authors FROM books WHERE id = document_id),'Kevin') > 0 and"
-                "instr((SELECT title FROM books WHERE id = document_id),'Hack') > 0 and"
-                "instr((SELECT keywords FROM books WHERE id = document_id),'hack') > 0 and"
-                "instr((SELECT publisher FROM books WHERE id = document_id),'MIT') > 0 and"
-                "(SELECT year FROM books WHERE id = document_id) = 2011 and"
-                "(SELECT bestseller FROM books WHERE id = document_id) = 1";
-        if (bestseller) req += "bestseller = 1" + ins;
-        /*
-        query.exec("SELECT * FROM check_outs WHERE document_type = 1 AND year_end IS NULL AND user_id = "+QString::number(id));
-        while (query.next()) {
-            int book_id = query.value(3).toInt();
-            int year_start = query.value(4).toInt();
-            int month_start = query.value(5).toInt();
-            int day_start = query.value(6).toInt();
-            Book book = get_book(book_id);
-            std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, faculty, book.bestseller, book.price);
-            ans.push_back(make_pair(Check_out(id, 1, book_id, -1, year_start, month_start, day_start, end.first.year(), end.first.month(), end.first.day(), end.second), book));
-        }*/
+        for (int i = 0; i < books.size(); i++){
+            QString req = "SELECT * FROM check_outs WHERE document_type = 1 AND year_end IS NOT NULL AND document_id = " + QString::number(books[i].id);
+            if (user_id != -1) req += QString(or_and ? " AND" : " OR") + " user_id = " + QString::number(user_id);
+            query.exec(req);
+            while (query.next()) {
+                int check_out_id = query.value(0).toInt();
+                int current_user_id = query.value(1).toInt();
+                int book_id = query.value(3).toInt();
+                int year_start = query.value(4).toInt();
+                int month_start = query.value(5).toInt();
+                int day_start = query.value(6).toInt();
+                int state_renew = query.value(10).toInt();
+                Book book = get_book(book_id);
+                PatronUser patron = get_patron(current_user_id);
+                std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, patron.faculty, book.bestseller, book.price, state_renew);
+                QDate return_date;
+                return_date.setDate(end.first.year(), end.first.month(), end.first.day());
+                if (overdue && QDate::currentDate().daysTo(return_date) >= 0) continue;
+                ans.push_back(make_pair(Check_out(id, 1, book_id, check_out_id, year_start, month_start, day_start, end.first.year(), end.first.month(), end.first.day(), end.second), book));
+            }
+        }
         return ans;
     }
     QVector<std::pair<Check_out, Article> > search_articles_checked_out(int user_id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, bool or_and);
@@ -461,7 +462,7 @@ public:
         return 1;//mb change to void
     }
 
-    PatronUser getPatron(int user_id){
+    PatronUser get_patron(int user_id){
         QSqlQuery query;
         query.exec("SELECT * FROM patrons WHERE id = " + QString::number(user_id));
         if (!query.next()) return PatronUser(-1, "", "", "", 0, "", "", "");
