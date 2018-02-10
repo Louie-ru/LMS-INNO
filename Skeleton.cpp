@@ -439,7 +439,7 @@ public:
 
     bool modify_patron(int user_id, QString name, QString address, QString phone, bool faculty, QString login, QString password){
         QSqlQuery query;
-        query.prepare("UPDATE patrons SET name = :name, address = :address, phone = :phone, faculty = :faculty, login = :login, password = :password WHERE user_id = :user_id");
+        query.prepare("UPDATE patrons SET name = :name, address = :address, phone = :phone, faculty = :faculty, login = :login, password = :password WHERE id = :user_id");
         query.bindValue(":name", name);
         query.bindValue(":address", address);
         query.bindValue(":phone", phone);

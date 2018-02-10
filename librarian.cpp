@@ -466,7 +466,7 @@ void Librarian::modifyPatron(){
 
     me.modify_patron(id, name, address, phone, faculty, login, password);
     closeWidget();
-
+    on_button_search_patrons_clicked();
 }
 void Librarian::modifyLibrarian(){
     QString name = line2->text();
