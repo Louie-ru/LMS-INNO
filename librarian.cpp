@@ -368,8 +368,11 @@ void Librarian::on_modify_va_clicked(int id){
 }
 
 void Librarian::on_delete_patron_clicked(int id){
-    QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this patron?", QMessageBox::Yes|QMessageBox::No);
+    PatronUser patron = me.getPatron(id);
+    QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this patron?\nname: " + patron.name + "\nlogin: " + patron.login, QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
+    me.delete_patron(id);
+    on_button_search_patrons_clicked();
 }
 void Librarian::on_delete_librarian_clicked(int id){
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this librarian?", QMessageBox::Yes|QMessageBox::No);
@@ -514,12 +517,15 @@ void Librarian::closeWidget(){
 }
 
 void Librarian::createPatron(){
-    QString id = line1->text();
-    QString name = line2->text();
-    QString address = line3->text();
-    QString phone = line4->text();
+    QString name = line1->text();
+    QString address = line2->text();
+    QString phone = line3->text();
+    QString login = line4->text();
+    QString password = line5->text();
     bool faculty = check->isChecked();
     closeWidget();
+    me.add_patron(name, address, phone, faculty, login, password);
+    on_button_search_patrons_clicked();
 }
 void Librarian::createLibrarian(){
     QString id = line1->text();
@@ -567,17 +573,19 @@ void Librarian::createVA(){
 void Librarian::on_button_new_patron_clicked(){
     if (widget != NULL && !widget->isHidden()) return;
     widget = new QWidget();
-    QLabel *id = new QLabel("card id:");
     QLabel *name = new QLabel("name:");
     QLabel *address = new QLabel("address:");
     QLabel *phone = new QLabel("phone:");
     QLabel *faculty = new QLabel("faculty:");
+    QLabel *login = new QLabel("login:");
+    QLabel *password = new QLabel("password:");
     clearObjects();
-    w_layout->addRow(id, line1);
-    w_layout->addRow(name, line2);
-    w_layout->addRow(address, line3);
-    w_layout->addRow(phone, line4);
+    w_layout->addRow(name, line1);
+    w_layout->addRow(address, line2);
+    w_layout->addRow(phone, line3);
     w_layout->addRow(faculty, check);
+    w_layout->addRow(login, line4);
+    w_layout->addRow(password, line5);
     w_layout->addRow(cancel, ok);
     connect(ok, SIGNAL (clicked()),this, SLOT (createPatron()));
     widget->setLayout(w_layout);

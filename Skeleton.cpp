@@ -434,7 +434,17 @@ public:
 
     QVector<LibrarianUser> search_librarians(QString name, QString address, QString phone, bool or_and);
 
-    bool add_patron(QString name, QString address, QString phone, int id, bool faculty, QString login, QString password);
+    bool add_patron(QString name, QString address, QString phone, bool faculty, QString login, QString password){
+        QSqlQuery query;
+        query.prepare("INSERT INTO patrons (name, address, phone, faculty, login, password) VALUES(:name, :address, :phone, :faculty, :login, :password)");
+        query.bindValue(":name", name);
+        query.bindValue(":address", address);
+        query.bindValue(":phone", phone);
+        query.bindValue(":faculty", (faculty ? 1 : 0));
+        query.bindValue(":login", login);
+        query.bindValue(":password", password);
+        query.exec();
+    }
     bool add_librarian(QString name, QString address, QString phone);
 
     bool modify_patron(int user_id, QString name, QString address, QString phone, bool faculty, QString login, QString password){
@@ -467,7 +477,11 @@ public:
 
     bool modify_librarian(int user_id, QString name, QString address, QString phone);
 
-    bool delete_patron(int user_id);
+    bool delete_patron(int user_id){
+        QSqlQuery query;
+        query.exec("DELETE FROM patrons WHERE id = " + QString::number(user_id));
+        return 1;
+    }
     bool delete_librarian(int user_id);
 
     bool add_book(QString authors, QString title, QString keywords, QString publisher, QString editors, int year, bool bestseller, int copies);
