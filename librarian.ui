@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Librarian</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
@@ -527,7 +527,7 @@
                     </size>
                    </property>
                    <property name="inputMask">
-                    <string>9999</string>
+                    <string/>
                    </property>
                    <property name="text">
                     <string/>
@@ -645,6 +645,11 @@
          <column>
           <property name="text">
            <string>publisher</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>keywords</string>
           </property>
          </column>
          <column>

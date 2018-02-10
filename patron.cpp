@@ -140,7 +140,8 @@ void Patron::on_button_search_va_clicked(){
     ui->table_search_va->resizeColumnsToContents();
 }
 
-
+//move this to on_tabWidget_tabBarClicked
+/*
 void Patron::on_table_my_articles_clicked(const QModelIndex &index){
     ui->table_my_articles->setRowCount(0);
     QVector<std::pair<Check_out, Article> > found;// = patron.get_checked_out_articles();//CHANGE LATER
@@ -179,7 +180,8 @@ void Patron::on_table_my_articles_clicked(const QModelIndex &index){
     }
     ui->table_my_articles->resizeColumnsToContents();
 }
-
+*/
+/*
 void Patron::on_table_my_vas_clicked(const QModelIndex &index){
     ui->table_my_vas->setRowCount(0);
     QVector<std::pair<Check_out, VA> > found;// = patron.get_checked_out_vas();//CHANGE LATER
@@ -213,7 +215,7 @@ void Patron::on_table_my_vas_clicked(const QModelIndex &index){
     }
     ui->table_my_vas->resizeColumnsToContents();
 }
-
+*/
 void Patron::on_button_logout_clicked(){
     MainWindow *mainwindow = new MainWindow();
     mainwindow->show();

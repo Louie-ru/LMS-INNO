@@ -30,8 +30,6 @@ private slots:
 
     void want_book(int book_id);
 
-    void on_table_my_vas_clicked(const QModelIndex &index);
-    void on_table_my_articles_clicked(const QModelIndex &index);
     void on_tabWidget_tabBarClicked(int index);
 };
 

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>LMS-INNO</string>
+   <string>Patron</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -893,8 +893,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>98</width>
-            <height>89</height>
+            <width>632</width>
+            <height>176</height>
            </rect>
           </property>
           <attribute name="label">
@@ -996,7 +996,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>98</width>
+            <width>89</width>
             <height>89</height>
            </rect>
           </property>
@@ -1088,7 +1088,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>98</width>
+            <width>89</width>
             <height>89</height>
            </rect>
           </property>

@@ -11,6 +11,10 @@
 
 Librarian::Librarian(QWidget *parent) : QWidget(parent), ui(new Ui::Librarian){
     ui->setupUi(this);
+    ui->line_year_books->setValidator(new QIntValidator(0, 2100, this));
+    ui->line_year_articles->setValidator(new QIntValidator(0, 2100, this));
+    ui->line_year_books_checked->setValidator(new QIntValidator(0, 2100, this));
+    ui->line_year_checked_out_articles->setValidator(new QIntValidator(0, 2100, this));
 }
 Librarian::~Librarian(){
     delete ui;
@@ -127,7 +131,17 @@ void Librarian::on_button_search_librarians_clicked(){
 }
 void Librarian::on_button_search_books_clicked(){
     ui->table_search_books->setRowCount(0);
-    QVector<Book> found;// = librarian.search_books();//CHANGE LATER
+
+    QString authors = ui->line_authors_books->text();
+    QString title = ui->line_title_books->text();
+    QString keywords = ui->line_keywords_books->text();
+    QString publisher = ui->line_publisher_books->text();
+    int year = (ui->line_year_books->text() == "" ? 0 : ui->line_year_books->text().toInt());
+    bool bestseller = ui->checkbox_bestseller_books->isChecked();
+    bool available = ui->checkbox_available_books->isChecked();
+    bool or_and = ui->checkbox_criteria_books->isChecked();
+
+    QVector<Book> found = me.search_books(authors, title, keywords, publisher, year, bestseller, available, or_and);
     for (int i = 0; i < found.size(); i++){
         ui->table_search_books->insertRow(i);
         QPushButton *btn_modify = new QPushButton(this);
@@ -147,14 +161,15 @@ void Librarian::on_button_search_books_clicked(){
         ui->table_search_books->setItem(i, 0, new QTableWidgetItem(found[i].title));
         ui->table_search_books->setItem(i, 1, new QTableWidgetItem(found[i].authors));
         ui->table_search_books->setItem(i, 2, new QTableWidgetItem(found[i].publisher));
-        ui->table_search_books->setItem(i, 3, new QTableWidgetItem(QString::number(found[i].year)));
-        ui->table_search_books->setItem(i, 4, new QTableWidgetItem(QString::number(found[i].price)));
-        ui->table_search_books->setItem(i, 5, new QTableWidgetItem(QString::number(found[i].room)));
-        ui->table_search_books->setItem(i, 6, new QTableWidgetItem(QString::number(found[i].level)));
-        ui->table_search_books->setItem(i, 7, new QTableWidgetItem(QString::number(found[i].copies)));
-        ui->table_search_books->setItem(i, 8, new QTableWidgetItem(found[i].bestseller ? "yes" : "no"));
-        ui->table_search_books->setCellWidget(i, 9, btn_modify);
-        ui->table_search_books->setCellWidget(i, 10, btn_delete);
+        ui->table_search_books->setItem(i, 3, new QTableWidgetItem(found[i].keywords));
+        ui->table_search_books->setItem(i, 4, new QTableWidgetItem(QString::number(found[i].year)));
+        ui->table_search_books->setItem(i, 5, new QTableWidgetItem(QString::number(found[i].price)));
+        ui->table_search_books->setItem(i, 6, new QTableWidgetItem(QString::number(found[i].room)));
+        ui->table_search_books->setItem(i, 7, new QTableWidgetItem(QString::number(found[i].level)));
+        ui->table_search_books->setItem(i, 8, new QTableWidgetItem(QString::number(found[i].copies)));
+        ui->table_search_books->setItem(i, 9, new QTableWidgetItem(found[i].bestseller ? "yes" : "no"));
+        ui->table_search_books->setCellWidget(i, 10, btn_modify);
+        ui->table_search_books->setCellWidget(i, 11, btn_delete);
     }
     ui->table_search_books->resizeColumnsToContents();
 }
@@ -274,12 +289,14 @@ void Librarian::on_modify_librarian_clicked(int user_id){
     widget->setLayout(w_layout);
     widget->show();
 }
-void Librarian::on_modify_book_clicked(int id){
+void Librarian::on_modify_book_clicked(int document_id){
     if (widget != NULL && !widget->isHidden()) return;
     widget = new QWidget();
+    QLabel *id = new QLabel("id:");
     QLabel *title = new QLabel("title:");
     QLabel *authors = new QLabel("authors:");
     QLabel *publisher = new QLabel("publisher:");
+    QLabel *keywords = new QLabel("keywords:");
     QLabel *year = new QLabel("year:");
     QLabel *price = new QLabel("price:");
     QLabel *room = new QLabel("room:");
@@ -287,15 +304,31 @@ void Librarian::on_modify_book_clicked(int id){
     QLabel *copies = new QLabel("copies:");
     QLabel *bestseller = new QLabel("bestseller:");
     clearObjects();
+    line1->setEnabled(0);
+    Book book = me.get_book(document_id);
+    line1->setText(QString::number(book.id));
+    line2->setText(book.title);
+    line3->setText(book.authors);
+    line4->setText(book.publisher);
+    line5->setText(book.keywords);
+    line6->setText(QString::number(book.year));
+    line7->setText(QString::number(book.price));
+    line8->setText(QString::number(book.room));
+    line9->setText(QString::number(book.level));
+    line10->setText(QString::number(book.copies));
+    check->setChecked(book.bestseller);
+
     w_layout = new QFormLayout();
-    w_layout->addRow(title, line1);
-    w_layout->addRow(authors, line2);
-    w_layout->addRow(publisher, line3);
-    w_layout->addRow(year, line4);
-    w_layout->addRow(price, line5);
-    w_layout->addRow(room, line6);
-    w_layout->addRow(level, line7);
-    w_layout->addRow(copies, line8);
+    w_layout->addRow(id, line1);
+    w_layout->addRow(title, line2);
+    w_layout->addRow(authors, line3);
+    w_layout->addRow(publisher, line4);
+    w_layout->addRow(keywords, line5);
+    w_layout->addRow(year, line6);
+    w_layout->addRow(price, line7);
+    w_layout->addRow(room, line8);
+    w_layout->addRow(level, line9);
+    w_layout->addRow(copies, line10);
     w_layout->addRow(bestseller, check);
     w_layout->addRow(cancel, ok);
     connect(ok, SIGNAL (clicked()),this, SLOT (modifyBook()));
@@ -478,15 +511,19 @@ void Librarian::modifyLibrarian(){
     closeWidget();
 }
 void Librarian::modifyBook(){
-    QString title = line1->text();
-    QString authors = line2->text();
-    QString publisher = line3->text();
-    QString year = line4->text();
-    QString price = line5->text();
-    QString room = line6->text();
-    QString level = line7->text();
-    QString copies = line8->text();
+    int id = line1->text().toInt();
+    QString title = line2->text();
+    QString authors = line3->text();
+    QString publisher = line4->text();
+    QString keywords = line5->text();
+    int year = line6->text().toInt();
+    int price = line7->text().toInt();
+    int room = line8->text().toInt();
+    int level = line9->text().toInt();
+    int copies = line10->text().toInt();
     bool bestseller = check->isChecked();
+    me.modify_book(id, title, authors, publisher, keywords, year, price, room, level, copies, bestseller);
+    on_button_search_books_clicked();
     closeWidget();
 }
 void Librarian::modifyArticle(){
@@ -711,7 +748,6 @@ void Librarian::showName(){
     ui->status->setText("Logged in as librarian: " + me.name);
 }
 
-void Librarian::on_button_settings_clicked()
-{
+void Librarian::on_button_settings_clicked(){
 
 }

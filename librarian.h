@@ -22,15 +22,17 @@ private slots:
     void on_button_search_books_clicked();
     void on_button_search_articles_clicked();
     void on_button_search_vas_clicked();
+
+
     void on_button_show_checked_out_books_clicked();
     void on_button_show_checked_out_articles_clicked();
     void on_button_show_checked_out_vas_clicked();
+
     void on_button_new_patron_clicked();
     void on_button_new_librarian_clicked();
     void on_button_new_book_clicked();
     void on_button_new_article_clicked();
     void on_button_new_va_clicked();
-    void on_button_logout_clicked();
 
     void on_modify_patron_clicked(int id);
     void on_modify_librarian_clicked(int id);
@@ -57,9 +59,8 @@ private slots:
     void createLibrarian();
 
     void closeWidget();
-
+    void on_button_logout_clicked();
     void on_button_settings_clicked();
-
 private:
     Ui::Librarian *ui;
     void clearObjects();

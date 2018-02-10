@@ -492,7 +492,25 @@ public:
     bool delete_article(int id, int copies);
     bool delete_av(int id, int copies);
 
-    bool modify_book(int id, QString authors, QString title, QString keywords, QString publisher, int year, bool bestseller, int copies);
+    bool modify_book(int document_id, QString title, QString authors, QString publisher, QString keywords, int year, int price, int room, int level, int copies, bool bestseller){
+        QSqlQuery query;
+        query.prepare("UPDATE books SET title = :title, authors = :authors, publisher = :publisher, keywords = :keywords, year = :year, price = :price, room = :room, level = :level, copies = :copies, bestseller = :bestseller WHERE id = :document_id");
+        query.bindValue(":title", title);
+        query.bindValue(":authors", authors);
+        query.bindValue(":publisher", publisher);
+        query.bindValue(":keywords", keywords);
+        query.bindValue(":year", year);
+        query.bindValue(":price", price);
+        query.bindValue(":room", room);
+        query.bindValue(":level", level);
+        query.bindValue(":copies", copies);
+        query.bindValue(":bestseller", (bestseller ? 1 : 0));
+        query.bindValue(":document_id", document_id);
+        query.exec();
+        qDebug() << query.lastError();
+        return 1;
+    }
+
     bool modify_article(int id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int copies);
     bool modify_av(int id, QString authors, QString title, QString keywords, bool available, int copies);
 
