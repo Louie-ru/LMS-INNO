@@ -488,9 +488,13 @@ public:
     bool add_article(QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int copies);
     bool add_av(QString authors, QString title, QString keywords, int available, int copies);
 
-    bool delete_book(int id, int copies);
-    bool delete_article(int id, int copies);
-    bool delete_av(int id, int copies);
+    bool delete_book(int document_id){
+        QSqlQuery query;
+        query.exec("DELETE FROM books WHERE id = " + QString::number(document_id));
+        return 1;
+    }
+    bool delete_article(int id);
+    bool delete_av(int id);
 
     bool modify_book(int document_id, QString title, QString authors, QString publisher, QString keywords, int year, int price, int room, int level, int copies, bool bestseller){
         QSqlQuery query;
@@ -507,7 +511,6 @@ public:
         query.bindValue(":bestseller", (bestseller ? 1 : 0));
         query.bindValue(":document_id", document_id);
         query.exec();
-        qDebug() << query.lastError();
         return 1;
     }
 

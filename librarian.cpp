@@ -412,8 +412,11 @@ void Librarian::on_delete_librarian_clicked(int id){
     if (reply == QMessageBox::No) return;
 }
 void Librarian::on_delete_book_clicked(int id){
-    QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this book?", QMessageBox::Yes|QMessageBox::No);
+    Book book = me.get_book(id);
+    QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this book?\ntitle: " + book.title, QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
+    me.delete_book(id);
+    on_button_search_books_clicked();
 }
 void Librarian::on_delete_article_clicked(int id){
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this article?", QMessageBox::Yes|QMessageBox::No);
