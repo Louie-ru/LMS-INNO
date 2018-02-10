@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab_patrons">
       <attribute name="title">
@@ -401,6 +401,9 @@
           <layout class="QVBoxLayout" name="verticalLayout_10">
            <item>
             <layout class="QFormLayout" name="formLayout_5">
+             <property name="fieldGrowthPolicy">
+              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+             </property>
              <property name="labelAlignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
@@ -436,23 +439,6 @@
              </item>
              <item row="1" column="1">
               <widget class="QLineEdit" name="line_keywords_books">
-               <property name="minimumSize">
-                <size>
-                 <width>280</width>
-                 <height>0</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_25">
-               <property name="text">
-                <string>editors:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QLineEdit" name="line_editors_books">
                <property name="minimumSize">
                 <size>
                  <width>280</width>
@@ -1065,6 +1051,9 @@
           <layout class="QVBoxLayout" name="verticalLayout_16">
            <item>
             <layout class="QFormLayout" name="formLayout_7">
+             <property name="fieldGrowthPolicy">
+              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+             </property>
              <property name="labelAlignment">
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
@@ -1087,16 +1076,6 @@
              </item>
              <item row="1" column="1">
               <widget class="QLineEdit" name="line_keywords_va"/>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_31">
-               <property name="text">
-                <string>editors:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QLineEdit" name="line_editors_va"/>
              </item>
             </layout>
            </item>
@@ -1260,15 +1239,15 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="page">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>629</width>
-            <height>208</height>
+            <width>962</width>
+            <height>304</height>
            </rect>
           </property>
           <attribute name="label">
@@ -1279,6 +1258,9 @@
             <layout class="QHBoxLayout" name="horizontalLayout_19">
              <item>
               <layout class="QFormLayout" name="formLayout_9">
+               <property name="fieldGrowthPolicy">
+                <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+               </property>
                <property name="labelAlignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
@@ -1323,30 +1305,13 @@
                 </widget>
                </item>
                <item row="2" column="0">
-                <widget class="QLabel" name="label_35">
-                 <property name="text">
-                  <string>editors:</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QLineEdit" name="line_editors_books_checked">
-                 <property name="minimumSize">
-                  <size>
-                   <width>280</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
                 <widget class="QLabel" name="label_39">
                  <property name="text">
                   <string>user id</string>
                  </property>
                 </widget>
                </item>
-               <item row="3" column="1">
+               <item row="2" column="1">
                 <widget class="QLineEdit" name="line_user_id_books_checked">
                  <property name="minimumSize">
                   <size>
@@ -2017,8 +1982,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>442</width>
-            <height>206</height>
+            <width>962</width>
+            <height>304</height>
            </rect>
           </property>
           <attribute name="label">
@@ -2031,6 +1996,9 @@
               <layout class="QVBoxLayout" name="verticalLayout_26">
                <item>
                 <layout class="QFormLayout" name="formLayout_11">
+                 <property name="fieldGrowthPolicy">
+                  <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+                 </property>
                  <property name="labelAlignment">
                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                  </property>
@@ -2066,23 +2034,6 @@
                  </item>
                  <item row="1" column="1">
                   <widget class="QLineEdit" name="line_keywords_checked_out_vas">
-                   <property name="minimumSize">
-                    <size>
-                     <width>200</width>
-                     <height>0</height>
-                    </size>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0">
-                  <widget class="QLabel" name="label_52">
-                   <property name="text">
-                    <string>editors:</string>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QLineEdit" name="line_editors_checked_out_vas">
                    <property name="minimumSize">
                     <size>
                      <width>200</width>
@@ -2277,6 +2228,13 @@
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="button_settings">
+       <property name="text">
+        <string>settings</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="button_logout">

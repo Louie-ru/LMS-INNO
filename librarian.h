@@ -58,6 +58,8 @@ private slots:
 
     void closeWidget();
 
+    void on_button_settings_clicked();
+
 private:
     Ui::Librarian *ui;
     void clearObjects();

@@ -710,3 +710,8 @@ void Librarian::on_button_logout_clicked(){
 void Librarian::showName(){
     ui->status->setText("Logged in as librarian: " + me.name);
 }
+
+void Librarian::on_button_settings_clicked()
+{
+
+}
