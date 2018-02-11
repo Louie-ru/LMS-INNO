@@ -259,7 +259,9 @@ public:
         }
     }
 
-    int check_out_article(int document_id);
+    int check_out_article(int document_id) {
+        return 2;
+    }
     int check_out_av(int document_id);
     int return_book(int check_out_id){
         QSqlQuery query;
