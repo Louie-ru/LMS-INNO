@@ -452,11 +452,10 @@ void Librarian::on_button_show_checked_out_books_clicked(){
         ui->table_checked_out_books->setItem(i, 5, new QTableWidgetItem(QString::number(found[i].second.price)));
         ui->table_checked_out_books->setItem(i, 6, new QTableWidgetItem(QString::number(found[i].second.room)));
         ui->table_checked_out_books->setItem(i, 7, new QTableWidgetItem(QString::number(found[i].second.level)));\
-        ui->table_checked_out_books->setItem(i, 8, new QTableWidgetItem(found[i].second.bestseller ? "yes" : "no"));
-        ui->table_checked_out_books->setItem(i, 9, new QTableWidgetItem(QString::number(found[i].second.copies)));
-        ui->table_checked_out_books->setItem(i, 10, new QTableWidgetItem(date_start));
-        ui->table_checked_out_books->setItem(i, 11, new QTableWidgetItem(date_end));
-        ui->table_checked_out_books->setItem(i, 12, new QTableWidgetItem(QString::number(found[i].first.fine)));
+        ui->table_checked_out_books->setItem(i, 8, new QTableWidgetItem(found[i].second.bestseller ? "yes" : "no"));\
+        ui->table_checked_out_books->setItem(i, 9, new QTableWidgetItem(date_start));
+        ui->table_checked_out_books->setItem(i, 10, new QTableWidgetItem(date_end));
+        ui->table_checked_out_books->setItem(i, 11, new QTableWidgetItem(QString::number(found[i].first.fine)));
     }
     ui->table_checked_out_books->resizeColumnsToContents();
 }

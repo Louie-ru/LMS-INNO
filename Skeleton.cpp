@@ -374,11 +374,12 @@ class LibrarianUser : public User{
 public:
     QVector<std::pair<Check_out, Book> > search_books_checked_out(int user_id, QString authors, QString title, QString keywords, QString publisher, int year, bool bestseller, bool overdue, bool or_and){
         QSqlQuery query;
+        qDebug() << "start";
         QVector<Book> books = search_books(authors, title, keywords, publisher, year, bestseller, 0, or_and);
         QVector<std::pair<Check_out, Book> > ans;
         for (int i = 0; i < books.size(); i++){
-            QString req = "SELECT * FROM check_outs WHERE document_type = 1 AND year_end IS NOT NULL AND document_id = " + QString::number(books[i].id);
-            if (user_id != -1) req += QString(or_and ? " AND" : " OR") + " user_id = " + QString::number(user_id);
+            QString req = "SELECT * FROM check_outs WHERE document_type = 1 AND year_end IS NULL AND document_id = " + QString::number(books[i].id);
+            if (user_id != 0) req += QString(or_and ? " AND" : " OR") + " user_id = " + QString::number(user_id);
             query.exec(req);
             while (query.next()) {
                 int check_out_id = query.value(0).toInt();
@@ -394,7 +395,7 @@ public:
                 QDate return_date;
                 return_date.setDate(end.first.year(), end.first.month(), end.first.day());
                 if (overdue && QDate::currentDate().daysTo(return_date) >= 0) continue;
-                ans.push_back(make_pair(Check_out(id, 1, book_id, check_out_id, year_start, month_start, day_start, end.first.year(), end.first.month(), end.first.day(), end.second), book));
+                ans.push_back(make_pair(Check_out(current_user_id, 1, book_id, check_out_id, year_start, month_start, day_start, end.first.year(), end.first.month(), end.first.day(), end.second), book));
             }
         }
         return ans;
