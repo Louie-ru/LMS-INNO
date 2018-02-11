@@ -400,6 +400,18 @@ public:
         }
         return ans;
     }
+    void set_settings(int days_add_renew){
+        QSqlQuery query;
+        query.prepare("UPDATE settings SET days_add_renew = :days_add_renew");
+        query.bindValue(":days_add_renew", days_add_renew);
+        query.exec();
+    }
+    int get_days_add_renew(){
+        QSqlQuery query;
+        query.exec("SELECT days_add_renew FROM settings");
+        query.next();
+        return query.value(0).toInt();
+    }
     QVector<std::pair<Check_out, Article> > search_articles_checked_out(int user_id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, bool or_and);
     QVector<std::pair<Check_out, VA> > search_av_checked_out(int user_id, QString authors, QString title, QString keywords, bool or_and);
 

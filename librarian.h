@@ -51,6 +51,7 @@ private slots:
     void modifyVA();
     void modifyPatron();
     void modifyLibrarian();
+    void modifySettings();
 
     void createBook();
     void createArticle();

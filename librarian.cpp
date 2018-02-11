@@ -760,9 +760,24 @@ void Librarian::on_button_logout_clicked(){
 void Librarian::showName(){
     ui->status->setText("Logged in as librarian: " + me.name);
 }
+void Librarian::modifySettings(){
+    int days = line1->text().toInt();
+    me.set_settings(days);
+    closeWidget();
+}
 void Librarian::on_button_settings_clicked(){
-
+    if (widget != NULL && !widget->isHidden()) return;
+    widget = new QWidget();
+    QLabel *days = new QLabel("days to add for renew:");
+    clearObjects();
+    line1->setText(QString::number(me.get_days_add_renew()));
+    w_layout->addRow(days, line1);
+    w_layout->addRow(cancel, ok);
+    connect(ok, SIGNAL (clicked()),this, SLOT (modifySettings()));
+    widget->setLayout(w_layout);
+    widget->show();
 }
 void Librarian::closeWidget(){
+    //need special function as slot to connect with button
     widget->close();
 }
