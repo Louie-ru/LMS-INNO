@@ -404,7 +404,11 @@ void Librarian::on_delete_patron_clicked(int id){
     PatronUser patron = me.get_patron(id);
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this patron?\nname: " + patron.name + "\nlogin: " + patron.login, QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
-    me.delete_patron(id);
+    if (!me.delete_patron(id)){
+        ui->status->setText("This patron has actual check outs");
+        return;
+    }
+    ui->status->setText("Patron deleted successfully");
     on_button_search_patrons_clicked();
 }
 void Librarian::on_delete_librarian_clicked(int id){

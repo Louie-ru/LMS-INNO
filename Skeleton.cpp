@@ -495,6 +495,8 @@ public:
 
     bool delete_patron(int user_id){
         QSqlQuery query;
+        if (get_patron(user_id).check_outs.size() > 1)
+            return 0; //cant delete if has check outs
         query.exec("DELETE FROM patrons WHERE id = " + QString::number(user_id));
         return 1;
     }
