@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab_books">
       <attribute name="title">
@@ -980,11 +980,6 @@
              <column>
               <property name="text">
                <string>renew</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>return</string>
               </property>
              </column>
             </widget>

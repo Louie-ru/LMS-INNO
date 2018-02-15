@@ -26,7 +26,6 @@ private slots:
 
     void check_out_book(int id);
     void renew_book(int check_out_id);
-    void return_book(int id);
 
     void want_book(int book_id);
 

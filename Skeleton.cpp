@@ -79,12 +79,11 @@ public:
 
 class Check_out {
 public:
-    int document_type;
-    int document_id;
-    int check_out_id;
+    int user_id;
+    int document_type, document_id;
+    int check_out_id, fine;
     int year_start, month_start, day_start;
     int year_end, month_end, day_end;
-    int fine, user_id;
     Check_out(int user_id_, int document_type_, int document_id_, int check_out_id_, int year_start_, int month_start_, int day_start_, int year_end_, int month_end_, int day_end_, int fine_){
         user_id = user_id_;
         document_type = document_type_;
@@ -263,40 +262,6 @@ public:
         return 2;
     }
     int check_out_av(int document_id);
-    int return_book(int check_out_id){
-        QSqlQuery query;
-        query.exec("SELECT * FROM check_outs WHERE document_type = 1 AND check_out_id = " + QString::number(check_out_id));
-        if (!query.next()) return -1;
-        int book_id = query.value(3).toInt();
-        int year_start = query.value(4).toInt();
-        int month_start = query.value(5).toInt();
-        int day_start = query.value(6).toInt();
-        int renew_state = query.value(10).toInt();
-
-        Book book = get_book(book_id);
-        std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, faculty, book.bestseller, book.price, renew_state);
-        int fine = end.second;
-
-        QDate today = QDate::currentDate();
-        query.prepare("UPDATE check_outs SET year_end = :year_end, month_end = :month_end, day_end = :day_end WHERE check_out_id = :check_out_id");
-        query.bindValue(":check_out_id", check_out_id);
-        query.bindValue(":year_end", end.first.year());
-        query.bindValue(":month_end", end.first.month());
-        query.bindValue(":day_end", end.first.day());
-        query.exec();
-
-        //remove check out from my list
-        query.prepare("UPDATE patrons SET check_outs = replace(check_outs, :check_out_id_str, '') WHERE id = :user_id");
-        query.bindValue(":check_out_id_str", ";" + QString::number(check_out_id));
-        query.bindValue(":user_id", id);
-        query.exec();
-
-        query.prepare("UPDATE books SET copies = copies + 1 WHERE id = :document_id");
-        query.bindValue(":document_id", book.id);
-        query.exec();
-
-        return fine;
-    }
     int return_article(int check_out_id);
     int return_av(int check_out_id);
 
@@ -416,6 +381,43 @@ public:
     }
     QVector<std::pair<Check_out, Article> > search_articles_checked_out(int user_id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, bool or_and);
     QVector<std::pair<Check_out, VA> > search_av_checked_out(int user_id, QString authors, QString title, QString keywords, bool or_and);
+
+    int return_book(int check_out_id){
+        QSqlQuery query;
+        query.exec("SELECT * FROM check_outs WHERE document_type = 1 AND check_out_id = " + QString::number(check_out_id));
+        if (!query.next()) return -1;
+        int user_id = query.value(1).toInt();
+        int book_id = query.value(3).toInt();
+        int year_start = query.value(4).toInt();
+        int month_start = query.value(5).toInt();
+        int day_start = query.value(6).toInt();
+        int renew_state = query.value(10).toInt();
+
+        PatronUser patron = get_patron(user_id);
+        Book book = get_book(book_id);
+        std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, patron.faculty, book.bestseller, book.price, renew_state);
+        int fine = end.second;
+
+        QDate today = QDate::currentDate();
+        query.prepare("UPDATE check_outs SET year_end = :year_end, month_end = :month_end, day_end = :day_end WHERE check_out_id = :check_out_id");
+        query.bindValue(":check_out_id", check_out_id);
+        query.bindValue(":year_end", end.first.year());
+        query.bindValue(":month_end", end.first.month());
+        query.bindValue(":day_end", end.first.day());
+        query.exec();
+
+        //remove check out from my list
+        query.prepare("UPDATE patrons SET check_outs = replace(check_outs, :check_out_id_str, '') WHERE id = :user_id");
+        query.bindValue(":check_out_id_str", ";" + QString::number(check_out_id));
+        query.bindValue(":user_id", id);
+        query.exec();
+
+        query.prepare("UPDATE books SET copies = copies + 1 WHERE id = :document_id");
+        query.bindValue(":document_id", book.id);
+        query.exec();
+
+        return fine;
+    }
 
     QVector<PatronUser> search_patrons(QString name, QString address, QString phone, bool faculty, bool or_and){
         QSqlQuery query;
@@ -670,7 +672,8 @@ public:
                      "year_end INTEGER, "
                      "month_end INTEGER, "
                      "day_end INTEGER, "
-                     "renew_state INTEGER DEFAULT 0)");
+                     "renew_state INTEGER DEFAULT 0,"
+                     "return_state INTEGER DEFAULT 0)");
 
         query.exec("CREATE TABLE IF NOT EXISTS settings ("
                      "days_add_renew INTEGER DEFAULT 7)");
