@@ -39,6 +39,7 @@ public:
     Book(){};
 };
 
+
 class Article : public Document{
 public:
     QString journal_title, publisher, editors, authors;
