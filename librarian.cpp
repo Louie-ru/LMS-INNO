@@ -175,7 +175,19 @@ void Librarian::on_button_search_books_clicked(){
 }
 void Librarian::on_button_search_articles_clicked(){
     ui->table_search_articles->setRowCount(0);
-    QVector<Article> found;// = librarian.search_articles();//CHANGE LATER
+
+    QString authors = ui->line_author_articles->text();
+    QString title = ui->line_title_articles->text();
+    QString journal = ui->line_journal_articles->text();
+    QString keywords = ui->line_keywords_articles->text();
+    QString publisher = ui->line_publisher_articles->text();
+    QString editors = ui->line_editors_articles->text();
+    int year = (ui->line_year_articles->text() == "" ? 0 : ui->line_year_articles->text().toInt());
+    int month = (ui->combobox_month_articles->currentText() == "" ? 0 : ui->combobox_month_articles->currentText().toInt());
+    bool available = ui->checkbox_available_articles->isChecked();
+    bool or_and = ui->checkbox_criteria_articles->isChecked();
+
+    QVector<Article> found = me.search_articles(authors, title, keywords, journal, publisher, editors, year, month, available, or_and);
     for (int i = 0; i < found.size(); i++){
         ui->table_search_articles->insertRow(i);
         QPushButton *btn_modify = new QPushButton(this);
@@ -198,7 +210,7 @@ void Librarian::on_button_search_articles_clicked(){
         ui->table_search_articles->setItem(i, 3, new QTableWidgetItem(found[i].journal_title));
         ui->table_search_articles->setItem(i, 4, new QTableWidgetItem(found[i].editors));
         ui->table_search_articles->setItem(i, 5, new QTableWidgetItem(QString::number(found[i].year)));
-        ui->table_search_articles->setItem(i, 6, new QTableWidgetItem(QString::number(found[i].month)));
+        ui->table_search_articles->setItem(i, 6, new QTableWidgetItem(QDate::longMonthName(found[i].month, QDate::DateFormat)));
         ui->table_search_articles->setItem(i, 7, new QTableWidgetItem(QString::number(found[i].price)));
         ui->table_search_articles->setItem(i, 8, new QTableWidgetItem(QString::number(found[i].room)));
         ui->table_search_articles->setItem(i, 9, new QTableWidgetItem(QString::number(found[i].level)));
@@ -210,7 +222,15 @@ void Librarian::on_button_search_articles_clicked(){
 }
 void Librarian::on_button_search_vas_clicked(){
     ui->table_search_va->setRowCount(0);
-    QVector<VA> found;// = librarian.search_vas();//CHANGE LATER
+
+    QString authors = ui->line_authors_va->text();
+    QString title = ui->line_title_va->text();
+    QString keywords = ui->line_keywords_va->text();
+    QString publisher = ui->line_publisher_va->text();
+    bool available = ui->checkbox_available_va->isChecked();
+    bool or_and = ui->checkbox_criteria_va->isChecked();
+
+    QVector<VA> found = me.search_av(authors, title, keywords, available, or_and);
     for (int i = 0; i < found.size(); i++){
         ui->table_search_va->insertRow(i);
         QPushButton *btn_modify = new QPushButton(this);
@@ -425,24 +445,56 @@ void Librarian::on_delete_book_clicked(int id){
 void Librarian::on_delete_article_clicked(int id){
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this article?", QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
+    me.delete_article(id);
+    on_button_search_articles_clicked();
 }
 void Librarian::on_delete_va_clicked(int id){
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this va?", QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
+    me.delete_av(id);
+    on_button_search_vas_clicked();
 }
 
 void Librarian::return_book(int check_out_id){
     std::pair<int, int> ret = me.return_book(check_out_id);
     int fine = ret.first, user_id = ret.second;
     if (fine == -1)
-        ui->status->setText("Error returning book");
+        ui->status->setText("Error returning document");
     else if (fine > 0)
         QMessageBox::information(0, "Fine", "Fine size: " + QString::number(fine));
     if (user_id == -1)
-        ui->status->setText("Book returned successfully");
+        ui->status->setText("Document returned successfully");
     else
-        ui->status->setText("Book returned successfully; Patron " + QString::number(user_id) + " wants this book");
+        ui->status->setText("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
     on_button_show_checked_out_books_clicked();
+}
+
+void Librarian::return_article(int check_out_id){
+    std::pair<int, int> ret = me.return_article(check_out_id);
+    int fine = ret.first, user_id = ret.second;
+    if (fine == -1)
+        ui->status->setText("Error returning document");
+    else if (fine > 0)
+        QMessageBox::information(0, "Fine", "Fine size: " + QString::number(fine));
+    if (user_id == -1)
+        ui->status->setText("Document returned successfully");
+    else
+        ui->status->setText("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
+    on_button_show_checked_out_articles_clicked();
+}
+
+void Librarian::return_va(int check_out_id){
+    std::pair<int, int> ret = me.return_va(check_out_id);
+    int fine = ret.first, user_id = ret.second;
+    if (fine == -1)
+        ui->status->setText("Error returning document");
+    else if (fine > 0)
+        QMessageBox::information(0, "Fine", "Fine size: " + QString::number(fine));
+    if (user_id == -1)
+        ui->status->setText("Document returned successfully");
+    else
+        ui->status->setText("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
+    on_button_show_checked_out_vas_clicked();
 }
 
 void Librarian::on_button_show_checked_out_books_clicked(){
