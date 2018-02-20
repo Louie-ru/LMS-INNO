@@ -432,12 +432,16 @@ void Librarian::on_delete_va_clicked(int id){
 }
 
 void Librarian::return_book(int check_out_id){
-    int fine = me.return_book(check_out_id);
+    std::pair<int, int> ret = me.return_book(check_out_id);
+    int fine = ret.first, user_id = ret.second;
     if (fine == -1)
         ui->status->setText("Error returning book");
     else if (fine > 0)
         QMessageBox::information(0, "Fine", "Fine size: " + QString::number(fine));
-    ui->status->setText("Book returned successfully");
+    if (user_id == -1)
+        ui->status->setText("Book returned successfully");
+    else
+        ui->status->setText("Book returned successfully; Patron " + QString::number(user_id) + " wants this book");
     on_button_show_checked_out_books_clicked();
 }
 
