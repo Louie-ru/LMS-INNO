@@ -70,7 +70,7 @@ void Patron::renew_article(int check_out_id){
 }
 
 void Patron::renew_va(int check_out_id){
-    int ret = me.renew_va(check_out_id);
+    int ret = me.renew_av(check_out_id);
     if (ret == 0)
         ui->status->setText("Error renewing");
     else if (ret == 1)
@@ -153,7 +153,7 @@ void Patron::on_button_search_articles_clicked(){
         ui->table_search_articles->setItem(i, 3, new QTableWidgetItem(found[i].journal_title));
         ui->table_search_articles->setItem(i, 4, new QTableWidgetItem(found[i].editors));
         ui->table_search_articles->setItem(i, 5, new QTableWidgetItem(QString::number(found[i].year)));
-        ui->table_search_articles->setItem(i, 6, new QTableWidgetItem(QDate::longMonthName(found[i].month, 0);));
+        ui->table_search_articles->setItem(i, 6, new QTableWidgetItem(QDate::longMonthName(found[i].month, QDate::DateFormat)));
         ui->table_search_articles->setItem(i, 7, new QTableWidgetItem(QString::number(found[i].price)));
         ui->table_search_articles->setItem(i, 8, new QTableWidgetItem(QString::number(found[i].room)));
         ui->table_search_articles->setItem(i, 9, new QTableWidgetItem(QString::number(found[i].level)));
@@ -279,26 +279,26 @@ void Patron::on_button_logout_clicked(){
 void Patron::on_tabWidget_tabBarClicked(int index){
     if (index != 3) return;
     ui->table_my_books->setRowCount(0);
-    QVector<std::pair<Check_out, Book> > found = me.get_checked_out_books();
-    for (int i = 0; i < found.size(); i++){
+    QVector<std::pair<Check_out, Book> > found_books = me.get_checked_out_books();
+    for (int i = 0; i < found_books.size(); i++){
         ui->table_my_books->insertRow(i);
         QPushButton *btn_renew = new QPushButton(this);
         btn_renew->setText("renew");
         QSignalMapper *sm = new QSignalMapper(this);
         connect(sm, SIGNAL(mapped(int)), this, SLOT(renew_book(int)));
         connect(btn_renew, SIGNAL(clicked()), sm, SLOT(map()));
-        sm->setMapping(btn_renew, found[i].first.check_out_id);
+        sm->setMapping(btn_renew, found_books[i].first.check_out_id);
 
-        QString date_start = QString::number(found[i].first.day_start)+"."+QString::number(found[i].first.month_start)+"."+QString::number(found[i].first.year_start);
-        QString date_end = QString::number(found[i].first.day_end)+"."+QString::number(found[i].first.month_end)+"."+QString::number(found[i].first.year_end);
-        ui->table_my_books->setItem(i, 0, new QTableWidgetItem(found[i].second.title));
-        ui->table_my_books->setItem(i, 1, new QTableWidgetItem(found[i].second.authors));
-        ui->table_my_books->setItem(i, 2, new QTableWidgetItem(found[i].second.publisher));
-        ui->table_my_books->setItem(i, 3, new QTableWidgetItem(QString::number(found[i].second.year)));
-        ui->table_my_books->setItem(i, 4, new QTableWidgetItem(QString::number(found[i].second.price)));
-        ui->table_my_books->setItem(i, 5, new QTableWidgetItem(QString::number(found[i].second.room)));
-        ui->table_my_books->setItem(i, 6, new QTableWidgetItem(QString::number(found[i].second.level)));
-        ui->table_my_books->setItem(i, 7, new QTableWidgetItem(found[i].second.bestseller ? "yes" : "no"));
+        QString date_start = QString::number(found_books[i].first.day_start)+"."+QString::number(found_books[i].first.month_start)+"."+QString::number(found_books[i].first.year_start);
+        QString date_end = QString::number(found_books[i].first.day_end)+"."+QString::number(found_books[i].first.month_end)+"."+QString::number(found_books[i].first.year_end);
+        ui->table_my_books->setItem(i, 0, new QTableWidgetItem(found_books[i].second.title));
+        ui->table_my_books->setItem(i, 1, new QTableWidgetItem(found_books[i].second.authors));
+        ui->table_my_books->setItem(i, 2, new QTableWidgetItem(found_books[i].second.publisher));
+        ui->table_my_books->setItem(i, 3, new QTableWidgetItem(QString::number(found_books[i].second.year)));
+        ui->table_my_books->setItem(i, 4, new QTableWidgetItem(QString::number(found_books[i].second.price)));
+        ui->table_my_books->setItem(i, 5, new QTableWidgetItem(QString::number(found_books[i].second.room)));
+        ui->table_my_books->setItem(i, 6, new QTableWidgetItem(QString::number(found_books[i].second.level)));
+        ui->table_my_books->setItem(i, 7, new QTableWidgetItem(found_books[i].second.bestseller ? "yes" : "no"));
         ui->table_my_books->setItem(i, 8, new QTableWidgetItem(date_start));
         ui->table_my_books->setItem(i, 9, new QTableWidgetItem(date_end));
         ui->table_my_books->setCellWidget(i, 10, btn_renew);
@@ -307,35 +307,35 @@ void Patron::on_tabWidget_tabBarClicked(int index){
 
 
     ui->table_my_articles->setRowCount(0);
-    QVector<std::pair<Check_out, Article> > found = me.get_checked_out_articles();
-    for (int i = 0; i < found.size(); i++){
+    QVector<std::pair<Check_out, Article> > found_articles = me.get_checked_out_articles();
+    for (int i = 0; i < found_articles.size(); i++){
         ui->table_my_articles->insertRow(i);
         QPushButton *btn_renew = new QPushButton(this);
         btn_renew->setText("renew");
         QSignalMapper *sm = new QSignalMapper(this);
         connect(sm, SIGNAL(mapped(int)), this, SLOT(renew_article(int)));
         connect(btn_renew, SIGNAL(clicked()), sm, SLOT(map()));
-        sm->setMapping(btn_renew, found[i].second.id);
+        sm->setMapping(btn_renew, found_articles[i].second.id);
 
         QPushButton *btn_return = new QPushButton(this);
         btn_return->setText("return");
         QSignalMapper *sm2 = new QSignalMapper(this);
         connect(sm2, SIGNAL(mapped(int)), this, SLOT(return_article(int)));
         connect(btn_return, SIGNAL(clicked()), sm2, SLOT(map()));
-        sm2->setMapping(btn_return, found[i].second.id);
+        sm2->setMapping(btn_return, found_articles[i].second.id);
 
-        QString date_start = QString::number(found[i].first.day_start)+"."+QString::number(found[i].first.month_start)+"."+QString::number(found[i].first.year_start);
-        QString date_end = QString::number(found[i].first.day_end)+"."+QString::number(found[i].first.month_end)+"."+QString::number(found[i].first.year_end);
-        ui->table_my_articles->setItem(i, 0, new QTableWidgetItem(QString(found[i].second.title)));
-        ui->table_my_articles->setItem(i, 1, new QTableWidgetItem(QString(found[i].second.authors)));
-        ui->table_my_articles->setItem(i, 2, new QTableWidgetItem(QString(found[i].second.publisher)));
-        ui->table_my_articles->setItem(i, 3, new QTableWidgetItem(QString(found[i].second.journal_title)));
-        ui->table_my_articles->setItem(i, 4, new QTableWidgetItem(QString(found[i].second.editors)));
-        ui->table_my_articles->setItem(i, 5, new QTableWidgetItem(QString::number(found[i].second.year)));
-        ui->table_my_articles->setItem(i, 6, new QTableWidgetItem(QString::number(found[i].second.month)));
-        ui->table_my_articles->setItem(i, 7, new QTableWidgetItem(QString::number(found[i].second.price)));
-        ui->table_my_articles->setItem(i, 8, new QTableWidgetItem(QString::number(found[i].second.room)));
-        ui->table_my_articles->setItem(i, 9, new QTableWidgetItem(QString::number(found[i].second.level)));
+        QString date_start = QString::number(found_articles[i].first.day_start)+"."+QString::number(found_articles[i].first.month_start)+"."+QString::number(found_articles[i].first.year_start);
+        QString date_end = QString::number(found_articles[i].first.day_end)+"."+QString::number(found_articles[i].first.month_end)+"."+QString::number(found_articles[i].first.year_end);
+        ui->table_my_articles->setItem(i, 0, new QTableWidgetItem(QString(found_articles[i].second.title)));
+        ui->table_my_articles->setItem(i, 1, new QTableWidgetItem(QString(found_articles[i].second.authors)));
+        ui->table_my_articles->setItem(i, 2, new QTableWidgetItem(QString(found_articles[i].second.publisher)));
+        ui->table_my_articles->setItem(i, 3, new QTableWidgetItem(QString(found_articles[i].second.journal_title)));
+        ui->table_my_articles->setItem(i, 4, new QTableWidgetItem(QString(found_articles[i].second.editors)));
+        ui->table_my_articles->setItem(i, 5, new QTableWidgetItem(QString::number(found_articles[i].second.year)));
+        ui->table_my_articles->setItem(i, 6, new QTableWidgetItem(QString::number(found_articles[i].second.month)));
+        ui->table_my_articles->setItem(i, 7, new QTableWidgetItem(QString::number(found_articles[i].second.price)));
+        ui->table_my_articles->setItem(i, 8, new QTableWidgetItem(QString::number(found_articles[i].second.room)));
+        ui->table_my_articles->setItem(i, 9, new QTableWidgetItem(QString::number(found_articles[i].second.level)));
         ui->table_my_articles->setItem(i, 10, new QTableWidgetItem(date_start));
         ui->table_my_articles->setItem(i, 11, new QTableWidgetItem(date_end));
         ui->table_my_articles->setCellWidget(i, 12, btn_renew);
@@ -345,30 +345,30 @@ void Patron::on_tabWidget_tabBarClicked(int index){
 
 
     ui->table_my_vas->setRowCount(0);
-    QVector<std::pair<Check_out, VA> > found = patron.get_checked_out_vas();
-    for (int i = 0; i < found.size(); i++){
+    QVector<std::pair<Check_out, VA> > found_vas = me.get_checked_out_avs();
+    for (int i = 0; i < found_vas.size(); i++){
         ui->table_my_vas->insertRow(i);
         QPushButton *btn_renew = new QPushButton(this);
         btn_renew->setText("renew");
         QSignalMapper *sm = new QSignalMapper(this);
         connect(sm, SIGNAL(mapped(int)), this, SLOT(renew_va(int)));
         connect(btn_renew, SIGNAL(clicked()), sm, SLOT(map()));
-        sm->setMapping(btn_renew, found[i].second.id);
+        sm->setMapping(btn_renew, found_vas[i].second.id);
 
         QPushButton *btn_return = new QPushButton(this);
         btn_return->setText("return");
         QSignalMapper *sm2 = new QSignalMapper(this);
         connect(sm2, SIGNAL(mapped(int)), this, SLOT(return_va(int)));
         connect(btn_return, SIGNAL(clicked()), sm2, SLOT(map()));
-        sm2->setMapping(btn_return, found[i].second.id);
+        sm2->setMapping(btn_return, found_vas[i].second.id);
 
-        QString date_start = QString::number(found[i].first.day_start)+"."+QString::number(found[i].first.month_start)+"."+QString::number(found[i].first.year_start);
-        QString date_end = QString::number(found[i].first.day_end)+"."+QString::number(found[i].first.month_end)+"."+QString::number(found[i].first.year_end);
-        ui->table_my_vas->setItem(i, 0, new QTableWidgetItem(found[i].second.title));
-        ui->table_my_vas->setItem(i, 1, new QTableWidgetItem(found[i].second.authors));
-        ui->table_my_vas->setItem(i, 2, new QTableWidgetItem(QString::number(found[i].second.price)));
-        ui->table_my_vas->setItem(i, 3, new QTableWidgetItem(QString::number(found[i].second.room)));
-        ui->table_my_vas->setItem(i, 4, new QTableWidgetItem(QString::number(found[i].second.level)));
+        QString date_start = QString::number(found_vas[i].first.day_start)+"."+QString::number(found_vas[i].first.month_start)+"."+QString::number(found_vas[i].first.year_start);
+        QString date_end = QString::number(found_vas[i].first.day_end)+"."+QString::number(found_vas[i].first.month_end)+"."+QString::number(found_vas[i].first.year_end);
+        ui->table_my_vas->setItem(i, 0, new QTableWidgetItem(found_vas[i].second.title));
+        ui->table_my_vas->setItem(i, 1, new QTableWidgetItem(found_vas[i].second.authors));
+        ui->table_my_vas->setItem(i, 2, new QTableWidgetItem(QString::number(found_vas[i].second.price)));
+        ui->table_my_vas->setItem(i, 3, new QTableWidgetItem(QString::number(found_vas[i].second.room)));
+        ui->table_my_vas->setItem(i, 4, new QTableWidgetItem(QString::number(found_vas[i].second.level)));
         ui->table_my_vas->setItem(i, 5, new QTableWidgetItem(date_start));
         ui->table_my_vas->setItem(i, 6, new QTableWidgetItem(date_end));
         ui->table_my_vas->setCellWidget(i, 7, btn_renew);
