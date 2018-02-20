@@ -404,7 +404,11 @@ void Librarian::on_delete_patron_clicked(int id){
     PatronUser patron = me.get_patron(id);
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this patron?\nname: " + patron.name + "\nlogin: " + patron.login, QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
-    me.delete_patron(id);
+    if (!me.delete_patron(id)){
+        ui->status->setText("This patron has actual check outs");
+        return;
+    }
+    ui->status->setText("Patron deleted successfully");
     on_button_search_patrons_clicked();
 }
 void Librarian::on_delete_librarian_clicked(int id){
@@ -427,6 +431,20 @@ void Librarian::on_delete_va_clicked(int id){
     if (reply == QMessageBox::No) return;
 }
 
+void Librarian::return_book(int check_out_id){
+    std::pair<int, int> ret = me.return_book(check_out_id);
+    int fine = ret.first, user_id = ret.second;
+    if (fine == -1)
+        ui->status->setText("Error returning book");
+    else if (fine > 0)
+        QMessageBox::information(0, "Fine", "Fine size: " + QString::number(fine));
+    if (user_id == -1)
+        ui->status->setText("Book returned successfully");
+    else
+        ui->status->setText("Book returned successfully; Patron " + QString::number(user_id) + " wants this book");
+    on_button_show_checked_out_books_clicked();
+}
+
 void Librarian::on_button_show_checked_out_books_clicked(){
     ui->table_checked_out_books->setRowCount(0);
     QString authors = ui->line_authors_books_checked->text();
@@ -442,6 +460,14 @@ void Librarian::on_button_show_checked_out_books_clicked(){
     QVector<std::pair<Check_out, Book> > found = me.search_books_checked_out(user_id, authors, title, keywords, publisher, year, bestseller, overdue, or_and);
     for (int i = 0; i < found.size(); i++){
         ui->table_checked_out_books->insertRow(i);
+
+        QPushButton *btn_return = new QPushButton(this);
+        btn_return->setText("return");
+        QSignalMapper *sm2 = new QSignalMapper(this);
+        connect(sm2, SIGNAL(mapped(int)), this, SLOT(return_book(int)));
+        connect(btn_return, SIGNAL(clicked()), sm2, SLOT(map()));
+        sm2->setMapping(btn_return, found[i].first.check_out_id);
+
         QString date_start = QString::number(found[i].first.day_start)+"."+QString::number(found[i].first.month_start)+"."+QString::number(found[i].first.year_start);
         QString date_end = QString::number(found[i].first.day_end)+"."+QString::number(found[i].first.month_end)+"."+QString::number(found[i].first.year_end);
         ui->table_checked_out_books->setItem(i, 0, new QTableWidgetItem(QString::number(found[i].first.user_id)));
@@ -456,6 +482,7 @@ void Librarian::on_button_show_checked_out_books_clicked(){
         ui->table_checked_out_books->setItem(i, 9, new QTableWidgetItem(date_start));
         ui->table_checked_out_books->setItem(i, 10, new QTableWidgetItem(date_end));
         ui->table_checked_out_books->setItem(i, 11, new QTableWidgetItem(QString::number(found[i].first.fine)));
+        ui->table_checked_out_books->setCellWidget(i, 12, btn_return);
     }
     ui->table_checked_out_books->resizeColumnsToContents();
 }

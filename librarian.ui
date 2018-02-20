@@ -1565,6 +1565,11 @@
                <string>fine</string>
               </property>
              </column>
+             <column>
+              <property name="text">
+               <string>return</string>
+              </property>
+             </column>
             </widget>
            </item>
           </layout>
@@ -1574,8 +1579,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>962</width>
-            <height>304</height>
+            <width>533</width>
+            <height>236</height>
            </rect>
           </property>
           <attribute name="label">
@@ -1987,8 +1992,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>962</width>
-            <height>304</height>
+            <width>442</width>
+            <height>206</height>
            </rect>
           </property>
           <attribute name="label">

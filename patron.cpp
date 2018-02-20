@@ -38,18 +38,6 @@ void Patron::renew_book(int check_out_id){
     }
 }
 
-
-void Patron::return_book(int check_out_id){
-    int fine = me.return_book(check_out_id);
-    if (fine == -1)
-        ui->status->setText("Error returning book");
-    else if (fine > 0)
-        QMessageBox::information(0, "Fine", "Fine size: " + QString::number(fine));
-    ui->status->setText("Book returned successfully");
-    on_tabWidget_tabBarClicked(3);//update table
-    ui->table_search_books->setRowCount(0);//clear search table
-}
-
 void Patron::on_button_search_books_clicked(){
     ui->table_search_books->setRowCount(0);
 
@@ -236,13 +224,6 @@ void Patron::on_tabWidget_tabBarClicked(int index){
         connect(btn_renew, SIGNAL(clicked()), sm, SLOT(map()));
         sm->setMapping(btn_renew, found[i].first.check_out_id);
 
-        QPushButton *btn_return = new QPushButton(this);
-        btn_return->setText("return");
-        QSignalMapper *sm2 = new QSignalMapper(this);
-        connect(sm2, SIGNAL(mapped(int)), this, SLOT(return_book(int)));
-        connect(btn_return, SIGNAL(clicked()), sm2, SLOT(map()));
-        sm2->setMapping(btn_return, found[i].first.check_out_id);
-
         QString date_start = QString::number(found[i].first.day_start)+"."+QString::number(found[i].first.month_start)+"."+QString::number(found[i].first.year_start);
         QString date_end = QString::number(found[i].first.day_end)+"."+QString::number(found[i].first.month_end)+"."+QString::number(found[i].first.year_end);
         ui->table_my_books->setItem(i, 0, new QTableWidgetItem(found[i].second.title));
@@ -256,7 +237,6 @@ void Patron::on_tabWidget_tabBarClicked(int index){
         ui->table_my_books->setItem(i, 8, new QTableWidgetItem(date_start));
         ui->table_my_books->setItem(i, 9, new QTableWidgetItem(date_end));
         ui->table_my_books->setCellWidget(i, 10, btn_renew);
-        ui->table_my_books->setCellWidget(i, 11, btn_return);
     }
     ui->table_my_books->resizeColumnsToContents();
 }

@@ -15,6 +15,19 @@ class Document{
 public:
     QString title, keywords;
     int copies, id, price, room, level;
+    QVector<int> wants;
+    //add users, who wants this book from database
+    void add_wants(QString str){
+        QString id = "";
+        for (int i = 0; i < str.size(); i++){
+            if (str[i] == ';'){
+                if (id != "")
+                    wants.push_back(id.toInt());
+                id = "";
+            }
+            else id += str[i];
+        }
+    }
 };
 
 class Book : public Document{
@@ -22,7 +35,7 @@ public:
     QString publisher, authors;
     int year;
     bool bestseller, reference;
-    Book(QString authors_, QString title_, QString keywords_, QString publisher_, int id_, int year_, int copies_, int price_, int room_, int level_, bool bestseller_, bool reference_){
+    Book(QString authors_, QString title_, QString keywords_, QString publisher_, int id_, int year_, int copies_, int price_, int room_, int level_, bool bestseller_, bool reference_, QString wants_str){
         authors = authors_;
         title = title_;
         keywords = keywords_;
@@ -35,6 +48,7 @@ public:
         room = room_;
         level = level_;
         reference = reference_;
+        add_wants(wants_str);
     }
     Book(){};
 };
@@ -80,12 +94,11 @@ public:
 
 class Check_out {
 public:
-    int document_type;
-    int document_id;
-    int check_out_id;
+    int user_id;
+    int document_type, document_id;
+    int check_out_id, fine;
     int year_start, month_start, day_start;
     int year_end, month_end, day_end;
-    int fine, user_id;
     Check_out(int user_id_, int document_type_, int document_id_, int check_out_id_, int year_start_, int month_start_, int day_start_, int year_end_, int month_end_, int day_end_, int fine_){
         user_id = user_id_;
         document_type = document_type_;
@@ -154,7 +167,6 @@ public:
         req += "1 = " + QString(or_and ? "1" : "0");//nice hack to finish statement correctly
         if (req.length() == 31)//no parameters given
             req = "SELECT * FROM books";
-        qDebug() << req;
         query.exec(req);
         QVector<Book> ans;
         while (query.next()) {
@@ -170,7 +182,8 @@ public:
             int copies = query.value(9).toInt();
             bool bestseller = query.value(10).toInt();
             bool reference = query.value(11).toInt();
-            ans.push_back(Book(authors, title, keywords, publisher, id, year, copies, price, room ,level, bestseller, reference));
+            QString wants_str = query.value(12).toString();
+            ans.push_back(Book(authors, title, keywords, publisher, id, year, copies, price, room ,level, bestseller, reference, wants_str));
         }
         return ans;
     }
@@ -190,7 +203,8 @@ public:
         int copies = query.value(9).toInt();
         bool bestseller = query.value(10).toInt();
         bool reference = query.value(11).toInt();
-        return Book(authors, title, keywords, publisher, book_id, year, copies, price, room ,level, bestseller, reference);
+        QString wants_str = query.value(12).toString();
+        return Book(authors, title, keywords, publisher, book_id, year, copies, price, room ,level, bestseller, reference, wants_str);
     }
 
     QVector<Article> search_articles(QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, bool available, bool or_and);
@@ -253,7 +267,8 @@ public:
         QString id = "";
         for (int i = 0; i < str.size(); i++){
             if (str[i] == ';'){
-                check_outs.push_back(id.toInt());
+                if (id != "")
+                    check_outs.push_back(id.toInt());
                 id = "";
             }
             else id += str[i];
@@ -264,40 +279,6 @@ public:
         return 2;
     }
     int check_out_av(int document_id);
-    int return_book(int check_out_id){
-        QSqlQuery query;
-        query.exec("SELECT * FROM check_outs WHERE document_type = 1 AND check_out_id = " + QString::number(check_out_id));
-        if (!query.next()) return -1;
-        int book_id = query.value(3).toInt();
-        int year_start = query.value(4).toInt();
-        int month_start = query.value(5).toInt();
-        int day_start = query.value(6).toInt();
-        int renew_state = query.value(10).toInt();
-
-        Book book = get_book(book_id);
-        std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, faculty, book.bestseller, book.price, renew_state);
-        int fine = end.second;
-
-        QDate today = QDate::currentDate();
-        query.prepare("UPDATE check_outs SET year_end = :year_end, month_end = :month_end, day_end = :day_end WHERE check_out_id = :check_out_id");
-        query.bindValue(":check_out_id", check_out_id);
-        query.bindValue(":year_end", end.first.year());
-        query.bindValue(":month_end", end.first.month());
-        query.bindValue(":day_end", end.first.day());
-        query.exec();
-
-        //remove check out from my list
-        query.prepare("UPDATE patrons SET check_outs = replace(check_outs, :check_out_id_str, '') WHERE id = :user_id");
-        query.bindValue(":check_out_id_str", ";" + QString::number(check_out_id));
-        query.bindValue(":user_id", id);
-        query.exec();
-
-        query.prepare("UPDATE books SET copies = copies + 1 WHERE id = :document_id");
-        query.bindValue(":document_id", book.id);
-        query.exec();
-
-        return fine;
-    }
     int return_article(int check_out_id);
     int return_av(int check_out_id);
 
@@ -307,6 +288,14 @@ public:
         query.prepare("UPDATE check_outs SET renew_state = 1 WHERE document_type = 1 AND renew_state = 0 AND year_end IS NULL AND document_id = :document_id");
         query.bindValue(":document_id", book_id);
         query.exec();
+
+        Book book = get_book(book_id);
+        if (!book.wants.contains(id)){
+            query.prepare("UPDATE books SET wants = wants || :user_id WHERE id = :document_id");
+            query.bindValue(":user_id", QString::number(id)+";");
+            query.bindValue(":document_id", book_id);
+            query.exec();
+        }
     }
 
     int renew_book(int check_out_id){
@@ -377,7 +366,6 @@ class LibrarianUser : public User{
 public:
     QVector<std::pair<Check_out, Book> > search_books_checked_out(int user_id, QString authors, QString title, QString keywords, QString publisher, int year, bool bestseller, bool overdue, bool or_and){
         QSqlQuery query;
-        qDebug() << "start";
         QVector<Book> books = search_books(authors, title, keywords, publisher, year, bestseller, 0, or_and);
         QVector<std::pair<Check_out, Book> > ans;
         for (int i = 0; i < books.size(); i++){
@@ -403,6 +391,24 @@ public:
         }
         return ans;
     }
+
+    int remove_last_wants_book(int document_id){
+        Book book = get_book(document_id);
+        if (book.wants.size() == 0)
+            return -1;
+        int last = book.wants[book.wants.size()-1];
+        book.wants.pop_back();
+        QString new_wants = ";";
+        for (int i = 0; i < book.wants.size(); i++)
+            new_wants += QString::number(book.wants[i]) + ";";
+        QSqlQuery query;
+        query.prepare("UPDATE books SET wants = :wants WHERE id = :document_id");
+        query.bindValue(":wants", new_wants);
+        query.bindValue(":document_id", document_id);
+        query.exec();
+        return last;
+    }
+
     void set_settings(int days_add_renew){
         QSqlQuery query;
         query.prepare("UPDATE settings SET days_add_renew = :days_add_renew");
@@ -418,6 +424,47 @@ public:
     QVector<std::pair<Check_out, Article> > search_articles_checked_out(int user_id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, bool or_and);
     QVector<std::pair<Check_out, VA> > search_av_checked_out(int user_id, QString authors, QString title, QString keywords, bool or_and);
 
+    //fine, wants_user_id
+    std::pair<int, int> return_book(int check_out_id){
+        QSqlQuery query;
+        query.exec("SELECT * FROM check_outs WHERE document_type = 1 AND check_out_id = " + QString::number(check_out_id));
+        if (!query.next()) return make_pair(-1, -1);
+        int user_id = query.value(1).toInt();
+        int book_id = query.value(3).toInt();
+        int year_start = query.value(4).toInt();
+        int month_start = query.value(5).toInt();
+        int day_start = query.value(6).toInt();
+        int renew_state = query.value(10).toInt();
+
+        PatronUser patron = get_patron(user_id);
+        Book book = get_book(book_id);
+        std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, patron.faculty, book.bestseller, book.price, renew_state);
+        int fine = end.second;
+
+        QDate today = QDate::currentDate();
+        query.prepare("UPDATE check_outs SET year_end = :year_end, month_end = :month_end, day_end = :day_end WHERE check_out_id = :check_out_id");
+        query.bindValue(":check_out_id", check_out_id);
+        query.bindValue(":year_end", end.first.year());
+        query.bindValue(":month_end", end.first.month());
+        query.bindValue(":day_end", end.first.day());
+        query.exec();
+
+        //remove check out from my list
+        query.prepare("UPDATE patrons SET check_outs = replace(check_outs, :check_out_id_str, '') WHERE id = :user_id");
+        query.bindValue(":check_out_id_str", ";" + QString::number(check_out_id));
+        query.bindValue(":user_id", id);
+        query.exec();
+
+        query.prepare("UPDATE books SET copies = copies + 1 WHERE id = :document_id");
+        query.bindValue(":document_id", book.id);
+        query.exec();
+
+        int wants_id = remove_last_wants_book(book.id);
+        if (wants_id != -1)
+            return make_pair(fine, wants_id);
+        return make_pair(fine, -1);
+    }
+
     QVector<PatronUser> search_patrons(QString name, QString address, QString phone, bool faculty, bool or_and){
         QSqlQuery query;
         QString ins = or_and ? " AND " : " OR ";
@@ -432,7 +479,6 @@ public:
         req += "1 = " + QString(or_and ? "1" : "0");//nice hack to finish statement correctly
         if (req.length() == 33)//no parameters given
             req = "SELECT * FROM patrons";
-        qDebug() << req;
         query.exec(req);
         QVector<PatronUser> ans;
         while (query.next()) {
@@ -496,6 +542,8 @@ public:
 
     bool delete_patron(int user_id){
         QSqlQuery query;
+        if (get_patron(user_id).check_outs.size() > 1)
+            return 0; //cant delete if has check outs
         query.exec("DELETE FROM patrons WHERE id = " + QString::number(user_id));
         return 1;
     }
@@ -613,7 +661,8 @@ public:
                      "level INTEGER, "
                      "copies INTEGER, "
                      "bestseller INTEGER, "
-                     "reference INTEGER);");
+                     "reference INTEGER,"
+                     "wants VARCHAR(255) DEFAULT ';');");
 
         query.exec("CREATE TABLE IF NOT EXISTS articles ("
                      "id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -628,7 +677,8 @@ public:
                      "price INTEGER, "
                      "room INTEGER, "
                      "level INTEGER, "
-                     "copies INTEGER);");
+                     "copies INTEGER,"
+                     "wants VARCHAR(255) DEFAULT ';');");
 
         query.exec("CREATE TABLE IF NOT EXISTS vas ("
                      "id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -638,7 +688,8 @@ public:
                      "price INTEGER, "
                      "room INTEGER, "
                      "level INTEGER, "
-                     "copies INTEGER);");
+                     "copies INTEGER,"
+                     "wants VARCHAR(255) DEFAULT ';');");
 
         query.exec("CREATE TABLE IF NOT EXISTS patrons ("
                      "id INTEGER PRIMARY KEY, "
@@ -669,7 +720,8 @@ public:
                      "year_end INTEGER, "
                      "month_end INTEGER, "
                      "day_end INTEGER, "
-                     "renew_state INTEGER DEFAULT 0)");
+                     "renew_state INTEGER DEFAULT 0,"
+                     "return_state INTEGER DEFAULT 0)");
 
         query.exec("CREATE TABLE IF NOT EXISTS settings ("
                      "days_add_renew INTEGER DEFAULT 7)");
