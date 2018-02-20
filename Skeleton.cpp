@@ -15,14 +15,8 @@ class Document{
 public:
     QString title, keywords;
     int copies, id, price, room, level;
-};
-
-class Book : public Document{
-public:
-    QString publisher, authors;
-    int year;
-    bool bestseller, reference;
     QVector<int> wants;
+    //add users, who wants this book from database
     void add_wants(QString str){
         QString id = "";
         for (int i = 0; i < str.size(); i++){
@@ -34,6 +28,13 @@ public:
             else id += str[i];
         }
     }
+};
+
+class Book : public Document{
+public:
+    QString publisher, authors;
+    int year;
+    bool bestseller, reference;
     Book(QString authors_, QString title_, QString keywords_, QString publisher_, int id_, int year_, int copies_, int price_, int room_, int level_, bool bestseller_, bool reference_, QString wants_str){
         authors = authors_;
         title = title_;
@@ -675,7 +676,8 @@ public:
                      "price INTEGER, "
                      "room INTEGER, "
                      "level INTEGER, "
-                     "copies INTEGER);");
+                     "copies INTEGER,"
+                     "wants VARCHAR(255) DEFAULT ';');");
 
         query.exec("CREATE TABLE IF NOT EXISTS vas ("
                      "id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -685,7 +687,8 @@ public:
                      "price INTEGER, "
                      "room INTEGER, "
                      "level INTEGER, "
-                     "copies INTEGER);");
+                     "copies INTEGER,"
+                     "wants VARCHAR(255) DEFAULT ';');");
 
         query.exec("CREATE TABLE IF NOT EXISTS patrons ("
                      "id INTEGER PRIMARY KEY, "

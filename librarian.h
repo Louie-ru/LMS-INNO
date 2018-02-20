@@ -23,7 +23,6 @@ private slots:
     void on_button_search_articles_clicked();
     void on_button_search_vas_clicked();
 
-
     void on_button_show_checked_out_books_clicked();
     void on_button_show_checked_out_articles_clicked();
     void on_button_show_checked_out_vas_clicked();
@@ -60,6 +59,8 @@ private slots:
     void createLibrarian();
 
     void return_book(int);
+    void return_article(int);
+    void return_va(int);
 
     void closeWidget();
     void on_button_logout_clicked();
