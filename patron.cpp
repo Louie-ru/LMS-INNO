@@ -173,7 +173,7 @@ void Patron::on_button_search_va_clicked(){
     bool available = ui->checkbox_available_va->isChecked();
     bool or_and = ui->checkbox_criteria_va->isChecked();
 
-    QVector<VA> found = me.search_av(authors, title, keywords, available, or_and);
+    QVector<VA> found = me.search_vas(authors, title, keywords, available, or_and);
     for (int i = 0; i < found.size(); i++){
         ui->table_search_va->insertRow(i);
         QPushButton *btn = new QPushButton(this);
@@ -256,7 +256,7 @@ void Patron::on_tabWidget_tabBarClicked(int index){
         ui->table_my_articles->setItem(i, 3, new QTableWidgetItem(QString(found_articles[i].second.journal_title)));
         ui->table_my_articles->setItem(i, 4, new QTableWidgetItem(QString(found_articles[i].second.editors)));
         ui->table_my_articles->setItem(i, 5, new QTableWidgetItem(QString::number(found_articles[i].second.year)));
-        ui->table_my_articles->setItem(i, 6, new QTableWidgetItem(QDate::longMonthName(found_articles[i].month, QDate::DateFormat)));
+        ui->table_my_articles->setItem(i, 6, new QTableWidgetItem(QDate::longMonthName(found_articles[i].second.month, QDate::DateFormat)));
         ui->table_my_articles->setItem(i, 7, new QTableWidgetItem(QString::number(found_articles[i].second.price)));
         ui->table_my_articles->setItem(i, 8, new QTableWidgetItem(QString::number(found_articles[i].second.room)));
         ui->table_my_articles->setItem(i, 9, new QTableWidgetItem(QString::number(found_articles[i].second.level)));

@@ -226,7 +226,6 @@ void Librarian::on_button_search_vas_clicked(){
     QString authors = ui->line_authors_va->text();
     QString title = ui->line_title_va->text();
     QString keywords = ui->line_keywords_va->text();
-    QString publisher = ui->line_publisher_va->text();
     bool available = ui->checkbox_available_va->isChecked();
     bool or_and = ui->checkbox_criteria_va->isChecked();
 
@@ -580,7 +579,6 @@ void Librarian::on_button_show_checked_out_vas_clicked(){
     QString authors = ui->line_authors_checked_out_vas->text();
     QString title = ui->line_title_checked_out_vas->text();
     QString keywords = ui->line_keywords_checked_out_vas->text();
-    QString publisher = ui->line_publisher_checked_out_vas->text();
     int user_id = ui->line_user_id_checked_out_vas->text().toInt();
     bool available = ui->checkbox_available_checked_out_vas->isChecked();
     bool or_and = ui->checkbox_criteria_checked_out_vas->isChecked();
@@ -852,7 +850,6 @@ void Librarian::on_button_new_va_clicked(){
     widget = new QWidget();
     QLabel *title = new QLabel("title:");
     QLabel *authors = new QLabel("authors:");
-    QLabel *publisher = new QLabel("publisher:");
     QLabel *keywords = new QLabel("keywords:");
     QLabel *price = new QLabel("price:");
     QLabel *room = new QLabel("room:");
@@ -861,12 +858,11 @@ void Librarian::on_button_new_va_clicked(){
     clearObjects();
     w_layout->addRow(title, line1);
     w_layout->addRow(authors, line2);
-    w_layout->addRow(publisher, line3);
-    w_layout->addRow(keywords, line4);
-    w_layout->addRow(price, line5);
-    w_layout->addRow(room, line6);
-    w_layout->addRow(level, line7);
-    w_layout->addRow(copies, line8);
+    w_layout->addRow(keywords, line3);
+    w_layout->addRow(price, line4);
+    w_layout->addRow(room, line5);
+    w_layout->addRow(level, line6);
+    w_layout->addRow(copies, line7);
     w_layout->addRow(cancel, ok);
     connect(ok, SIGNAL (clicked()),this, SLOT (createVA()));
     widget->setLayout(w_layout);

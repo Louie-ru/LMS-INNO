@@ -16,6 +16,7 @@ public:
     QString title, keywords;
     int copies, id, price, room, level;
     QVector<int> wants;
+    bool reference;
     //add users, who wants this book from database
     void add_wants(QString str){
         QString id = "";
@@ -34,7 +35,7 @@ class Book : public Document{
 public:
     QString publisher, authors;
     int year;
-    bool bestseller, reference;
+    bool bestseller;
     Book(QString authors_, QString title_, QString keywords_, QString publisher_, int id_, int year_, int copies_, int price_, int room_, int level_, bool bestseller_, bool reference_, QString wants_str){
         authors = authors_;
         title = title_;
@@ -57,7 +58,7 @@ class Article : public Document{
 public:
     QString journal_title, publisher, editors, authors;
     int year, month;
-    Article(QString authors_, QString title_, QString journal_title_, QString keywords_, QString publisher_, QString editors_, int id_, int year_, int month_, int copies_, int price_, int room_, int level_){
+    Article(QString authors_, QString title_, QString journal_title_, QString keywords_, QString publisher_, QString editors_, int id_, int year_, int month_, int copies_, int price_, int room_, int level_, bool reference_, QString wants_str){
         authors = authors_;
         title = title_;
         journal_title = journal_title_;
@@ -71,6 +72,8 @@ public:
         price = price_;
         room = room_;
         level = level_;
+        reference = reference_;
+        add_wants(wants_str);
     }
     Article(){};
 };
@@ -78,7 +81,7 @@ public:
 class VA : public Document{
 public:
     QString authors;
-    VA(QString authors_, QString title_, QString keywords_, int id_, int copies_, int price_, int room_, int level_){
+    VA(QString authors_, QString title_, QString keywords_, int id_, int copies_, int price_, int room_, int level_, bool reference_, QString wants_str){
         authors = authors_;
         title = title_;
         keywords = keywords_;
@@ -87,6 +90,8 @@ public:
         price = price_;
         room = room_;
         level = level_;
+        reference = reference_;
+        add_wants(wants_str);
     }
     VA(){};
 };
@@ -186,6 +191,83 @@ public:
         }
         return ans;
     }
+    QVector<Article> search_articles(QString authors, QString title, QString keywords, QString journal, QString publisher, QString editors, int year, int month, bool available, bool or_and){
+        QSqlQuery query;
+        QString ins = or_and ? " AND " : " OR ";
+        title = title.toLower();
+        authors = authors.toLower();
+        keywords = keywords.toLower();
+        publisher = publisher.toLower();
+        editors = editors.toLower();
+        journal = journal.toLower();
+        QString req = "SELECT * FROM articles WHERE ";
+        if (authors != "") req += "instr(lower(authors), '"+authors+"') > 0" + ins;
+        if (title != "") req += "instr(lower(title), '"+title+"') > 0" + ins;
+        if (keywords != "") req += "instr(lower(keywords), '"+keywords+"') > 0" + ins;
+        if (publisher != "") req += "instr(lower(publisher), '"+publisher+"') > 0" + ins;
+        if (editors != "") req += "instr(lower(publisher), '"+editors+"') > 0" + ins;
+        if (journal != "") req += "instr(lower(publisher), '"+journal+"') > 0" + ins;
+        if (year != 0) req += "instr(year, '"+QString::number(year)+"') > 0" + ins;
+        if (month != 0) req += "instr(year, '"+QString::number(month)+"') > 0" + ins;
+        if (available) req += "copies > 0" + ins;
+        req += "1 = " + QString(or_and ? "1" : "0");
+        if (req.length() == 34)
+            req = "SELECT * FROM articles";
+        query.exec(req);
+        QVector<Article> ans;
+        while (query.next()) {
+            int id = query.value(0).toInt();
+            QString title = query.value(1).toString();
+            QString authors = query.value(2).toString();
+            QString publisher = query.value(3).toString();
+            QString journal = query.value(4).toString();
+            QString editors = query.value(5).toString();
+            QString keywords = query.value(6).toString();
+            int year = query.value(7).toInt();
+            int month = query.value(8).toInt();
+            int price = query.value(9).toInt();
+            int room = query.value(10).toInt();
+            int level = query.value(11).toInt();
+            int copies = query.value(12).toInt();
+            bool reference = query.value(13).toInt();
+            QString wants_str = query.value(14).toString();
+            ans.push_back(Article(authors, title, journal, keywords, publisher, editors, id, year, month, copies, price, room, level, reference, wants_str));
+        }
+        return ans;
+    }
+    QVector<VA> search_vas(QString authors, QString title, QString keywords, bool available, bool or_and){
+        QSqlQuery query;
+
+        QString ins = or_and ? " AND " : " OR ";
+        title = title.toLower();
+        authors = authors.toLower();
+        keywords = keywords.toLower();
+
+        QString req = "SELECT * FROM vas WHERE ";
+        if (authors != "") req += "instr(lower(authors), '"+authors+"') > 0" + ins;
+        if (title != "") req += "instr(lower(title), '"+title+"') > 0" + ins;
+        if (keywords != "") req += "instr(lower(keywords), '"+keywords+"') > 0" + ins;
+        if (available) req += "copies > 0" + ins;
+        req += "1 = " + QString(or_and ? "1" : "0");
+        if (req.length() == 29)
+            req = "SELECT * FROM vas";
+        query.exec(req);
+        QVector<VA> ans;
+        while (query.next()) {
+            int id = query.value(0).toInt();
+            QString title = query.value(1).toString();
+            QString authors = query.value(2).toString();
+            QString keywords = query.value(3).toString();
+            int price = query.value(4).toInt();
+            int room = query.value(5).toInt();
+            int level = query.value(6).toInt();
+            int copies = query.value(7).toInt();
+            bool reference = query.value(8).toInt();
+            QString wants_str = query.value(9).toString();
+            ans.push_back(VA(authors, title, keywords, id, copies, price, room, level, reference, wants_str));
+        }
+        return ans;
+    }
 
     Book get_book(int book_id){
         QSqlQuery query;
@@ -205,9 +287,43 @@ public:
         QString wants_str = query.value(12).toString();
         return Book(authors, title, keywords, publisher, book_id, year, copies, price, room ,level, bestseller, reference, wants_str);
     }
-
-    QVector<Article> search_articles(QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, bool available, bool or_and);
-    QVector<VA> search_av(QString authors, QString title, QString keywords, bool available, bool or_and);
+    Article get_article(int article_id){
+        QSqlQuery query;
+        query.exec("SELECT * FROM articles WHERE id = " + QString::number(article_id));
+        query.next();
+        int id = query.value(0).toInt();
+        QString title = query.value(1).toString();
+        QString authors = query.value(2).toString();
+        QString publisher = query.value(3).toString();
+        QString journal = query.value(4).toString();
+        QString editors = query.value(5).toString();
+        QString keywords = query.value(6).toString();
+        int year = query.value(7).toInt();
+        int month = query.value(8).toInt();
+        int price = query.value(9).toInt();
+        int room = query.value(10).toInt();
+        int level = query.value(11).toInt();
+        int copies = query.value(12).toInt();
+        bool reference = query.value(13).toInt();
+        QString wants_str = query.value(14).toString();
+        return Article(authors, title, journal, keywords, publisher, editors, article_id, year, month, copies, price, room, level, reference, wants_str);
+    }
+    VA get_va(int va_id){
+        QSqlQuery query;
+        query.exec("SELECT * FROM vas WHERE id = " + QString::number(va_id));
+        query.next();
+        int id = query.value(0).toInt();
+        QString title = query.value(1).toString();
+        QString authors = query.value(2).toString();
+        QString keywords = query.value(3).toString();
+        int price = query.value(4).toInt();
+        int room = query.value(5).toInt();
+        int level = query.value(6).toInt();
+        int copies = query.value(7).toInt();
+        bool reference = query.value(8).toInt();
+        QString wants_str = query.value(9).toString();
+        return VA(authors, title, keywords, va_id, copies, price, room, level, reference, wants_str);
+    }
 };
 
 //search/check_out documents, renew/return checked_out documents
@@ -677,6 +793,7 @@ public:
                      "room INTEGER, "
                      "level INTEGER, "
                      "copies INTEGER,"
+                     "reference INTEGER,"
                      "wants VARCHAR(255) DEFAULT ';');");
 
         query.exec("CREATE TABLE IF NOT EXISTS vas ("
@@ -688,6 +805,7 @@ public:
                      "room INTEGER, "
                      "level INTEGER, "
                      "copies INTEGER,"
+                     "reference INTEGER,"
                      "wants VARCHAR(255) DEFAULT ';');");
 
         query.exec("CREATE TABLE IF NOT EXISTS patrons ("
