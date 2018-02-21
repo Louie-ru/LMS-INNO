@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>674</width>
-    <height>350</height>
+    <width>956</width>
+    <height>471</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -886,15 +886,15 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="page_books">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>632</width>
-            <height>176</height>
+            <width>914</width>
+            <height>297</height>
            </rect>
           </property>
           <attribute name="label">
@@ -991,8 +991,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>89</width>
-            <height>89</height>
+            <width>914</width>
+            <height>297</height>
            </rect>
           </property>
           <attribute name="label">
