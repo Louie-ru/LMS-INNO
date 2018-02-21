@@ -86,8 +86,8 @@ void Patron::renew_va(int check_out_id){
 void Patron::on_button_search_books_clicked(){
     ui->table_search_books->setRowCount(0);
 
-    QString authors = ui->line_authors_books->text();
     QString title = ui->line_title_books->text();
+    QString authors = ui->line_authors_books->text();
     QString keywords = ui->line_keywords_books->text();
     QString publisher = ui->line_publisher_books->text();
     int year = (ui->line_year_books->text() == "" ? 0 : ui->line_year_books->text().toInt());
@@ -127,11 +127,11 @@ void Patron::on_button_search_books_clicked(){
 void Patron::on_button_search_articles_clicked(){
     ui->table_search_articles->setRowCount(0);
 
-    QString authors = ui->line_author_articles->text();
     QString title = ui->line_title_articles->text();
+    QString authors = ui->line_author_articles->text();
     QString journal = ui->line_journal_articles->text();
-    QString keywords = ui->line_keywords_articles->text();
     QString publisher = ui->line_publisher_articles->text();
+    QString keywords = ui->line_keywords_articles->text();
     QString editors = ui->line_editors_articles->text();
     int year = (ui->line_year_articles->text() == "" ? 0 : ui->line_year_articles->text().toInt());
     int month = (ui->comboBox->currentText() == "" ? 0 : ui->comboBox->currentText().toInt());

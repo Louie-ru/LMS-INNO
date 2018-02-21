@@ -564,7 +564,7 @@ public:
         query.exec();
         return 1;
     }
-    bool add_article(QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int copies);
+    bool add_article(QString title, QString authors, QString journal, QString publisher, QString keywords, QString editors, int year, int month, int price, int room, int level, int copies);
     bool add_av(QString authors, QString title, QString keywords, int available, int copies);
 
     bool delete_book(int document_id){
@@ -593,8 +593,8 @@ public:
         return 1;
     }
 
-    bool modify_article(int id, QString authors, QString title, QString keywords, QString journal_title, QString publisher, QString editors, int year, int month, int copies);
-    bool modify_av(int id, QString authors, QString title, QString keywords, bool available, int copies);
+    bool modify_article(int id, QString authors, QString title, QString journal, QString keywords, QString publisher, QString editors, int year, int month, int price, int room, int level, int copies);
+    bool modify_av(int id, QString authors, QString title, QString keywords, int price, int room, int level, int copies);
 
     LibrarianUser(int id_, QString name_, QString address_, QString phone_, QString login_, QString password_){
         id = id_;
