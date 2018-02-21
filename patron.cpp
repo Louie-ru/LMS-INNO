@@ -70,7 +70,7 @@ void Patron::renew_article(int check_out_id){
 }
 
 void Patron::renew_va(int check_out_id){
-    int ret = me.renew_av(check_out_id);
+    int ret = me.renew_va(check_out_id);
     if (ret == 0)
         ui->status->setText("Error renewing");
     else if (ret == 1)
@@ -269,7 +269,7 @@ void Patron::on_tabWidget_tabBarClicked(int index){
 
 
     ui->table_my_vas->setRowCount(0);
-    QVector<std::pair<Check_out, VA> > found_vas = me.get_checked_out_avs();
+    QVector<std::pair<Check_out, VA> > found_vas = me.get_checked_out_vas();
     for (int i = 0; i < found_vas.size(); i++){
         ui->table_my_vas->insertRow(i);
         QPushButton *btn_renew = new QPushButton(this);
