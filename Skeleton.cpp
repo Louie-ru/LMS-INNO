@@ -124,6 +124,7 @@ class User{
 public:
     QString name, address, phone, login, password;
     int id;
+
     //bestseller can be any if not book given
     std::pair<QDate, int> calculate_check_out(int document_type, int year_start, int month_start, int day_start, bool faculty, bool bestseller, int price, int renew_state){
         QDate date_start;

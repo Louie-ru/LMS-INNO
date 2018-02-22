@@ -174,8 +174,9 @@ void Librarian::on_button_search_books_clicked(){
         ui->table_search_books->setItem(i, 7, new QTableWidgetItem(QString::number(found[i].level)));
         ui->table_search_books->setItem(i, 8, new QTableWidgetItem(QString::number(found[i].copies)));
         ui->table_search_books->setItem(i, 9, new QTableWidgetItem(found[i].bestseller ? "yes" : "no"));
-        ui->table_search_books->setCellWidget(i, 10, btn_modify);
-        ui->table_search_books->setCellWidget(i, 11, btn_delete);
+        ui->table_search_books->setItem(i, 10, new QTableWidgetItem(found[i].reference ? "yes" : "no"));
+        ui->table_search_books->setCellWidget(i, 11, btn_modify);
+        ui->table_search_books->setCellWidget(i, 12, btn_delete);
     }
     ui->table_search_books->resizeColumnsToContents();
 }
@@ -221,8 +222,9 @@ void Librarian::on_button_search_articles_clicked(){
         ui->table_search_articles->setItem(i, 8, new QTableWidgetItem(QString::number(found[i].room)));
         ui->table_search_articles->setItem(i, 9, new QTableWidgetItem(QString::number(found[i].level)));
         ui->table_search_articles->setItem(i, 10, new QTableWidgetItem(QString::number(found[i].copies)));
-        ui->table_search_articles->setCellWidget(i, 11, btn_modify);
-        ui->table_search_articles->setCellWidget(i, 12, btn_delete);
+        ui->table_search_articles->setItem(i, 11, new QTableWidgetItem(found[i].reference ? "yes" : "no"));
+        ui->table_search_articles->setCellWidget(i, 12, btn_modify);
+        ui->table_search_articles->setCellWidget(i, 13, btn_delete);
     }
     ui->table_search_articles->resizeColumnsToContents();
 }
@@ -258,8 +260,9 @@ void Librarian::on_button_search_vas_clicked(){
         ui->table_search_va->setItem(i, 3, new QTableWidgetItem(QString::number(found[i].room)));
         ui->table_search_va->setItem(i, 4, new QTableWidgetItem(QString::number(found[i].level)));
         ui->table_search_va->setItem(i, 5, new QTableWidgetItem(QString::number(found[i].copies)));
-        ui->table_search_va->setCellWidget(i, 6, btn_modify);
-        ui->table_search_va->setCellWidget(i, 7, btn_delete);
+        ui->table_search_va->setItem(i, 6, new QTableWidgetItem(found[i].reference ? "yes" : "no"));
+        ui->table_search_va->setCellWidget(i, 7, btn_modify);
+        ui->table_search_va->setCellWidget(i, 8, btn_delete);
     }
     ui->table_search_va->resizeColumnsToContents();
 }
@@ -388,13 +391,13 @@ void Librarian::on_modify_article_clicked(int document_id){
     line3->setText(article.authors);
     line4->setText(article.publisher);
     line5->setText(article.journal_title);
-    line5->setText(article.editors);
-    line5->setText(article.keywords);
-    line6->setText(QString::number(article.year));
-    line7->setText(QString::number(article.price));
-    line8->setText(QString::number(article.room));
-    line9->setText(QString::number(article.level));
-    line10->setText(QString::number(article.copies));
+    line6->setText(article.editors);
+    line7->setText(article.keywords);
+    line8->setText(QString::number(article.year));
+    line9->setText(QString::number(article.price));
+    line10->setText(QString::number(article.room));
+    line11->setText(QString::number(article.level));
+    line12->setText(QString::number(article.copies));
     check->setChecked(article.reference);
     combo->addItem("January");
     combo->addItem("February");
@@ -408,6 +411,7 @@ void Librarian::on_modify_article_clicked(int document_id){
     combo->addItem("October");
     combo->addItem("November");
     combo->addItem("December");
+    combo->setCurrentIndex(article.month - 1);
     w_layout->addRow(id, line1);
     w_layout->addRow(title, line2);
     w_layout->addRow(authors, line3);
@@ -694,13 +698,13 @@ void Librarian::modifyArticle(){
     QString editors = line6->text();
     QString keywords = line7->text();
     int year = line8->text().toInt();
-    int month = QDate::longMonthName(combo->currentText().toInt(), QDate::DateFormat).toInt();
+    int month = combo->currentIndex() + 1;
     int price = line9->text().toInt();
     int room = line10->text().toInt();
     int level = line11->text().toInt();
     int copies = line12->text().toInt();
     bool reference = check->isChecked();
-    me.modify_article(id, authors, title, journal, keywords, publisher, editors, year, month, price, room, level, copies, reference);
+    me.modify_article(id, title, authors, journal, keywords, publisher, editors, year, month, price, room, level, copies, reference);
     on_button_search_articles_clicked();
     closeWidget();
 }
@@ -766,7 +770,7 @@ void Librarian::createArticle(){
     int room = line9->text().toInt();
     int level = line10->text().toInt();
     int copies = line11->text().toInt();
-    bool reference = check2->isChecked();
+    bool reference = check->isChecked();
     me.add_article(title, authors, journal, publisher, keywords, editors, year, month, price, room, level, copies, reference);
     on_button_search_articles_clicked();
     closeWidget();
@@ -780,7 +784,7 @@ void Librarian::createVA(){
     int room = line4->text().toInt();
     int level = line5->text().toInt();
     int copies = line6->text().toInt();
-    bool reference = check2->isChecked();
+    bool reference = check->isChecked();
     me.add_va(title, authors, publisher, keywords, price, room, level, copies, reference);
     on_button_search_vas_clicked();
     closeWidget();
@@ -898,7 +902,7 @@ void Librarian::on_button_new_article_clicked(){
     w_layout->addRow(room, line9);
     w_layout->addRow(level, line10);
     w_layout->addRow(copies, line11);
-    w_layout->addRow(reference, check2);
+    w_layout->addRow(reference, check);
     w_layout->addRow(cancel, ok);
     connect(ok, SIGNAL (clicked()),this, SLOT (createArticle()));
     widget->setLayout(w_layout);
@@ -923,7 +927,7 @@ void Librarian::on_button_new_va_clicked(){
     w_layout->addRow(room, line5);
     w_layout->addRow(level, line6);
     w_layout->addRow(copies, line7);
-    w_layout->addRow(reference, check2);
+    w_layout->addRow(reference, check);
     w_layout->addRow(cancel, ok);
     connect(ok, SIGNAL (clicked()),this, SLOT (createVA()));
     widget->setLayout(w_layout);

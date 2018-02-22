@@ -684,6 +684,11 @@
          </column>
          <column>
           <property name="text">
+           <string>reference</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
            <string>modify</string>
           </property>
          </column>
@@ -807,7 +812,7 @@
                     </size>
                    </property>
                    <property name="inputMask">
-                    <string>9999</string>
+                    <string/>
                    </property>
                    <property name="text">
                     <string/>
@@ -1033,6 +1038,11 @@
          </column>
          <column>
           <property name="text">
+           <string>reference</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
            <string>modify</string>
           </property>
          </column>
@@ -1214,6 +1224,11 @@
          <column>
           <property name="text">
            <string>copies</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>reference</string>
           </property>
          </column>
          <column>
@@ -1400,7 +1415,7 @@
                         </size>
                        </property>
                        <property name="inputMask">
-                        <string>9999</string>
+                        <string/>
                        </property>
                        <property name="text">
                         <string/>
@@ -1758,7 +1773,7 @@
                         </size>
                        </property>
                        <property name="inputMask">
-                        <string>9999</string>
+                        <string/>
                        </property>
                        <property name="text">
                         <string/>
