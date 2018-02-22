@@ -241,13 +241,6 @@ void Patron::on_tabWidget_tabBarClicked(int index){
         connect(btn_renew, SIGNAL(clicked()), sm, SLOT(map()));
         sm->setMapping(btn_renew, found_articles[i].second.id);
 
-        QPushButton *btn_return = new QPushButton(this);
-        btn_return->setText("return");
-        QSignalMapper *sm2 = new QSignalMapper(this);
-        connect(sm2, SIGNAL(mapped(int)), this, SLOT(return_article(int)));
-        connect(btn_return, SIGNAL(clicked()), sm2, SLOT(map()));
-        sm2->setMapping(btn_return, found_articles[i].second.id);
-
         QString date_start = QString::number(found_articles[i].first.day_start)+"."+QString::number(found_articles[i].first.month_start)+"."+QString::number(found_articles[i].first.year_start);
         QString date_end = QString::number(found_articles[i].first.day_end)+"."+QString::number(found_articles[i].first.month_end)+"."+QString::number(found_articles[i].first.year_end);
         ui->table_my_articles->setItem(i, 0, new QTableWidgetItem(QString(found_articles[i].second.title)));
@@ -263,7 +256,6 @@ void Patron::on_tabWidget_tabBarClicked(int index){
         ui->table_my_articles->setItem(i, 10, new QTableWidgetItem(date_start));
         ui->table_my_articles->setItem(i, 11, new QTableWidgetItem(date_end));
         ui->table_my_articles->setCellWidget(i, 12, btn_renew);
-        ui->table_my_articles->setCellWidget(i, 13, btn_return);
     }
     ui->table_my_articles->resizeColumnsToContents();
 
@@ -279,13 +271,6 @@ void Patron::on_tabWidget_tabBarClicked(int index){
         connect(btn_renew, SIGNAL(clicked()), sm, SLOT(map()));
         sm->setMapping(btn_renew, found_vas[i].second.id);
 
-        QPushButton *btn_return = new QPushButton(this);
-        btn_return->setText("return");
-        QSignalMapper *sm2 = new QSignalMapper(this);
-        connect(sm2, SIGNAL(mapped(int)), this, SLOT(return_va(int)));
-        connect(btn_return, SIGNAL(clicked()), sm2, SLOT(map()));
-        sm2->setMapping(btn_return, found_vas[i].second.id);
-
         QString date_start = QString::number(found_vas[i].first.day_start)+"."+QString::number(found_vas[i].first.month_start)+"."+QString::number(found_vas[i].first.year_start);
         QString date_end = QString::number(found_vas[i].first.day_end)+"."+QString::number(found_vas[i].first.month_end)+"."+QString::number(found_vas[i].first.year_end);
         ui->table_my_vas->setItem(i, 0, new QTableWidgetItem(found_vas[i].second.title));
@@ -296,7 +281,6 @@ void Patron::on_tabWidget_tabBarClicked(int index){
         ui->table_my_vas->setItem(i, 5, new QTableWidgetItem(date_start));
         ui->table_my_vas->setItem(i, 6, new QTableWidgetItem(date_end));
         ui->table_my_vas->setCellWidget(i, 7, btn_renew);
-        ui->table_my_vas->setCellWidget(i, 8, btn_return);
     }
     ui->table_my_vas->resizeColumnsToContents();
 }

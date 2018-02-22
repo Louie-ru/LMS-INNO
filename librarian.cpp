@@ -604,9 +604,17 @@ void Librarian::on_button_show_checked_out_articles_clicked(){
 
     QVector<std::pair<Check_out, Article> > found = me.search_articles_checked_out(user_id, authors, title, keywords, journal, publisher, editors, year, month, overdue, or_and);
     for (int i = 0; i < found.size(); i++){
+        ui->table_checked_out_articles->insertRow(i);
+
+        QPushButton *btn_return = new QPushButton(this);
+        btn_return->setText("return");
+        QSignalMapper *sm2 = new QSignalMapper(this);
+        connect(sm2, SIGNAL(mapped(int)), this, SLOT(return_article(int)));
+        connect(btn_return, SIGNAL(clicked()), sm2, SLOT(map()));
+        sm2->setMapping(btn_return, found[i].first.check_out_id);
+
         QString date_start = QString::number(found[i].first.day_start)+"."+QString::number(found[i].first.month_start)+"."+QString::number(found[i].first.year_start);
         QString date_end = QString::number(found[i].first.day_end)+"."+QString::number(found[i].first.month_end)+"."+QString::number(found[i].first.year_end);
-        ui->table_checked_out_articles->insertRow(i);
         ui->table_checked_out_articles->setItem(i, 0, new QTableWidgetItem(QString::number(found[i].first.user_id)));
         ui->table_checked_out_articles->setItem(i, 1, new QTableWidgetItem(found[i].second.title));
         ui->table_checked_out_articles->setItem(i, 2, new QTableWidgetItem(found[i].second.authors));
@@ -621,6 +629,7 @@ void Librarian::on_button_show_checked_out_articles_clicked(){
         ui->table_checked_out_articles->setItem(i, 11, new QTableWidgetItem(date_start));
         ui->table_checked_out_articles->setItem(i, 12, new QTableWidgetItem(date_end));
         ui->table_checked_out_articles->setItem(i, 13, new QTableWidgetItem(QString::number(found[i].first.fine)));
+        ui->table_checked_out_articles->setCellWidget(i, 14, btn_return);
     }
     ui->table_checked_out_articles->resizeColumnsToContents();
 }
@@ -636,6 +645,14 @@ void Librarian::on_button_show_checked_out_vas_clicked(){
 
     QVector<std::pair<Check_out, VA> > found = me.search_vas_checked_out(user_id, authors, title, keywords, overdue, or_and);
     for (int i = 0; i < found.size(); i++){
+
+        QPushButton *btn_return = new QPushButton(this);
+        btn_return->setText("return");
+        QSignalMapper *sm2 = new QSignalMapper(this);
+        connect(sm2, SIGNAL(mapped(int)), this, SLOT(return_va(int)));
+        connect(btn_return, SIGNAL(clicked()), sm2, SLOT(map()));
+        sm2->setMapping(btn_return, found[i].first.check_out_id);
+
         QString date_start = QString::number(found[i].first.day_start)+"."+QString::number(found[i].first.month_start)+"."+QString::number(found[i].first.year_start);
         QString date_end = QString::number(found[i].first.day_end)+"."+QString::number(found[i].first.month_end)+"."+QString::number(found[i].first.year_end);
         ui->table_checked_out_vas->insertRow(i);
@@ -648,6 +665,7 @@ void Librarian::on_button_show_checked_out_vas_clicked(){
         ui->table_checked_out_vas->setItem(i, 6, new QTableWidgetItem(date_start));
         ui->table_checked_out_vas->setItem(i, 7, new QTableWidgetItem(date_end));
         ui->table_checked_out_vas->setItem(i, 8, new QTableWidgetItem(QString::number(found[i].first.fine)));
+        ui->table_checked_out_vas->setCellWidget(i, 9, btn_return);
     }
     ui->table_checked_out_vas->resizeColumnsToContents();
 }

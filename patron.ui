@@ -886,15 +886,15 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>1</number>
+          <number>2</number>
          </property>
          <widget class="QWidget" name="page_books">
           <property name="geometry">
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>914</width>
-            <height>297</height>
+            <width>98</width>
+            <height>89</height>
            </rect>
           </property>
           <attribute name="label">
@@ -1069,11 +1069,6 @@
                <string>renew</string>
               </property>
              </column>
-             <column>
-              <property name="text">
-               <string>return</string>
-              </property>
-             </column>
             </widget>
            </item>
           </layout>
@@ -1083,8 +1078,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>89</width>
-            <height>89</height>
+            <width>914</width>
+            <height>297</height>
            </rect>
           </property>
           <attribute name="label">
@@ -1134,11 +1129,6 @@
              <column>
               <property name="text">
                <string>renew</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
-               <string>return</string>
               </property>
              </column>
             </widget>

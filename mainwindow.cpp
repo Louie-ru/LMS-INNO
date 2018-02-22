@@ -3,8 +3,6 @@
 #include <QWidget>
 #include <QtSql>
 
-
-
 Login mainLogin;
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow){
