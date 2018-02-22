@@ -72,7 +72,6 @@ void Librarian::on_button_search_patrons_clicked(){
     QString name = ui->line_patrons_name->text();
     QString phone = ui->line_patrons_phone->text();
     QString address = ui->line_patrons_address->text();
-    int id = ui->line_patrons_id->text().toInt();
     bool faculty = ui->checkbox_patrons_faculty->isChecked();
     bool or_and = ui->checkbox_patrons_criteria->isChecked();
 
@@ -82,14 +81,14 @@ void Librarian::on_button_search_patrons_clicked(){
         QPushButton *btn_modify = new QPushButton(this);
         btn_modify->setText("modify");
         QSignalMapper *sm = new QSignalMapper(this);
-        connect(sm, SIGNAL(mapped(int)), this, SLOT(on_modify_patron_clicked(int)));
+        connect(sm, SIGNAL(mapped(int)), this, SLOT(modify_patron_clicked(int)));
         connect(btn_modify, SIGNAL(clicked()), sm, SLOT(map()));
         sm->setMapping(btn_modify, found[i].id);
 
         QPushButton *btn_delete = new QPushButton(this);
         btn_delete->setText("delete");
         QSignalMapper *sm2 = new QSignalMapper(this);
-        connect(sm2, SIGNAL(mapped(int)), this, SLOT(on_delete_patron_clicked(int)));
+        connect(sm2, SIGNAL(mapped(int)), this, SLOT(delete_patron_clicked(int)));
         connect(btn_delete, SIGNAL(clicked()), sm2, SLOT(map()));
         sm2->setMapping(btn_delete, found[i].id);
 
@@ -113,14 +112,14 @@ void Librarian::on_button_search_librarians_clicked(){
         QPushButton *btn_modify = new QPushButton(this);
         btn_modify->setText("modify");
         QSignalMapper *sm = new QSignalMapper(this);
-        connect(sm, SIGNAL(mapped(int)), this, SLOT(on_modify_librarian_clicled(int)));
+        connect(sm, SIGNAL(mapped(int)), this, SLOT(modify_librarian_clicled(int)));
         connect(btn_modify, SIGNAL(clicked()), sm, SLOT(map()));
         sm->setMapping(btn_modify, found[i].id);
 
         QPushButton *btn_delete = new QPushButton(this);
         btn_delete->setText("delete");
         QSignalMapper *sm2 = new QSignalMapper(this);
-        connect(sm2, SIGNAL(mapped(int)), this, SLOT(on_delete_librarian_clicked(int)));
+        connect(sm2, SIGNAL(mapped(int)), this, SLOT(delete_librarian_clicked(int)));
         connect(btn_delete, SIGNAL(clicked()), sm2, SLOT(map()));
         sm2->setMapping(btn_delete, found[i].id);
 
@@ -153,14 +152,14 @@ void Librarian::on_button_search_books_clicked(){
         QPushButton *btn_modify = new QPushButton(this);
         btn_modify->setText("modify");
         QSignalMapper *sm = new QSignalMapper(this);
-        connect(sm, SIGNAL(mapped(int)), this, SLOT(on_modify_book_clicked(int)));
+        connect(sm, SIGNAL(mapped(int)), this, SLOT(modify_book_clicked(int)));
         connect(btn_modify, SIGNAL(clicked()), sm, SLOT(map()));
         sm->setMapping(btn_modify, found[i].id);
 
         QPushButton *btn_delete = new QPushButton(this);
         btn_delete->setText("delete");
         QSignalMapper *sm2 = new QSignalMapper(this);
-        connect(sm2, SIGNAL(mapped(int)), this, SLOT(on_delete_book_clicked(int)));
+        connect(sm2, SIGNAL(mapped(int)), this, SLOT(delete_book_clicked(int)));
         connect(btn_delete, SIGNAL(clicked()), sm2, SLOT(map()));
         sm2->setMapping(btn_delete, found[i].id);
 
@@ -200,14 +199,14 @@ void Librarian::on_button_search_articles_clicked(){
         QPushButton *btn_modify = new QPushButton(this);
         btn_modify->setText("modify");
         QSignalMapper *sm = new QSignalMapper(this);
-        connect(sm, SIGNAL(mapped(int)), this, SLOT(on_modify_article_clicked(int)));
+        connect(sm, SIGNAL(mapped(int)), this, SLOT(modify_article_clicked(int)));
         connect(btn_modify, SIGNAL(clicked()), sm, SLOT(map()));
         sm->setMapping(btn_modify, found[i].id);
 
         QPushButton *btn_delete = new QPushButton(this);
         btn_delete->setText("delete");
         QSignalMapper *sm2 = new QSignalMapper(this);
-        connect(sm2, SIGNAL(mapped(int)), this, SLOT(on_delete_article_clicked(int)));
+        connect(sm2, SIGNAL(mapped(int)), this, SLOT(delete_article_clicked(int)));
         connect(btn_delete, SIGNAL(clicked()), sm2, SLOT(map()));
         sm2->setMapping(btn_delete, found[i].id);
 
@@ -243,14 +242,14 @@ void Librarian::on_button_search_vas_clicked(){
         QPushButton *btn_modify = new QPushButton(this);
         btn_modify->setText("modify");
         QSignalMapper *sm = new QSignalMapper(this);
-        connect(sm, SIGNAL(mapped(int)), this, SLOT(on_modify_va_clicked(int)));
+        connect(sm, SIGNAL(mapped(int)), this, SLOT(modify_va_clicked(int)));
         connect(btn_modify, SIGNAL(clicked()), sm, SLOT(map()));
         sm->setMapping(btn_modify, found[i].id);
 
         QPushButton *btn_delete = new QPushButton(this);
         btn_delete->setText("delete");
         QSignalMapper *sm2 = new QSignalMapper(this);
-        connect(sm2, SIGNAL(mapped(int)), this, SLOT(on_delete_va_clicked(int)));
+        connect(sm2, SIGNAL(mapped(int)), this, SLOT(delete_va_clicked(int)));
         connect(btn_delete, SIGNAL(clicked()), sm2, SLOT(map()));
         sm2->setMapping(btn_delete, found[i].id);
 
@@ -267,7 +266,7 @@ void Librarian::on_button_search_vas_clicked(){
     ui->table_search_va->resizeColumnsToContents();
 }
 
-void Librarian::on_modify_patron_clicked(int user_id){
+void Librarian::modify_patron_clicked(int user_id){
     if (widget != NULL && !widget->isHidden()) return;
     PatronUser patron = me.get_patron(user_id);
     widget = new QWidget();
@@ -300,7 +299,7 @@ void Librarian::on_modify_patron_clicked(int user_id){
     widget->setLayout(w_layout);
     widget->show();
 }
-void Librarian::on_modify_librarian_clicked(int user_id){
+void Librarian::modify_librarian_clicked(int user_id){
     if (widget != NULL && !widget->isHidden()) return;
     widget = new QWidget();
     QLabel *id = new QLabel("card id:");
@@ -317,7 +316,7 @@ void Librarian::on_modify_librarian_clicked(int user_id){
     widget->setLayout(w_layout);
     widget->show();
 }
-void Librarian::on_modify_book_clicked(int document_id){
+void Librarian::modify_book_clicked(int document_id){
     if (widget != NULL && !widget->isHidden()) return;
     widget = new QWidget();
     QLabel *id = new QLabel("id:");
@@ -366,7 +365,7 @@ void Librarian::on_modify_book_clicked(int document_id){
     widget->setLayout(w_layout);
     widget->show();
 }
-void Librarian::on_modify_article_clicked(int document_id){
+void Librarian::modify_article_clicked(int document_id){
     if (widget != NULL && !widget->isHidden()) return;
     widget = new QWidget();
     QLabel *id = new QLabel("id:");
@@ -431,7 +430,7 @@ void Librarian::on_modify_article_clicked(int document_id){
     widget->setLayout(w_layout);
     widget->show();
 }
-void Librarian::on_modify_va_clicked(int document_id){
+void Librarian::modify_va_clicked(int document_id){
     if (widget != NULL && !widget->isHidden()) return;
     widget = new QWidget();
     QLabel *id = new QLabel("id:");
@@ -470,7 +469,7 @@ void Librarian::on_modify_va_clicked(int document_id){
     widget->show();
 }
 
-void Librarian::on_delete_patron_clicked(int id){
+void Librarian::delete_patron_clicked(int id){
     PatronUser patron = me.get_patron(id);
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this patron?\nname: " + patron.name + "\nlogin: " + patron.login, QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
@@ -481,24 +480,24 @@ void Librarian::on_delete_patron_clicked(int id){
     ui->status->setText("Patron deleted successfully");
     on_button_search_patrons_clicked();
 }
-void Librarian::on_delete_librarian_clicked(int id){
+void Librarian::delete_librarian_clicked(int id){
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this librarian?", QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
 }
-void Librarian::on_delete_book_clicked(int id){
+void Librarian::delete_book_clicked(int id){
     Book book = me.get_book(id);
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this book?\ntitle: " + book.title, QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
     me.delete_book(id);
     on_button_search_books_clicked();
 }
-void Librarian::on_delete_article_clicked(int id){
+void Librarian::delete_article_clicked(int id){
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this article?", QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
     me.delete_article(id);
     on_button_search_articles_clicked();
 }
-void Librarian::on_delete_va_clicked(int id){
+void Librarian::delete_va_clicked(int id){
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this va?", QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
     me.delete_va(id);
@@ -778,14 +777,13 @@ void Librarian::createArticle(){
 void Librarian::createVA(){
     QString title = line1->text();
     QString authors = line2->text();
-    QString publisher = line2->text();
     QString keywords = line2->text();
     int price = line3->text().toInt();
     int room = line4->text().toInt();
     int level = line5->text().toInt();
     int copies = line6->text().toInt();
     bool reference = check->isChecked();
-    me.add_va(title, authors, publisher, keywords, price, room, level, copies, reference);
+    me.add_va(title, authors, keywords, price, room, level, copies, reference);
     on_button_search_vas_clicked();
     closeWidget();
 }

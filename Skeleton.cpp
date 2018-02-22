@@ -293,7 +293,6 @@ public:
         QSqlQuery query;
         query.exec("SELECT * FROM articles WHERE id = " + QString::number(article_id));
         query.next();
-        int id = query.value(0).toInt();
         QString title = query.value(1).toString();
         QString authors = query.value(2).toString();
         QString publisher = query.value(3).toString();
@@ -314,7 +313,6 @@ public:
         QSqlQuery query;
         query.exec("SELECT * FROM vas WHERE id = " + QString::number(va_id));
         query.next();
-        int id = query.value(0).toInt();
         QString title = query.value(1).toString();
         QString authors = query.value(2).toString();
         QString keywords = query.value(3).toString();
@@ -842,7 +840,6 @@ public:
         std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, patron.faculty, book.bestseller, book.price, renew_state);
         int fine = end.second;
 
-        QDate today = QDate::currentDate();
         query.prepare("UPDATE check_outs SET year_end = :year_end, month_end = :month_end, day_end = :day_end WHERE check_out_id = :check_out_id");
         query.bindValue(":check_out_id", check_out_id);
         query.bindValue(":year_end", end.first.year());
@@ -881,7 +878,6 @@ public:
         std::pair<QDate, int> end = calculate_check_out(2, year_start, month_start, day_start, patron.faculty, 0, article.price, renew_state);
         int fine = end.second;
 
-        QDate today = QDate::currentDate();
         query.prepare("UPDATE check_outs SET year_end = :year_end, month_end = :month_end, day_end = :day_end WHERE check_out_id = :check_out_id");
         query.bindValue(":check_out_id", check_out_id);
         query.bindValue(":year_end", end.first.year());
@@ -920,7 +916,6 @@ public:
         std::pair<QDate, int> end = calculate_check_out(3, year_start, month_start, day_start, patron.faculty, 0, va.price, renew_state);
         int fine = end.second;
 
-        QDate today = QDate::currentDate();
         query.prepare("UPDATE check_outs SET year_end = :year_end, month_end = :month_end, day_end = :day_end WHERE check_out_id = :check_out_id");
         query.bindValue(":check_out_id", check_out_id);
         query.bindValue(":year_end", end.first.year());
@@ -976,7 +971,7 @@ public:
 
     QVector<LibrarianUser> search_librarians(QString name, QString address, QString phone, bool or_and);
 
-    bool add_patron(QString name, QString address, QString phone, bool faculty, QString login, QString password){
+    void add_patron(QString name, QString address, QString phone, bool faculty, QString login, QString password){
         QSqlQuery query;
         query.prepare("INSERT INTO patrons (name, address, phone, faculty, login, password) VALUES(:name, :address, :phone, :faculty, :login, :password)");
         query.bindValue(":name", name);
@@ -987,7 +982,7 @@ public:
         query.bindValue(":password", password);
         query.exec();
     }
-    bool add_librarian(QString name, QString address, QString phone);
+    void add_librarian(QString name, QString address, QString phone);
 
     bool modify_patron(int user_id, QString name, QString address, QString phone, bool faculty, QString login, QString password){
         QSqlQuery query;
@@ -1064,12 +1059,11 @@ public:
         query.exec();
         return 1;
     }
-    bool add_va(QString title, QString authors, QString publisher, QString keywords, int price, int room, int level, int copies, bool reference){
+    bool add_va(QString title, QString authors, QString keywords, int price, int room, int level, int copies, bool reference){
         QSqlQuery query;
-        query.prepare("INSERT INTO books (title, authors, publisher, keywords, price, room, level, copies, reference) VALUES(:title, :authors, :publisher, :keywords, :price, :room, :level, :copies, :reference)");
+        query.prepare("INSERT INTO vas (title, authors, keywords, price, room, level, copies, reference) VALUES(:title, :authors, :keywords, :price, :room, :level, :copies, :reference)");
         query.bindValue(":title", title);
         query.bindValue(":authors", authors);
-        query.bindValue(":publisher", publisher);
         query.bindValue(":keywords", keywords);
         query.bindValue(":price", price);
         query.bindValue(":room", room);
