@@ -777,11 +777,11 @@ void Librarian::createArticle(){
 void Librarian::createVA(){
     QString title = line1->text();
     QString authors = line2->text();
-    QString keywords = line2->text();
-    int price = line3->text().toInt();
-    int room = line4->text().toInt();
-    int level = line5->text().toInt();
-    int copies = line6->text().toInt();
+    QString keywords = line3->text();
+    int price = line4->text().toInt();
+    int room = line5->text().toInt();
+    int level = line6->text().toInt();
+    int copies = line7->text().toInt();
     bool reference = check->isChecked();
     me.add_va(title, authors, keywords, price, room, level, copies, reference);
     on_button_search_vas_clicked();

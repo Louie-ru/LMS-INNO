@@ -14,7 +14,7 @@ TEMPLATE = app
 DEFINES += QT_DEPRECATED_WARNINGS
 
 #Lines for Nikolai only
-CONFIG += release
+#CONFIG += release
 CONFIG += static
 QMAKE_LFLAGS_RELEASE += -static -static-libgcc
 QMAKE_LFLAGS += -static -static-libgcc
