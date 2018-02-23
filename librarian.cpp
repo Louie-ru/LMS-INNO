@@ -69,13 +69,14 @@ void Librarian::clearObjects(){
 void Librarian::on_button_search_patrons_clicked(){
     ui->table_patrons->setRowCount(0);
 
+    int user_id = ui->line_patrons_id->text().toInt();
     QString name = ui->line_patrons_name->text();
     QString phone = ui->line_patrons_phone->text();
     QString address = ui->line_patrons_address->text();
     bool faculty = ui->checkbox_patrons_faculty->isChecked();
     bool or_and = ui->checkbox_patrons_criteria->isChecked();
 
-    QVector<PatronUser> found = me.search_patrons(name, address, phone, faculty, or_and);
+    QVector<PatronUser> found = me.search_patrons(user_id, name, address, phone, faculty, or_and);
     for (int i = 0; i < found.size(); i++){
         ui->table_patrons->insertRow(i);
         QPushButton *btn_modify = new QPushButton(this);
@@ -106,7 +107,14 @@ void Librarian::on_button_search_patrons_clicked(){
 }
 void Librarian::on_button_search_librarians_clicked(){
     ui->table_librarian->setRowCount(0);
-    QVector<LibrarianUser> found;// = librarian.get_librarians();//CHANGE LATER
+
+    int user_id = ui->line_librarian_id->text().toInt();
+    QString name = ui->line_librarian_name->text();
+    QString phone = ui->line_librarian_phone->text();
+    QString address = ui->line_librarian_adress->text();
+    bool or_and = ui->checkbox_librarian_criteria->isChecked();
+
+    QVector<LibrarianUser> found = me.search_librarians(user_id, name, address, phone, or_and);
     for (int i = 0; i < found.size(); i++){
         ui->table_librarian->insertRow(i);
         QPushButton *btn_modify = new QPushButton(this);

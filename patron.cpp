@@ -169,7 +169,6 @@ void Patron::on_button_search_va_clicked(){
     QString authors = ui->line_authors_va->text();
     QString title = ui->line_title_va->text();
     QString keywords = ui->line_keywords_va->text();
-    QString publisher = ui->line_publisher_va->text();
     bool available = ui->checkbox_available_va->isChecked();
     bool or_and = ui->checkbox_criteria_va->isChecked();
 
@@ -287,4 +286,11 @@ void Patron::on_tabWidget_tabBarClicked(int index){
 
 void Patron::showName(){
     ui->status->setText("Logged in as " + QString(me.faculty ? "faculty " : "") + "patron: " + me.name);
+}
+void Patron::on_button_delete_account_clicked(){
+    QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete your account?", QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::No) return;
+    if(me.delete_me())
+        on_button_logout_clicked();
+    else ui->status->setText("You need to return all checked out documents");
 }

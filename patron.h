@@ -37,6 +37,7 @@ private slots:
 
     void on_tabWidget_tabBarClicked(int index);
     void on_button_logout_clicked();
+    void on_button_delete_account_clicked();
 };
 
 #endif // PATRON_H

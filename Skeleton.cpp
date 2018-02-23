@@ -207,10 +207,10 @@ public:
         if (title != "") req += "instr(lower(title), '"+title+"') > 0" + ins;
         if (keywords != "") req += "instr(lower(keywords), '"+keywords+"') > 0" + ins;
         if (publisher != "") req += "instr(lower(publisher), '"+publisher+"') > 0" + ins;
-        if (editors != "") req += "instr(lower(publisher), '"+editors+"') > 0" + ins;
-        if (journal != "") req += "instr(lower(publisher), '"+journal+"') > 0" + ins;
+        if (editors != "") req += "instr(lower(editors), '"+editors+"') > 0" + ins;
+        if (journal != "") req += "instr(lower(journal), '"+journal+"') > 0" + ins;
         if (year != 0) req += "instr(year, '"+QString::number(year)+"') > 0" + ins;
-        if (month != 0) req += "instr(year, '"+QString::number(month)+"') > 0" + ins;
+        if (month != 0) req += "instr(month, '"+QString::number(month)+"') > 0" + ins;
         if (available) req += "copies > 0" + ins;
         req += "1 = " + QString(or_and ? "1" : "0");
         if (req.length() == 34)
@@ -664,6 +664,15 @@ public:
         return ans;
     }
 
+    bool delete_me(){
+        QSqlQuery query;
+        qDebug() << check_outs.size();
+        if (check_outs.size() > 0)
+            return 0; //cant delete if has check outs
+        query.exec("DELETE FROM patrons WHERE id = " + QString::number(id));
+        return 1;
+    }
+
     PatronUser(int id_, QString name_, QString address_ , QString phone_, bool faculty_, QString login_, QString password_, QString check_outs_){
         id = id_;
         name = name_;
@@ -847,14 +856,17 @@ public:
         query.bindValue(":day_end", end.first.day());
         query.exec();
 
-        //remove check out from my list
         query.prepare("UPDATE patrons SET check_outs = replace(check_outs, :check_out_id_str, '') WHERE id = :user_id");
         query.bindValue(":check_out_id_str", ";" + QString::number(check_out_id));
-        query.bindValue(":user_id", id);
+        query.bindValue(":user_id", user_id);
         query.exec();
 
         query.prepare("UPDATE books SET copies = copies + 1 WHERE id = :document_id");
         query.bindValue(":document_id", book.id);
+        query.exec();
+
+        query.prepare("DELETE FROM check_outs WHERE check_out_id = :check_out_id");
+        query.bindValue(":check_out_id", check_out_id);
         query.exec();
 
         int wants_id = remove_last_wants_book(book.id);
@@ -888,11 +900,15 @@ public:
         //remove check out from my list
         query.prepare("UPDATE patrons SET check_outs = replace(check_outs, :check_out_id_str, '') WHERE id = :user_id");
         query.bindValue(":check_out_id_str", ";" + QString::number(check_out_id));
-        query.bindValue(":user_id", id);
+        query.bindValue(":user_id", user_id);
         query.exec();
 
         query.prepare("UPDATE articles SET copies = copies + 1 WHERE id = :document_id");
         query.bindValue(":document_id", article.id);
+        query.exec();
+
+        query.prepare("DELETE FROM check_outs WHERE check_out_id = :check_out_id");
+        query.bindValue(":check_out_id", check_out_id);
         query.exec();
 
         int wants_id = remove_last_wants_article(article.id);
@@ -926,11 +942,15 @@ public:
         //remove check out from my list
         query.prepare("UPDATE patrons SET check_outs = replace(check_outs, :check_out_id_str, '') WHERE id = :user_id");
         query.bindValue(":check_out_id_str", ";" + QString::number(check_out_id));
-        query.bindValue(":user_id", id);
+        query.bindValue(":user_id", user_id);
         query.exec();
 
         query.prepare("UPDATE vas SET copies = copies + 1 WHERE id = :document_id");
         query.bindValue(":document_id", va.id);
+        query.exec();
+
+        query.prepare("DELETE FROM check_outs WHERE check_out_id = :check_out_id");
+        query.bindValue(":check_out_id", check_out_id);
         query.exec();
 
         int wants_id = remove_last_wants_va(va.id);
@@ -939,13 +959,14 @@ public:
         return make_pair(fine, -1);
     }
 
-    QVector<PatronUser> search_patrons(QString name, QString address, QString phone, bool faculty, bool or_and){
+    QVector<PatronUser> search_patrons(int user_id, QString name, QString address, QString phone, bool faculty, bool or_and){
         QSqlQuery query;
         QString ins = or_and ? " AND " : " OR ";
         name = name.toLower();
         address = address.toLower();
         phone = phone.toLower();
         QString req = "SELECT * FROM patrons WHERE ";
+        if (user_id != 0) req += "id = " + QString::number(user_id) + ins;
         if (name != "") req += "instr(lower(name), '"+name+"') > 0" + ins;
         if (address != "") req += "instr(lower(address), '"+address+"') > 0" + ins;
         if (phone != "") req += "instr(lower(phone), '"+phone+"') > 0" + ins;
@@ -969,7 +990,33 @@ public:
         return ans;
     }
 
-    QVector<LibrarianUser> search_librarians(QString name, QString address, QString phone, bool or_and);
+    QVector<LibrarianUser> search_librarians(int user_id, QString name, QString address, QString phone, bool or_and){
+        QSqlQuery query;
+        QString ins = or_and ? " AND " : " OR ";
+        name = name.toLower();
+        address = address.toLower();
+        phone = phone.toLower();
+        QString req = "SELECT * FROM librarians WHERE ";
+        if (user_id != 0) req += "id = " + QString::number(user_id) + ins;
+        if (name != "") req += "instr(lower(name), '"+name+"') > 0" + ins;
+        if (address != "") req += "instr(lower(address), '"+address+"') > 0" + ins;
+        if (phone != "") req += "instr(lower(phone), '"+phone+"') > 0" + ins;
+        req += "1 = " + QString(or_and ? "1" : "0");//nice hack to finish statement correctly
+        if (req.length() == 36)//no parameters given
+            req = "SELECT * FROM librarians";
+        query.exec(req);
+        QVector<LibrarianUser> ans;
+        while (query.next()) {
+            int user_id = query.value(0).toInt();
+            QString name = query.value(1).toString();
+            QString address = query.value(2).toString();
+            QString phone = query.value(3).toString();
+            QString login = query.value(4).toString();
+            QString password = query.value(5).toString();
+            ans.push_back(LibrarianUser(user_id, name, address, phone, login, password));
+        }
+        return ans;
+    }
 
     void add_patron(QString name, QString address, QString phone, bool faculty, QString login, QString password){
         QSqlQuery query;
@@ -982,7 +1029,16 @@ public:
         query.bindValue(":password", password);
         query.exec();
     }
-    void add_librarian(QString name, QString address, QString phone);
+    void add_librarian(QString name, QString address, QString phone, QString login, QString password){
+        QSqlQuery query;
+        query.prepare("INSERT INTO librarians (name, address, phone, faculty, login, password) VALUES(:name, :address, :phone, :faculty, :login, :password)");
+        query.bindValue(":name", name);
+        query.bindValue(":address", address);
+        query.bindValue(":phone", phone);
+        query.bindValue(":login", login);
+        query.bindValue(":password", password);
+        query.exec();
+    }
 
     bool modify_patron(int user_id, QString name, QString address, QString phone, bool faculty, QString login, QString password){
         QSqlQuery query;
@@ -1016,7 +1072,7 @@ public:
 
     bool delete_patron(int user_id){
         QSqlQuery query;
-        if (get_patron(user_id).check_outs.size() > 1)
+        if (get_patron(user_id).check_outs.size() > 0)
             return 0; //cant delete if has check outs
         query.exec("DELETE FROM patrons WHERE id = " + QString::number(user_id));
         return 1;
