@@ -666,7 +666,6 @@ public:
 
     bool delete_me(){
         QSqlQuery query;
-        qDebug() << check_outs.size();
         if (check_outs.size() > 0)
             return 0; //cant delete if has check outs
         query.exec("DELETE FROM patrons WHERE id = " + QString::number(id));
@@ -1031,7 +1030,7 @@ public:
     }
     void add_librarian(QString name, QString address, QString phone, QString login, QString password){
         QSqlQuery query;
-        query.prepare("INSERT INTO librarians (name, address, phone, faculty, login, password) VALUES(:name, :address, :phone, :faculty, :login, :password)");
+        query.prepare("INSERT INTO librarians (name, address, phone, login, password) VALUES(:name, :address, :phone, :login, :password)");
         query.bindValue(":name", name);
         query.bindValue(":address", address);
         query.bindValue(":phone", phone);
@@ -1054,6 +1053,19 @@ public:
         return 1;//mb change to void
     }
 
+    bool modify_librarian(int user_id, QString name, QString address, QString phone, QString login, QString password){
+        QSqlQuery query;
+        query.prepare("UPDATE librarians SET name = :name, address = :address, phone = :phone, login = :login, password = :password WHERE id = :user_id");
+        query.bindValue(":name", name);
+        query.bindValue(":address", address);
+        query.bindValue(":phone", phone);
+        query.bindValue(":login", login);
+        query.bindValue(":password", password);
+        query.bindValue(":user_id", user_id);
+        query.exec();
+        return 1;
+    }
+
     PatronUser get_patron(int user_id){
         QSqlQuery query;
         query.exec("SELECT * FROM patrons WHERE id = " + QString::number(user_id));
@@ -1068,7 +1080,17 @@ public:
         return PatronUser(user_id, name, address, phone, faculty, login, password, check_outs);
     }
 
-    bool modify_librarian(int user_id, QString name, QString address, QString phone);
+    LibrarianUser get_librarian(int user_id){
+        QSqlQuery query;
+        query.exec("SELECT * FROM librarians WHERE id = " + QString::number(user_id));
+        if (!query.next()) return LibrarianUser(-1, "", "", "", "", "");
+        QString name = query.value(1).toString();
+        QString address = query.value(2).toString();
+        QString phone = query.value(3).toString();
+        QString login = query.value(4).toString();
+        QString password = query.value(5).toString();
+        return LibrarianUser(user_id, name, address, phone, login, password);
+    }
 
     bool delete_patron(int user_id){
         QSqlQuery query;
@@ -1077,7 +1099,11 @@ public:
         query.exec("DELETE FROM patrons WHERE id = " + QString::number(user_id));
         return 1;
     }
-    bool delete_librarian(int user_id);
+    bool delete_librarian(int user_id){
+        QSqlQuery query;
+        query.exec("DELETE FROM librarians WHERE id = " + QString::number(user_id));
+        return 1;
+    }
 
     bool add_book(QString title, QString authors, QString publisher, QString keywords, int year, int price, int room, int level, int copies, int bestseller, bool reference){
         QSqlQuery query;
