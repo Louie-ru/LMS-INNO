@@ -26,12 +26,16 @@ SOURCES += \
         mainwindow.cpp \
     patron.cpp \
     librarian.cpp \
-    skeleton.cpp
+    skeleton.cpp \
+    hasher.cpp \
+    sha_512.cpp
 
 HEADERS += \
         mainwindow.h \
     patron.h \
-    librarian.h
+    librarian.h \
+    hasher.h \
+    sha_512.h
 
 FORMS += \
         mainwindow.ui \
