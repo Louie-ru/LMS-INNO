@@ -41,4 +41,7 @@ FORMS += \
 RESOURCES += \
     logo_name.qrc
 
+#probably another command for linux/mac
+win32:RC_ICONS += logo_book.ico
+
 OTHER_FILES +=

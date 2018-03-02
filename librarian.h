@@ -23,7 +23,6 @@ private slots:
     void on_button_search_articles_clicked();
     void on_button_search_vas_clicked();
 
-
     void on_button_show_checked_out_books_clicked();
     void on_button_show_checked_out_articles_clicked();
     void on_button_show_checked_out_vas_clicked();
@@ -34,17 +33,17 @@ private slots:
     void on_button_new_article_clicked();
     void on_button_new_va_clicked();
 
-    void on_modify_patron_clicked(int id);
-    void on_modify_librarian_clicked(int id);
-    void on_modify_book_clicked(int id);
-    void on_modify_article_clicked(int id);
-    void on_modify_va_clicked(int id);
+    void modify_patron_clicked(int);
+    void modify_librarian_clicked(int);
+    void modify_book_clicked(int);
+    void modify_article_clicked(int);
+    void modify_va_clicked(int);
 
-    void on_delete_patron_clicked(int id);
-    void on_delete_librarian_clicked(int id);
-    void on_delete_book_clicked(int id);
-    void on_delete_article_clicked(int id);
-    void on_delete_va_clicked(int id);
+    void delete_patron_clicked(int);
+    void delete_librarian_clicked(int);
+    void delete_book_clicked(int);
+    void delete_article_clicked(int);
+    void delete_va_clicked(int);
 
     void modifyBook();
     void modifyArticle();
@@ -58,6 +57,10 @@ private slots:
     void createVA();
     void createPatron();
     void createLibrarian();
+
+    void return_book(int);
+    void return_article(int);
+    void return_va(int);
 
     void closeWidget();
     void on_button_logout_clicked();
