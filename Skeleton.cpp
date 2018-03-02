@@ -3,6 +3,7 @@
 #include <QVector>
 #include <QtSql>
 #include <unistd.h>
+#include <hasher.h>
 
 
 using namespace std;
@@ -1018,6 +1019,7 @@ public:
     }
 
     void add_patron(QString name, QString address, QString phone, bool faculty, QString login, QString password){
+        password = Hasher::hash_password(login,password);
         QSqlQuery query;
         query.prepare("INSERT INTO patrons (name, address, phone, faculty, login, password) VALUES(:name, :address, :phone, :faculty, :login, :password)");
         query.bindValue(":name", name);
@@ -1029,6 +1031,7 @@ public:
         query.exec();
     }
     void add_librarian(QString name, QString address, QString phone, QString login, QString password){
+        password = Hasher::hash_password(login,password);
         QSqlQuery query;
         query.prepare("INSERT INTO librarians (name, address, phone, login, password) VALUES(:name, :address, :phone, :login, :password)");
         query.bindValue(":name", name);
@@ -1040,6 +1043,7 @@ public:
     }
 
     bool modify_patron(int user_id, QString name, QString address, QString phone, bool faculty, QString login, QString password){
+        password = Hasher::hash_password(login,password);
         QSqlQuery query;
         query.prepare("UPDATE patrons SET name = :name, address = :address, phone = :phone, faculty = :faculty, login = :login, password = :password WHERE id = :user_id");
         query.bindValue(":name", name);
@@ -1054,6 +1058,7 @@ public:
     }
 
     bool modify_librarian(int user_id, QString name, QString address, QString phone, QString login, QString password){
+        password = Hasher::hash_password(login,password);
         QSqlQuery query;
         query.prepare("UPDATE librarians SET name = :name, address = :address, phone = :phone, login = :login, password = :password WHERE id = :user_id");
         query.bindValue(":name", name);
@@ -1240,6 +1245,7 @@ public:
 class Login{
 public:
     PatronUser login_patron(QString login, QString password){
+        password = Hasher::hash_password(login,password);
         QSqlQuery query;
         query.prepare("SELECT * from patrons WHERE login = :login and password = :password");
         query.bindValue(":login", login);
@@ -1259,6 +1265,7 @@ public:
         return PatronUser(-1,"","","",0,"","","");
     }
     LibrarianUser login_librarian(QString login, QString password){
+        password = Hasher::hash_password(login,password);
         QSqlQuery query;
         query.prepare("SELECT * from librarians WHERE login = :login and password = :password");
         query.bindValue(":login", login);
