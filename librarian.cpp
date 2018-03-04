@@ -99,9 +99,8 @@ void Librarian::on_button_search_patrons_clicked(){
         ui->table_patrons->setItem(i, 3, new QTableWidgetItem(found[i].phone));
         ui->table_patrons->setItem(i, 4, new QTableWidgetItem(found[i].faculty ? "yes" : "no"));
         ui->table_patrons->setItem(i, 5, new QTableWidgetItem(found[i].login));
-        ui->table_patrons->setItem(i, 6, new QTableWidgetItem(found[i].password));
-        ui->table_patrons->setCellWidget(i, 7, btn_modify);
-        ui->table_patrons->setCellWidget(i, 8, btn_delete);
+        ui->table_patrons->setCellWidget(i, 6, btn_modify);
+        ui->table_patrons->setCellWidget(i, 7, btn_delete);
     }
     ui->table_patrons->resizeColumnsToContents();
 }
@@ -136,9 +135,8 @@ void Librarian::on_button_search_librarians_clicked(){
         ui->table_librarian->setItem(i, 2, new QTableWidgetItem(found[i].address));
         ui->table_librarian->setItem(i, 3, new QTableWidgetItem(found[i].phone));
         ui->table_librarian->setItem(i, 4, new QTableWidgetItem(found[i].login));
-        ui->table_librarian->setItem(i, 5, new QTableWidgetItem(found[i].password));
-        ui->table_librarian->setCellWidget(i, 6, btn_modify);
-        ui->table_librarian->setCellWidget(i, 7, btn_delete);
+        ui->table_librarian->setCellWidget(i, 5, btn_modify);
+        ui->table_librarian->setCellWidget(i, 6, btn_delete);
     }
     ui->table_librarian->resizeColumnsToContents();
 }
@@ -292,7 +290,7 @@ void Librarian::modify_patron_clicked(int user_id){
     line4->setText(patron.phone);
     check->setChecked(patron.faculty);
     line5->setText(patron.login);
-    line6->setText(patron.password);
+    line6->setText("");
     line1->setEnabled(false);
     w_layout->addRow(id, line1);
     w_layout->addRow(name, line2);
@@ -323,7 +321,7 @@ void Librarian::modify_librarian_clicked(int user_id){
     line3->setText(librarian.address);
     line4->setText(librarian.phone);
     line5->setText(librarian.login);
-    line6->setText(librarian.password);
+    line6->setText("");
     line1->setEnabled(false);
     w_layout->addRow(id, line1);
     w_layout->addRow(name, line2);

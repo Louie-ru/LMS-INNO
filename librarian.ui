@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_patrons">
       <attribute name="title">
@@ -215,11 +215,6 @@
          </column>
          <column>
           <property name="text">
-           <string>password</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
            <string>modify</string>
           </property>
          </column>
@@ -369,11 +364,6 @@
          <column>
           <property name="text">
            <string>login</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>password</string>
           </property>
          </column>
          <column>
@@ -2012,8 +2002,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>962</width>
-            <height>304</height>
+            <width>442</width>
+            <height>206</height>
            </rect>
           </property>
           <attribute name="label">
