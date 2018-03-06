@@ -83,27 +83,27 @@ bool Tester::test4() {
 
     LibrarianUser Librarian = mainLogin.login_librarian("sidr", "123");
 
-    PatronUser patron = Librarian.get_patron(1011);
-    if(patron.name != ""){
+    PatronUser p2 = Librarian.get_patron(1011);
+    if(p2.name != ""){
         return false;
     }
 
-    PatronUser patron1 = Librarian.get_patron(1100);
-    if(patron1.name == ""){
+    PatronUser p3 = Librarian.get_patron(1100);
+    if(p3.name == ""){
         return false;
     }
 
     else{
-         if (patron1.name != "Elvira Espindola"){
+         if (p3.name != "Elvira Espindola"){
              return false;
          }
-         if (patron1.address != "Via del Corso, 22"){
+         if (p3.address != "Via del Corso, 22"){
              return false;
          }
-         if (patron1.phone != "30003"){
+         if (p3.phone != "30003"){
              return false;
          }
-         if (patron1.faculty != 0){
+         if (p3.faculty != 0){
              return false;
          }
          return true;
