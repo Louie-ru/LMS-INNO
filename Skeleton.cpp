@@ -1292,6 +1292,17 @@ public:
         }
         return LibrarianUser(-1,"","","","","");
     }
+
+    static void clear_database(){
+        QSqlQuery query;
+        query.exec("DELETE FROM librarians");
+        query.exec("DELETE FROM patrons");
+        query.exec("DELETE FROM books");
+        query.exec("DELETE FROM articles");
+        query.exec("DELETE FROM vas");
+        query.exec("DELETE FROM check_outs");
+    }
+
     static void make_database(){
         QSqlQuery query;
         query.exec("CREATE TABLE IF NOT EXISTS books ("
@@ -1374,82 +1385,4 @@ public:
                      "days_add_renew INTEGER DEFAULT 7)");
         //TODO: create basic librarian
     }
-};
-
-
-class Testing{
-public:
-    Login mainLogin;
-    bool testTC1(){
-        PatronUser patron = Login::login_patron("1", "1");
-        patron.check_out_book(1);//book exist
-        QVector<pair<Check_out, Book> > check_outs = patron.get_checked_out_books();
-        for (int i = 0; i < check_outs.size(); i++)
-            if (check_outs[i].second.id == 1)
-                return 1;
-        return 0;
-    }
-
-    bool testTC2(){
-        PatronUser patron = Login::login_patron("1", "1");
-        patron.check_out_book(1009);//book does not exist
-        QVector<pair<Check_out, Book> > check_outs = patron.get_checked_out_books();
-        for (int i = 0; i < check_outs.size(); i++)
-            if (check_outs[i].second.id == 1009)
-                return 0;
-        return 1;
-    }
-
-    bool testTC5(){
-        PatronUser patron1 = mainLogin.login_patron("1", "1");
-        PatronUser patron2 = mainLogin.login_patron("11", "11");
-        PatronUser patron3 = mainLogin.login_patron("111", "111");
-        patron1.check_out_book(2);
-        patron2.check_out_book(2);
-        patron3.check_out_book(2);
-
-        QVector<Book> books = patron1.search_books("","","","",2018,0,0,0);
-        for (int i = 0; i < books.size(); i++)
-            if (books[i].id == 2 && books[i].copies == 0)
-                return 1;
-        return 0;
-    }
-
-    bool testTC6(){
-        PatronUser patron = mainLogin.login_patron("1", "1");
-        patron.check_out_book(1);
-        QVector<pair<Check_out, Book> > check_outs = patron.get_checked_out_books();
-        return check_outs.size() == 2;
-    }
-
-    bool testTC7(){
-        PatronUser patron1 = mainLogin.login_patron("1", "1");
-        PatronUser patron2 = mainLogin.login_patron("11", "11");
-        patron2.check_out_book(3);
-        patron1.check_out_book(3);
-
-        QVector<Book> books = patron1.search_books("","","","",1983,0,0,1);
-        return books[0].copies == 0;
-    }
-
-    bool testTC10(){
-        PatronUser patron = mainLogin.login_patron("1", "1");
-        patron.check_out_book(4);
-        QVector<pair<Check_out, Book> > check_outs = patron.get_checked_out_books();
-        for (int i = 0; i < check_outs.size(); i++)
-            if (check_outs[i].second.id == 4)
-                return 0;
-        return 1;
-    }
-
-    void testAll(){
-        //start on special testing database. Ask Nikolai if you need it. But who cares about tests
-        qDebug() << "testTC1: " << (testTC1() ? "OK" : "FAIL");
-        qDebug() << "testTC2: " << (testTC2() ? "OK" : "FAIL");
-        qDebug() << "testTC5: " << (testTC5() ? "OK" : "FAIL");
-        qDebug() << "testTC6: " << (testTC6() ? "OK" : "FAIL");
-        qDebug() << "testTC7: " << (testTC7() ? "OK" : "FAIL");
-        qDebug() << "testTC10: " << (testTC10() ? "OK" : "FAIL");
-    }
-
 };

@@ -14,26 +14,16 @@ void Tester::run_tests() {
     libr.add_librarian("Сидорович", "Бункер на Кордоне", "88005553535", "sidr", "123");
 
     qDebug() << "TEST1: " << (test1() ? "OK" : "FAIL");
-    //Login::clear_database();
-    /*qDebug() << "TEST2: " << (test2() ? "OK" : "FAIL");
-    Login::clear_database();
+    qDebug() << "TEST2: " << (test2() ? "OK" : "FAIL");
     qDebug() << "TEST3: " << (test3() ? "OK" : "FAIL");
-    Login::clear_database();
     qDebug() << "TEST4: " << (test4() ? "OK" : "FAIL");
-    Login::clear_database();
     qDebug() << "TEST5: " << (test5() ? "OK" : "FAIL");
-    Login::clear_database();
     qDebug() << "TEST6: " << (test6() ? "OK" : "FAIL");
-    Login::clear_database();
     qDebug() << "TEST7: " << (test7() ? "OK" : "FAIL");
-    Login::clear_database();
     qDebug() << "TEST8: " << (test8() ? "OK" : "FAIL");
-    Login::clear_database();
     qDebug() << "TEST9: " << (test9() ? "OK" : "FAIL");
-    Login::clear_database();*/
-
+    Login::clear_database();
     sdb.close();
-    QFile(db_name).remove();
 }
 
 
@@ -74,6 +64,7 @@ bool Tester::test1() {
         users++;
     }
 
+    qDebug() << documents << " " << users;
     if (documents != 8 || users != 4)
         return false;
     return true;
@@ -100,7 +91,12 @@ bool Tester::test2() {
 }
 
 bool Tester::test3() {
-    return true;
+    LibrarianUser librarian = Login::login_librarian("sidr", "123");
+    QVector<PatronUser> p = librarian.search_patrons(0, "Sergey Afonso", "", "", 0, 0);
+    if (p.size() != 1) return 0;
+    QVector<PatronUser> p2 = librarian.search_patrons(0, "Elvira Espindola", "", "", 0, 0);
+    if (p.size() != 1) return 0;
+    return 1;
 }
 
 bool Tester::test4() {
@@ -203,23 +199,27 @@ bool Tester::test8() {
 
     bool c1,c2,c3;
 
-    auto p1_books = p1.get_checked_out_books();
-    auto p2_books = p2.get_checked_out_books();
-    auto p2_vas = p2.get_checked_out_vas();
-    for (pair<Check_out, Book> p : p1_books)
+    QVector<pair<Check_out, Book> > p1_books = p1.get_checked_out_books();
+    QVector<pair<Check_out, Book> > p2_books = p2.get_checked_out_books();
+    QVector<pair<Check_out, VA> > p2_vas = p2.get_checked_out_vas();
+    for (int i = 0; i < p1_books.size(); i++){
+        pair<Check_out, Book> p = p1_books[i];
         if (p.second.id == b2) {
             QDate date(p.first.year_end, p.first.month_end, p.first.day_end);
             int overdue = current_day.toJulianDay() - date.toJulianDay();
             c1 = overdue == 3;
         }
-    for (pair<Check_out, Book> p : p2_books) {
+    }
+    for (int i = 0; i < p2_books.size(); i++){
+        pair<Check_out, Book> p = p2_books[i];
         if(p.second.id == b1) {
             QDate date(p.first.year_end, p.first.month_end, p.first.day_end);
             int overdue = current_day.toJulianDay() - date.toJulianDay();
             c2 = overdue == 7;
         }
     }
-    for (pair<Check_out, VA> p : p2_vas) {
+    for (int i = 0; i < p2_vas.size(); i++){
+        pair<Check_out, VA> p = p2_vas[i];
         if(p.second.id == av1) {
             QDate date(p.first.year_end, p.first.month_end, p.first.day_end);
             int overdue = current_day.toJulianDay() - date.toJulianDay();
