@@ -2,8 +2,9 @@
 #include <QtSql>
 #include <skeleton.cpp>
 
-LibrarianUser libr;
+
 void Tester::run_tests() {
+    LibrarianUser libr;
     const QString db_name = "db_test.sqlite";
 
     QSqlDatabase sdb;
@@ -11,6 +12,7 @@ void Tester::run_tests() {
     sdb.setDatabaseName(db_name);
     sdb.open();
     Login::make_database();
+    Login::clear_database();
     libr.add_librarian("Сидорович", "Бункер на Кордоне", "88005553535", "sidr", "123");
 
     qDebug() << "TEST1: " << (test1() ? "OK" : "FAIL");
@@ -70,8 +72,9 @@ bool Tester::test1() {
 }
 
 bool Tester::test2() {
+    LibrarianUser libr = Login::login_librarian("sidr", "123");
     //Removing books
-    Book b1 = libr.search_books("", " Introduction to Algorithms", "", "", 0, false, false, false)[0];
+    Book b1 = libr.search_books("", "Introduction to Algorithms", "", "", 0, false, false, false)[0];
     libr.modify_book(b1.id, b1.title, b1.publisher, b1.authors, b1.keywords, b1.year, b1.price,b1.room,b1.level,b1.copies - 2,b1.bestseller,b1.reference);
     Book b3 = libr.search_books("", "The Mythical Man-month", "", "", 0, false, false, false)[0];
     libr.modify_book(b3.id, b3.title, b3.publisher, b1.authors, b3.keywords, b3.year, b3.price,b3.room,b3.level,b3.copies - 1,b3.bestseller,b3.reference);
@@ -187,6 +190,7 @@ bool Tester::test7() {
 }
 
 bool Tester::test8() {
+    LibrarianUser libr = Login::login_librarian("sidr", "123");
     QDate p1_b1_checkday(2018, 9, 3);
     QDate p1_b2_checkday(2018, 2, 2);
     QDate p2_b1_checkday(2018, 2, 5);
