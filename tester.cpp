@@ -71,7 +71,6 @@ bool Tester::test1() {
 }
 
 bool Tester::test2() {
-    test1();
     //Removing books
     Book b1 = libr.search_books("", " Introduction to Algorithms", "", "", 0, false, false, false)[0];
     libr.modify_book(b1.id, b1.title, b1.publisher, b1.authors, b1.keywords, b1.year, b1.price,b1.room,b1.level,b1.copies - 2,b1.bestseller,b1.reference);
@@ -100,39 +99,35 @@ bool Tester::test3() {
 }
 
 bool Tester::test4() {
-    test2();
+    LibrarianUser Librarian = Login::login_librarian("sidr", "123");
+    PatronUser p2 = Librarian.get_patron(1011);
+    if(p2.name != ""){
+        return false;
+    }
 
-        LibrarianUser Librarian = Login::login_librarian("sidr", "123");
+    PatronUser p3 = Librarian.get_patron(1100);
+    if(p3.name == ""){
+        return false;
+    }
 
-        PatronUser p2 = Librarian.get_patron(1011);
-        if(p2.name != ""){
-            return false;
-        }
-
-        PatronUser p3 = Librarian.get_patron(1100);
-        if(p3.name == ""){
-            return false;
-        }
-
-        else{
-             if (p3.name != "Elvira Espindola"){
-                 return false;
-             }
-             if (p3.address != "Via del Corso, 22"){
-                 return false;
-             }
-             if (p3.phone != "30003"){
-                 return false;
-             }
-             if (p3.faculty != 0){
-                 return false;
-             }
-             return true;
-        }
+    else{
+         if (p3.name != "Elvira Espindola"){
+             return false;
+         }
+         if (p3.address != "Via del Corso, 22"){
+             return false;
+         }
+         if (p3.phone != "30003"){
+             return false;
+         }
+         if (p3.faculty != 0){
+             return false;
+         }
+         return true;
+    }
 }
 
 bool Tester::test5() {
-    test2();
     //Try to login
     PatronUser p2 = Login::login_patron("n.teixeira", "1");
     //Check that login unsuccessful
@@ -144,41 +139,38 @@ bool Tester::test6() {
 }
 
 bool Tester::test7() {
-    test1();
+    PatronUser p1 = Login::login_patron("s.afonso", "1");
+    Book b1 = p1.search_books("Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest and Clifford Stein", "Introduction to Algorithms","","",2009,0,1,1)[0];
+    Book b2 = p1.search_books("Erich Gamma, Ralph Johnson, John Vlissides, Richard Helm", "Design Patterns: Elements of Reusable Object-Oriented Software", "", "", 2003, 1, 1, 1)[0];
+    Book b3 = p1.search_books("Brooks,Jr., Frederick P", "The Mythical Man-month", "", "", 1995, 0, 1, 1)[0];
+    VA av1 = p1.search_vas("Tony Hoare", "Null References: The Billion Dollar Mistake", "", 1, 1)[0];
+    p1.check_out_book(b1.id);
+    p1.check_out_book(b2.id);
+    p1.check_out_book(b3.id);
+    p1.check_out_av(av1.id);
 
-        PatronUser p1 = Login::login_patron("s.afonso", "1");
-        Book b1 = p1.search_books("Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest and Clifford Stein", "Introduction to Algorithms","","",2009,0,1,1)[0];
-        Book b2 = p1.search_books("Erich Gamma, Ralph Johnson, John Vlissides, Richard Helm", "Design Patterns: Elements of Reusable Object-Oriented Software", "", "", 2003, 1, 1, 1)[0];
-        Book b3 = p1.search_books("Brooks,Jr., Frederick P", "The Mythical Man-month", "", "", 1995, 0, 1, 1)[0];
-        VA av1 = p1.search_vas("Tony Hoare", "Null References: The Billion Dollar Mistake", "", 1, 1)[0];
-        p1.check_out_book(b1.id);
-        p1.check_out_book(b2.id);
-        p1.check_out_book(b3.id);
-        p1.check_out_av(av1.id);
+    PatronUser p2 = Login::login_patron("n.teixeira", "1");
+    VA av2 = p2.search_vas("Claude Shannon", " Information Entropy", "", 1, 1)[0];
+    p2.check_out_book(b1.id);
+    p2.check_out_book(b2.id);
+    p2.check_out_av(av2.id);
 
-        PatronUser p2 = Login::login_patron("n.teixeira", "1");
-        VA av2 = p2.search_vas("Claude Shannon", " Information Entropy", "", 1, 1)[0];
-        p2.check_out_book(b1.id);
-        p2.check_out_book(b2.id);
-        p2.check_out_av(av2.id);
+    LibrarianUser Librarian = Login::login_librarian("sidr", "123");
+    PatronUser patron1 = Librarian.get_patron(p1.id);
+    PatronUser patron2 = Librarian.get_patron(p2.id);
 
-        LibrarianUser Librarian = Login::login_librarian("sidr", "123");
-        PatronUser patron1 = Librarian.get_patron(p1.id);
-        PatronUser patron2 = Librarian.get_patron(p2.id);
+    if (patron1.check_outs.length() != 2){
+        return false;
+    }
 
-        if (patron1.check_outs.length() != 2){
-            return false;
-        }
+    if (patron2.check_outs.length() != 2){
+        return false;
+    }
 
-        if (patron2.check_outs.length() != 2){
-            return false;
-        }
-
-        return true;
+    return true;
 }
 
 bool Tester::test8() {
-    test1();
     QDate p1_b1_checkday(2018, 9, 3);
     QDate p1_b2_checkday(2018, 2, 2);
     QDate p2_b1_checkday(2018, 2, 5);
