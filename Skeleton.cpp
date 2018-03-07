@@ -1301,6 +1301,8 @@ public:
         query.exec("DELETE FROM articles");
         query.exec("DELETE FROM vas");
         query.exec("DELETE FROM check_outs");
+        LibrarianUser libr = Login::login_librarian("sidr", "123");
+        libr.add_librarian("Сидорович", "Бункер на Кордоне", "88005553535", "sidr", "123");
     }
 
     static void make_database(){

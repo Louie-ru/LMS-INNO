@@ -12,16 +12,22 @@ void Tester::run_tests() {
     sdb.setDatabaseName(db_name);
     sdb.open();
     Login::make_database();
-    Login::clear_database();
-    libr.add_librarian("Сидорович", "Бункер на Кордоне", "88005553535", "sidr", "123");
+    Login::clear_database();    
 
     qDebug() << "TEST1: " << (test1() ? "OK" : "FAIL");
+    Login::clear_database();
     qDebug() << "TEST2: " << (test2() ? "OK" : "FAIL");
+    Login::clear_database();
     qDebug() << "TEST3: " << (test3() ? "OK" : "FAIL");
+    Login::clear_database();
     qDebug() << "TEST4: " << (test4() ? "OK" : "FAIL");
+    Login::clear_database();
     qDebug() << "TEST5: " << (test5() ? "OK" : "FAIL");
+    Login::clear_database();
     qDebug() << "TEST6: " << (test6() ? "OK" : "FAIL");
+    Login::clear_database();
     qDebug() << "TEST7: " << (test7() ? "OK" : "FAIL");
+    Login::clear_database();
     qDebug() << "TEST8: " << (test8() ? "OK" : "FAIL");
     Login::clear_database();
     sdb.close();
@@ -65,13 +71,13 @@ bool Tester::test1() {
         users++;
     }
 
-    qDebug() << documents << " " << users;
     if (documents != 8 || users != 4)
         return false;
     return true;
 }
 
 bool Tester::test2() {
+    test1();
     LibrarianUser libr = Login::login_librarian("sidr", "123");
     //Removing books
     Book b1 = libr.search_books("", "Introduction to Algorithms", "", "", 0, false, false, false)[0];
@@ -92,6 +98,7 @@ bool Tester::test2() {
 }
 
 bool Tester::test3() {
+    test1();
     LibrarianUser librarian = Login::login_librarian("sidr", "123");
     QVector<PatronUser> p = librarian.search_patrons(0, "Sergey Afonso", "", "", 0, 0);
     if (p.size() != 1) return 0;
@@ -101,6 +108,7 @@ bool Tester::test3() {
 }
 
 bool Tester::test4() {
+    test2();
     LibrarianUser Librarian = Login::login_librarian("sidr", "123");
     QVector<PatronUser> p = Librarian.search_patrons(0,"Nadia Teixeira","","",0,0);
     if(p.size() != 0)
@@ -112,6 +120,7 @@ bool Tester::test4() {
 }
 
 bool Tester::test5() {
+    test2();
     //Try to login
     PatronUser p2 = Login::login_patron("n.teixeira", "1");
     //Check that login unsuccessful
@@ -119,6 +128,7 @@ bool Tester::test5() {
 }
 
 bool Tester::test6() {
+    test2();
     PatronUser p1 = Login::login_patron("s.afonso", "1");
     PatronUser p3 = Login::login_patron("e.espindola", "1");
 
@@ -141,9 +151,9 @@ bool Tester::test6() {
 
 bool Tester::test7() {
     PatronUser p1 = Login::login_patron("s.afonso", "1");
-    Book b1 = p1.search_books("Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest and Clifford Stein", "Introduction to Algorithms","","",2009,0,1,1)[0];
-    Book b2 = p1.search_books("Erich Gamma, Ralph Johnson, John Vlissides, Richard Helm", "Design Patterns: Elements of Reusable Object-Oriented Software", "", "", 2003, 1, 1, 1)[0];
-    Book b3 = p1.search_books("Brooks,Jr., Frederick P", "The Mythical Man-month", "", "", 1995, 0, 1, 1)[0];
+    Book b1 = p1.search_books("", "Introduction to Algorithms","","",0,0,0,0)[0];
+    Book b2 = p1.search_books("", "Design Patterns: Elements of Reusable Object-Oriented Software", "", "", 0, 0, 0, 0)[0];
+    Book b3 = p1.search_books("", "The Mythical Man-month", "", "", 0, 0, 0, 0)[0];
     VA av1 = p1.search_vas("Tony Hoare", "Null References: The Billion Dollar Mistake", "", 1, 1)[0];
     p1.check_out_book(b1.id);
     p1.check_out_book(b2.id);
