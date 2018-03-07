@@ -333,7 +333,7 @@ public:
     bool faculty;
     QVector<int> check_outs;
 
-    void check_out_book(int document_id){
+    void check_out_book(int document_id, QDate *gdate = NULL){
         QSqlQuery query;
         query.prepare("SELECT COUNT(*) FROM check_outs WHERE user_id = :user_id AND document_type = 1 AND document_id = :document_id AND year_end IS NULL");
         query.bindValue(":user_id", id);
@@ -349,8 +349,11 @@ public:
         bool reference = query.value(1).toInt() ;
         if (copies <= 0 || reference) return;
 
-
-        QDate date = QDate::currentDate();
+        QDate date;
+        if(gdate == NULL)
+            date = QDate::currentDate();
+        else
+            date = *gdate;
         int year_start = date.year();
         int month_start = date.month();
         int day_start = date.day();
@@ -378,7 +381,7 @@ public:
         query.bindValue(":user_id", id);
         query.exec();
     }
-    void check_out_article(int document_id) {
+    void check_out_article(int document_id, QDate *gdate = NULL) {
         QSqlQuery query;
         query.prepare("SELECT COUNT(*) FROM check_outs WHERE user_id = :user_id AND document_type = 2 AND document_id = :document_id AND year_end IS NULL");
         query.bindValue(":user_id", id);
@@ -395,7 +398,11 @@ public:
         if (copies <= 0 || reference) return;
 
 
-        QDate date = QDate::currentDate();
+        QDate date;
+        if(gdate == NULL)
+            date = QDate::currentDate();
+        else
+            date = *gdate;
         int year_start = date.year();
         int month_start = date.month();
         int day_start = date.day();
@@ -423,7 +430,7 @@ public:
         query.bindValue(":user_id", id);
         query.exec();
     }
-    void check_out_av(int document_id){
+    void check_out_av(int document_id, QDate *gdate = NULL){
         QSqlQuery query;
         query.prepare("SELECT COUNT(*) FROM check_outs WHERE user_id = :user_id AND document_type = 3 AND document_id = :document_id AND year_end IS NULL");
         query.bindValue(":user_id", id);
@@ -440,7 +447,11 @@ public:
         if (copies <= 0 || reference) return;
 
 
-        QDate date = QDate::currentDate();
+        QDate date;
+        if(gdate == NULL)
+            date = QDate::currentDate();
+        else
+            date = *gdate;
         int year_start = date.year();
         int month_start = date.month();
         int day_start = date.day();
@@ -1241,10 +1252,9 @@ public:
     LibrarianUser(){};
 };
 
-
 class Login{
 public:
-    PatronUser login_patron(QString login, QString password){
+    static PatronUser login_patron(QString login, QString password){
         password = Hasher::hash_password(login,password);
         QSqlQuery query;
         query.prepare("SELECT * from patrons WHERE login = :login and password = :password");
@@ -1264,7 +1274,7 @@ public:
         }
         return PatronUser(-1,"","","",0,"","","");
     }
-    LibrarianUser login_librarian(QString login, QString password){
+    static LibrarianUser login_librarian(QString login, QString password){
         password = Hasher::hash_password(login,password);
         QSqlQuery query;
         query.prepare("SELECT * from librarians WHERE login = :login and password = :password");
@@ -1282,7 +1292,7 @@ public:
         }
         return LibrarianUser(-1,"","","","","");
     }
-    void make_database(){
+    static void make_database(){
         QSqlQuery query;
         query.exec("CREATE TABLE IF NOT EXISTS books ("
                      "id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -1371,7 +1381,7 @@ class Testing{
 public:
     Login mainLogin;
     bool testTC1(){
-        PatronUser patron = mainLogin.login_patron("1", "1");
+        PatronUser patron = Login::login_patron("1", "1");
         patron.check_out_book(1);//book exist
         QVector<pair<Check_out, Book> > check_outs = patron.get_checked_out_books();
         for (int i = 0; i < check_outs.size(); i++)
@@ -1381,7 +1391,7 @@ public:
     }
 
     bool testTC2(){
-        PatronUser patron = mainLogin.login_patron("1", "1");
+        PatronUser patron = Login::login_patron("1", "1");
         patron.check_out_book(1009);//book does not exist
         QVector<pair<Check_out, Book> > check_outs = patron.get_checked_out_books();
         for (int i = 0; i < check_outs.size(); i++)
