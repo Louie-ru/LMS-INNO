@@ -14,7 +14,7 @@ void Tester::run_tests() {
     libr.add_librarian("Сидорович", "Бункер на Кордоне", "88005553535", "sidr", "123");
 
     qDebug() << "TEST1: " << (test1() ? "OK" : "FAIL");
-    Login::clear_database();
+    //Login::clear_database();
     /*qDebug() << "TEST2: " << (test2() ? "OK" : "FAIL");
     Login::clear_database();
     qDebug() << "TEST3: " << (test3() ? "OK" : "FAIL");
@@ -106,7 +106,7 @@ bool Tester::test3() {
 bool Tester::test4() {
     test2();
 
-        LibrarianUser Librarian = mainLogin.login_librarian("sidr", "123");
+        LibrarianUser Librarian = Login::login_librarian("sidr", "123");
 
         PatronUser p2 = Librarian.get_patron(1011);
         if(p2.name != ""){
@@ -150,7 +150,7 @@ bool Tester::test6() {
 bool Tester::test7() {
     test1();
 
-        PatronUser p1 = mainLogin.login_patron("s.afonso", "1");
+        PatronUser p1 = Login::login_patron("s.afonso", "1");
         Book b1 = p1.search_books("Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest and Clifford Stein", "Introduction to Algorithms","","",2009,0,1,1)[0];
         Book b2 = p1.search_books("Erich Gamma, Ralph Johnson, John Vlissides, Richard Helm", "Design Patterns: Elements of Reusable Object-Oriented Software", "", "", 2003, 1, 1, 1)[0];
         Book b3 = p1.search_books("Brooks,Jr., Frederick P", "The Mythical Man-month", "", "", 1995, 0, 1, 1)[0];
@@ -160,13 +160,13 @@ bool Tester::test7() {
         p1.check_out_book(b3.id);
         p1.check_out_av(av1.id);
 
-        PatronUser p2 = mainLogin.login_patron("n.teixeira", "1");
+        PatronUser p2 = Login::login_patron("n.teixeira", "1");
         VA av2 = p2.search_vas("Claude Shannon", " Information Entropy", "", 1, 1)[0];
         p2.check_out_book(b1.id);
         p2.check_out_book(b2.id);
         p2.check_out_av(av2.id);
 
-        LibrarianUser Librarian = mainLogin.login_librarian("sidr", "123");
+        LibrarianUser Librarian = Login::login_librarian("sidr", "123");
         PatronUser patron1 = Librarian.get_patron(p1.id);
         PatronUser patron2 = Librarian.get_patron(p2.id);
 
