@@ -102,31 +102,13 @@ bool Tester::test3() {
 
 bool Tester::test4() {
     LibrarianUser Librarian = Login::login_librarian("sidr", "123");
-    PatronUser p2 = Librarian.search_patrons(0,"Nadia Teixeira","","",0,1)[0];
-    if(p2.name != ""){
+    QVector<PatronUser> p = Librarian.search_patrons(0,"Nadia Teixeira","","",0,0);
+    if(p.size() != 0)
         return false;
-    }
-
-    PatronUser p3 = Librarian.search_patrons(0,"Elvira Espindola", "", "", 0,1)[0];
-    if(p3.name == ""){
+    PatronUser p3 = Librarian.search_patrons(0,"Elvira Espindola", "", "", 0,0)[0];
+    if(p3.name == "" || p3.name != "Elvira Espindola" || p3.address != "Via del Corso, 22" || p3.phone != "30003" || p3.faculty != 0)
         return false;
-    }
-
-    else{
-         if (p3.name != "Elvira Espindola"){
-             return false;
-         }
-         if (p3.address != "Via del Corso, 22"){
-             return false;
-         }
-         if (p3.phone != "30003"){
-             return false;
-         }
-         if (p3.faculty != 0){
-             return false;
-         }
-         return true;
-    }
+    return true;
 }
 
 bool Tester::test5() {
