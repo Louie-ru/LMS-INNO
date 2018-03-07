@@ -21,7 +21,6 @@ void Tester::run_tests() {
     qDebug() << "TEST6: " << (test6() ? "OK" : "FAIL");
     qDebug() << "TEST7: " << (test7() ? "OK" : "FAIL");
     qDebug() << "TEST8: " << (test8() ? "OK" : "FAIL");
-    qDebug() << "TEST9: " << (test9() ? "OK" : "FAIL");
     Login::clear_database();
     sdb.close();
 }
@@ -135,6 +134,23 @@ bool Tester::test5() {
 }
 
 bool Tester::test6() {
+    PatronUser p1 = Login::login_patron("s.afonso", "1");
+    PatronUser p3 = Login::login_patron("e.espindola", "1");
+
+    Book b1 = p1.search_books("Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest and Clifford Stein", "Introduction to Algorithms","","",2009,0,1,1)[0];
+    Book b2 = p1.search_books("Erich Gamma, Ralph Johnson, John Vlissides, Richard Helm", "Design Patterns: Elements of Reusable Object-Oriented Software", "", "", 2003, 1, 1, 1)[0];
+
+    p1.check_out_book(b1.id);
+    p3.check_out_book(b1.id);
+    p1.check_out_book(b2.id);
+
+    LibrarianUser librarian = Login::login_librarian("sidr", "123");
+    QVector<pair<Check_out, Book> > t1 = librarian.search_books_checked_out(p1.id, "", "", "", "", 0, 0, 0, 0);
+    QVector<pair<Check_out, Book> > t2 = librarian.search_books_checked_out(p3.id, "", "", "", "", 0, 0, 0, 0);
+
+    if (t1.size() != 1 || t2.size() != 1)
+        return false;
+
     return true;
 }
 
@@ -220,8 +236,4 @@ bool Tester::test8() {
     }
 
     return c1 && c2 && c3;
-}
-
-bool Tester::test9() {
-    return true;
 }
