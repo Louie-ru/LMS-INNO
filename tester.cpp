@@ -150,18 +150,19 @@ bool Tester::test6() {
 }
 
 bool Tester::test7() {
+    test1();
     PatronUser p1 = Login::login_patron("s.afonso", "1");
-    Book b1 = p1.search_books("", "Introduction to Algorithms","","",0,0,0,0)[0];
+    Book b1 = p1.search_books("", "Introduction to Algorithms", "", "", 0, false, false, false)[0];
     Book b2 = p1.search_books("", "Design Patterns: Elements of Reusable Object-Oriented Software", "", "", 0, 0, 0, 0)[0];
-    Book b3 = p1.search_books("", "The Mythical Man-month", "", "", 0, 0, 0, 0)[0];
-    VA av1 = p1.search_vas("Tony Hoare", "Null References: The Billion Dollar Mistake", "", 1, 1)[0];
+    Book b3 = p1.search_books("", "The Mythical Man-month", "", "", 0, false, false, false)[0];
+    VA av1 = p1.search_vas("Tony Hoare", "", "", 0, 0)[0];
     p1.check_out_book(b1.id);
     p1.check_out_book(b2.id);
     p1.check_out_book(b3.id);
     p1.check_out_av(av1.id);
 
     PatronUser p2 = Login::login_patron("n.teixeira", "1");
-    VA av2 = p2.search_vas("Claude Shannon", " Information Entropy", "", 1, 1)[0];
+    VA av2 = p2.search_vas("", "Information Entropy", "", 0, 0)[0];
     p2.check_out_book(b1.id);
     p2.check_out_book(b2.id);
     p2.check_out_av(av2.id);
@@ -170,18 +171,13 @@ bool Tester::test7() {
     PatronUser patron1 = Librarian.get_patron(p1.id);
     PatronUser patron2 = Librarian.get_patron(p2.id);
 
-    if (patron1.check_outs.length() != 2){
+    if (patron1.check_outs.length() != 3 || patron2.check_outs.length() != 3)
         return false;
-    }
-
-    if (patron2.check_outs.length() != 2){
-        return false;
-    }
-
     return true;
 }
 
 bool Tester::test8() {
+    test1();
     LibrarianUser libr = Login::login_librarian("sidr", "123");
     QDate p1_b1_checkday(2018, 9, 3);
     QDate p1_b2_checkday(2018, 2, 2);
