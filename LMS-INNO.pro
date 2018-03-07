@@ -28,14 +28,16 @@ SOURCES += \
     librarian.cpp \
     skeleton.cpp \
     hasher.cpp \
-    sha_512.cpp
+    sha_512.cpp \
+    tester.cpp
 
 HEADERS += \
         mainwindow.h \
     patron.h \
     librarian.h \
     hasher.h \
-    sha_512.h
+    sha_512.h \
+    tester.h
 
 FORMS += \
         mainwindow.ui \
