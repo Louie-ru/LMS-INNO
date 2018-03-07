@@ -102,12 +102,12 @@ bool Tester::test3() {
 
 bool Tester::test4() {
     LibrarianUser Librarian = Login::login_librarian("sidr", "123");
-    PatronUser p2 = Librarian.get_patron(1011);
+    PatronUser p2 = Librarian.search_patrons(0,"Nadia Teixeira","","",0,1)[0];
     if(p2.name != ""){
         return false;
     }
 
-    PatronUser p3 = Librarian.get_patron(1100);
+    PatronUser p3 = Librarian.search_patrons(0,"Elvira Espindola", "", "", 0,1)[0];
     if(p3.name == ""){
         return false;
     }
