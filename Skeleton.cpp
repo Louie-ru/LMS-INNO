@@ -12,6 +12,13 @@ using namespace std;
 #define ARTICLE    2
 #define AV         3
 
+#define PATRON_STUDENT             1
+#define PATRON_INSTRUCTOR          2
+#define PATRON_TA                  3
+#define PATRON_PROFESSOR           4
+#define PATRON_VISITINGPROFESSOR   5
+
+
 class Document{
 public:
     QString title, keywords;
@@ -98,6 +105,38 @@ public:
     VA(){};
 };
 
+class Queue {
+    int book_id;
+    bool outstanding_request;
+    QVector<int> request_ids;
+
+    Queue(int book_id, bool outstanding_request, QString request_ids) {
+        this->book_id = book_id;
+        this->outstanding_request = outstanding_request;
+        for (QString s : request_ids.split(" ")) {
+            if(s.isEmpty()) continue;
+            request_ids.append(s.toInt());
+        }
+    }
+
+    static Queue getFromDB(int book_id) {
+        QSqlQuery query;
+        query.prepare("SELECT book_id: FROM Query");
+        query.bindValue("book_id:", book_id);
+        query.exec();
+        query.next();
+        return Queue(query.value(0).toInt(), query.value(1).toBool(), query.value(3).toString());
+    }
+
+    static bool existInDB(int book_id) {
+        QSqlQuery query;
+        query.prepare("SELECT book_id: FROM Query");
+        query.bindValue("book_id:", book_id);
+        query.exec();
+        return query.next();
+    }
+};
+
 class Check_out {
 public:
     int user_id;
@@ -127,20 +166,29 @@ public:
     int id;
 
     //bestseller can be any if not book given
-    std::pair<QDate, int> calculate_check_out(int document_type, int year_start, int month_start, int day_start, bool faculty, bool bestseller, int price, int renew_state){
+    std::pair<QDate, int> calculate_check_out(int document_type, int year_start, int month_start, int day_start, int patron_type, bool bestseller, int price, int renew_state){
         QDate date_start;
         date_start.setDate(year_start, month_start, day_start);
         QDate date_end;
         int days_to_add = 0;
-        if (document_type == 1){
-            if (faculty)
+        switch(document_type) {
+        case BOOK:
+            if(patron_type == PATRON_VISITINGPROFESSOR)
+                days_to_add = 7;
+            else if(patron_type == PATRON_PROFESSOR || patron_type == PATRON_INSTRUCTOR || patron_type == PATRON_TA)
                 days_to_add = 28;
             else if (bestseller)
                 days_to_add = 14;
             else
                 days_to_add = 21;
+            break;
+        case ARTICLE: case AV:
+            if(patron_type == PATRON_VISITINGPROFESSOR)
+                days_to_add = 7;
+            else
+                days_to_add = 14;
+            break;
         }
-        else days_to_add = 14;
         if (renew_state == 2){//if renewed
             QSqlQuery query;
             query.exec("SELECT * FROM settings");//need to know how many days to add
@@ -156,6 +204,7 @@ public:
             fine = min(days_overdue * 100, price);
         return make_pair(date_end, fine);
     }
+
     QVector<Book> search_books(QString authors, QString title, QString keywords, QString publisher, int year, bool bestseller, bool available, bool or_and){
         QSqlQuery query;
         QString ins = or_and ? " AND " : " OR ";
@@ -330,7 +379,7 @@ public:
 //search/check_out documents, renew/return checked_out documents
 class PatronUser : public User{
 public:
-    bool faculty;
+    int patron_type;
     QVector<int> check_outs;
 
     void check_out_book(int document_id, QDate *gdate = NULL){
@@ -558,7 +607,7 @@ public:
         if (renew_state != 0) return 1; //someone wants
 
         Book book = get_book(book_id);
-        std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, faculty, book.bestseller, book.price, renew_state);
+        std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, patron_type, book.bestseller, book.price, renew_state);
 
         if (today.daysTo(end.first) != 0 && today.daysTo(end.first) != 1)
             return 2; //too late or early
@@ -568,6 +617,7 @@ public:
         query.exec();
         return 3;
     }
+
     int renew_article(int check_out_id){
         QSqlQuery query;
         QDate today = QDate::currentDate();
@@ -586,7 +636,7 @@ public:
         if (renew_state != 0) return 1; //someone wants
 
         Article article = get_article(article_id);
-        std::pair<QDate, int> end = calculate_check_out(2, year_start, month_start, day_start, faculty, 0, article.price, renew_state);
+        std::pair<QDate, int> end = calculate_check_out(2, year_start, month_start, day_start, patron_type, 0, article.price, renew_state);
 
         if (today.daysTo(end.first) != 0 && today.daysTo(end.first) != 1)
             return 2; //too late or early
@@ -596,6 +646,7 @@ public:
         query.exec();
         return 3;
     }
+
     int renew_va(int check_out_id){
         QSqlQuery query;
         QDate today = QDate::currentDate();
@@ -614,7 +665,7 @@ public:
         if (renew_state != 0) return 1; //someone wants
 
         VA va = get_va(va_id);
-        std::pair<QDate, int> end = calculate_check_out(3, year_start, month_start, day_start, faculty, 0, va.price, renew_state);
+        std::pair<QDate, int> end = calculate_check_out(3, year_start, month_start, day_start, patron_type, 0, va.price, renew_state);
 
         if (today.daysTo(end.first) != 0 && today.daysTo(end.first) != 1)
             return 2; //too late or early
@@ -636,7 +687,7 @@ public:
             int day_start = query.value(6).toInt();
             int state_renew = query.value(10).toInt();
             Book book = get_book(book_id);
-            std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, faculty, book.bestseller, book.price, state_renew);
+            std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, patron_type, book.bestseller, book.price, state_renew);
             ans.push_back(make_pair(Check_out(id, 1, book_id, check_out_id, year_start, month_start, day_start, end.first.year(), end.first.month(), end.first.day(), end.second), book));
         }
         return ans;
@@ -653,7 +704,7 @@ public:
             int day_start = query.value(6).toInt();
             int state_renew = query.value(10).toInt();
             Article article = get_article(article_id);
-            std::pair<QDate, int> end = calculate_check_out(2, year_start, month_start, day_start, faculty, 0, article.price, state_renew);
+            std::pair<QDate, int> end = calculate_check_out(2, year_start, month_start, day_start, patron_type, 0, article.price, state_renew);
             ans.push_back(make_pair(Check_out(id, 2, article_id, check_out_id, year_start, month_start, day_start, end.first.year(), end.first.month(), end.first.day(), end.second), article));
         }
         return ans;
@@ -670,7 +721,7 @@ public:
             int day_start = query.value(6).toInt();
             int state_renew = query.value(10).toInt();
             VA va = get_va(va_id);
-            std::pair<QDate, int> end = calculate_check_out(3, year_start, month_start, day_start, faculty, 0, va.price, state_renew);
+            std::pair<QDate, int> end = calculate_check_out(3, year_start, month_start, day_start, patron_type, 0, va.price, state_renew);
             ans.push_back(make_pair(Check_out(id, 3, va_id, check_out_id, year_start, month_start, day_start, end.first.year(), end.first.month(), end.first.day(), end.second), va));
         }
         return ans;
@@ -684,12 +735,12 @@ public:
         return 1;
     }
 
-    PatronUser(int id_, QString name_, QString address_ , QString phone_, bool faculty_, QString login_, QString password_, QString check_outs_){
+    PatronUser(int id_, QString name_, QString address_ , QString phone_, bool patron_type_, QString login_, QString password_, QString check_outs_){
         id = id_;
         name = name_;
         address = address_;
         phone = phone_;
-        faculty = faculty_;
+        patron_type = patron_type_;
         login = login_;
         password = password_;
         add_check_outs(check_outs_);
@@ -718,7 +769,7 @@ public:
                 int state_renew = query.value(10).toInt();
                 Book book = get_book(book_id);
                 PatronUser patron = get_patron(current_user_id);
-                std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, patron.faculty, book.bestseller, book.price, state_renew);
+                std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, patron.patron_type, book.bestseller, book.price, state_renew);
                 QDate return_date;
                 return_date.setDate(end.first.year(), end.first.month(), end.first.day());
                 if (overdue && QDate::currentDate().daysTo(return_date) >= 0) continue;
@@ -727,6 +778,7 @@ public:
         }
         return ans;
     }
+
     QVector<std::pair<Check_out, Article> > search_articles_checked_out(int user_id, QString authors, QString title, QString keywords, QString journal, QString publisher, QString editors, int year, int month, bool overdue, bool or_and){
         QSqlQuery query;
         QVector<Article> articles = search_articles(authors, title, keywords, journal, publisher, editors, year, month, 0, or_and);
@@ -745,7 +797,7 @@ public:
                 int state_renew = query.value(10).toInt();
                 Article article = get_article(article_id);
                 PatronUser patron = get_patron(current_user_id);
-                std::pair<QDate, int> end = calculate_check_out(2, year_start, month_start, day_start, patron.faculty, 0, article.price, state_renew);
+                std::pair<QDate, int> end = calculate_check_out(2, year_start, month_start, day_start, patron.patron_type, 0, article.price, state_renew);
                 QDate return_date;
                 return_date.setDate(end.first.year(), end.first.month(), end.first.day());
                 if (overdue && QDate::currentDate().daysTo(return_date) >= 0) continue;
@@ -772,7 +824,7 @@ public:
                 int state_renew = query.value(10).toInt();
                 VA va = get_va(va_id);
                 PatronUser patron = get_patron(current_user_id);
-                std::pair<QDate, int> end = calculate_check_out(3, year_start, month_start, day_start, patron.faculty, 0, va.price, state_renew);
+                std::pair<QDate, int> end = calculate_check_out(3, year_start, month_start, day_start, patron.patron_type, 0, va.price, state_renew);
                 QDate return_date;
                 return_date.setDate(end.first.year(), end.first.month(), end.first.day());
                 if (overdue && QDate::currentDate().daysTo(return_date) >= 0) continue;
@@ -843,6 +895,7 @@ public:
         query.next();
         return query.value(0).toInt();
     }
+
     //fine, wants_user_id
     std::pair<int, int> return_book(int check_out_id){
         QSqlQuery query;
@@ -857,7 +910,7 @@ public:
 
         PatronUser patron = get_patron(user_id);
         Book book = get_book(book_id);
-        std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, patron.faculty, book.bestseller, book.price, renew_state);
+        std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, patron.patron_type, book.bestseller, book.price, renew_state);
         int fine = end.second;
 
         query.prepare("UPDATE check_outs SET year_end = :year_end, month_end = :month_end, day_end = :day_end WHERE check_out_id = :check_out_id");
@@ -885,6 +938,7 @@ public:
             return make_pair(fine, wants_id);
         return make_pair(fine, -1);
     }
+
     std::pair<int, int> return_article(int check_out_id){
         QSqlQuery query;
         query.exec("SELECT * FROM check_outs WHERE document_type = 2 AND check_out_id = " + QString::number(check_out_id));
@@ -898,7 +952,7 @@ public:
 
         PatronUser patron = get_patron(user_id);
         Article article = get_article(article_id);
-        std::pair<QDate, int> end = calculate_check_out(2, year_start, month_start, day_start, patron.faculty, 0, article.price, renew_state);
+        std::pair<QDate, int> end = calculate_check_out(2, year_start, month_start, day_start, patron.patron_type, 0, article.price, renew_state);
         int fine = end.second;
 
         query.prepare("UPDATE check_outs SET year_end = :year_end, month_end = :month_end, day_end = :day_end WHERE check_out_id = :check_out_id");
@@ -927,6 +981,7 @@ public:
             return make_pair(fine, wants_id);
         return make_pair(fine, -1);
     }
+
     std::pair<int, int> return_va(int check_out_id){
         QSqlQuery query;
         query.exec("SELECT * FROM check_outs WHERE document_type = 3 AND check_out_id = " + QString::number(check_out_id));
@@ -940,7 +995,7 @@ public:
 
         PatronUser patron = get_patron(user_id);
         VA va = get_va(va_id);
-        std::pair<QDate, int> end = calculate_check_out(3, year_start, month_start, day_start, patron.faculty, 0, va.price, renew_state);
+        std::pair<QDate, int> end = calculate_check_out(3, year_start, month_start, day_start, patron.patron_type, 0, va.price, renew_state);
         int fine = end.second;
 
         query.prepare("UPDATE check_outs SET year_end = :year_end, month_end = :month_end, day_end = :day_end WHERE check_out_id = :check_out_id");
@@ -970,7 +1025,7 @@ public:
         return make_pair(fine, -1);
     }
 
-    QVector<PatronUser> search_patrons(int user_id, QString name, QString address, QString phone, bool faculty, bool or_and){
+    QVector<PatronUser> search_patrons(int user_id, QString name, QString address, QString phone, int patron_type, bool or_and){
         QSqlQuery query;
         QString ins = or_and ? " AND " : " OR ";
         name = name.toLower();
@@ -981,7 +1036,7 @@ public:
         if (name != "") req += "instr(lower(name), '"+name+"') > 0" + ins;
         if (address != "") req += "instr(lower(address), '"+address+"') > 0" + ins;
         if (phone != "") req += "instr(lower(phone), '"+phone+"') > 0" + ins;
-        if (faculty) req += "faculty = 1" + ins;
+        if (patron_type) req += "faculty = " + patron_type + ins;
         req += "1 = " + QString(or_and ? "1" : "0");//nice hack to finish statement correctly
         if (req.length() == 33)//no parameters given
             req = "SELECT * FROM patrons";
@@ -1029,14 +1084,14 @@ public:
         return ans;
     }
 
-    void add_patron(QString name, QString address, QString phone, bool faculty, QString login, QString password){
+    void add_patron(QString name, QString address, QString phone, int patron_type, QString login, QString password){
         password = Hasher::hash_password(login,password);
         QSqlQuery query;
         query.prepare("INSERT INTO patrons (name, address, phone, faculty, login, password) VALUES(:name, :address, :phone, :faculty, :login, :password)");
         query.bindValue(":name", name);
         query.bindValue(":address", address);
         query.bindValue(":phone", phone);
-        query.bindValue(":faculty", (faculty ? 1 : 0));
+        query.bindValue(":faculty", patron_type);
         query.bindValue(":login", login);
         query.bindValue(":password", password);
         query.exec();
@@ -1053,14 +1108,14 @@ public:
         query.exec();
     }
 
-    bool modify_patron(int user_id, QString name, QString address, QString phone, bool faculty, QString login, QString password){
+    bool modify_patron(int user_id, QString name, QString address, QString phone, int patron_type, QString login, QString password){
         password = Hasher::hash_password(login,password);
         QSqlQuery query;
         query.prepare("UPDATE patrons SET name = :name, address = :address, phone = :phone, faculty = :faculty, login = :login, password = :password WHERE id = :user_id");
         query.bindValue(":name", name);
         query.bindValue(":address", address);
         query.bindValue(":phone", phone);
-        query.bindValue(":faculty", (faculty ? 1 : 0));
+        query.bindValue(":faculty", patron_type);
         query.bindValue(":login", login);
         query.bindValue(":password", password);
         query.bindValue(":user_id", user_id);
@@ -1089,11 +1144,11 @@ public:
         QString name = query.value(1).toString();
         QString address = query.value(2).toString();
         QString phone = query.value(3).toString();
-        bool faculty = query.value(4).toInt();
+        int patron_type = query.value(4).toInt();
         QString check_outs = query.value(5).toString();
         QString login = query.value(6).toString();
         QString password = query.value(7).toString();
-        return PatronUser(user_id, name, address, phone, faculty, login, password, check_outs);
+        return PatronUser(user_id, name, address, phone, patron_type, login, password, check_outs);
     }
 
     LibrarianUser get_librarian(int user_id){
@@ -1108,6 +1163,8 @@ public:
         return LibrarianUser(user_id, name, address, phone, login, password);
     }
 
+
+
     bool delete_patron(int user_id){
         QSqlQuery query;
         if (get_patron(user_id).check_outs.size() > 0)
@@ -1115,6 +1172,7 @@ public:
         query.exec("DELETE FROM patrons WHERE id = " + QString::number(user_id));
         return 1;
     }
+
     bool delete_librarian(int user_id){
         QSqlQuery query;
         query.exec("DELETE FROM librarians WHERE id = " + QString::number(user_id));
@@ -1266,7 +1324,7 @@ public:
             QString name = query.value(1).toString();
             QString address = query.value(2).toString();
             QString phone = query.value(3).toString();
-            bool faculty = query.value(4).toInt();
+            int faculty = query.value(4).toInt();
             QString check_outs = query.value(5).toString();
             QString user_login = query.value(6).toString();
             QString user_password = query.value(7).toString();

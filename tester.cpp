@@ -20,8 +20,8 @@ void Tester::run_tests() {
     Login::clear_database();
     qDebug() << "TEST3: " << (test3() ? "OK" : "FAIL");
     Login::clear_database();
-    qDebug() << "TEST4: " << (test4() ? "OK" : "FAIL");
-    Login::clear_database();
+    //qDebug() << "TEST4: " << (test4() ? "OK" : "FAIL");
+    //Login::clear_database();
     qDebug() << "TEST5: " << (test5() ? "OK" : "FAIL");
     Login::clear_database();
     qDebug() << "TEST6: " << (test6() ? "OK" : "FAIL");
@@ -105,18 +105,6 @@ bool Tester::test3() {
     QVector<PatronUser> p2 = librarian.search_patrons(0, "Elvira Espindola", "", "", 0, 0);
     if (p.size() != 1) return 0;
     return 1;
-}
-
-bool Tester::test4() {
-    test2();
-    LibrarianUser Librarian = Login::login_librarian("sidr", "123");
-    QVector<PatronUser> p = Librarian.search_patrons(0,"Nadia Teixeira","","",0,0);
-    if(p.size() != 0)
-        return false;
-    PatronUser p3 = Librarian.search_patrons(0,"Elvira Espindola", "", "", 0,0)[0];
-    if(p3.name == "" || p3.name != "Elvira Espindola" || p3.address != "Via del Corso, 22" || p3.phone != "30003" || p3.faculty != 0)
-        return false;
-    return true;
 }
 
 bool Tester::test5() {
