@@ -3,7 +3,7 @@
 #include <skeleton.cpp>
 
 
-void Tester::run_tests() {
+void Tester2::run_tests() {
     LibrarianUser libr;
     const QString db_name = "db_test.sqlite";
 
@@ -33,7 +33,7 @@ void Tester::run_tests() {
     sdb.close();
 }
 
-bool Tester::test1(){
+bool Tester2::test1(){
     LibrarianUser Librarian = Login::login_librarian("sidr", "123");
     Librarian.add_book("Introduction to Algorithms", "Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest and Clifford Stein", " MIT Press", "ITA", 2009, 5000, 0, 0, 3, 0, 0);
     Librarian.add_book("Design Patterns: Elements of Reusable Object-Oriented Software", "Erich Gamma, Ralph Johnson, John Vlissides, Richard Helm", "Addison-Wesley Professional", "Object-Oriented", 2003, 1700, 0, 0, 3, 1, 0);
@@ -63,3 +63,5 @@ bool Tester::test1(){
         return false;
     return true;
 }
+
+

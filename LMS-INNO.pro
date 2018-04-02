@@ -13,7 +13,6 @@ TARGET = LMS-INNO
 TEMPLATE = app
 DEFINES += QT_DEPRECATED_WARNINGS
 
-CONFIG -= bitcode
 
 #Lines for Nikolai only
 #CONFIG += release

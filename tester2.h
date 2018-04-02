@@ -2,7 +2,7 @@
 #define TESTER2_H
 
 
-class Tester
+class Tester2
 {
 private:
     static bool test1();
