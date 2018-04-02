@@ -106,25 +106,41 @@ public:
 };
 
 class Queue {
+public:
     int book_id;
     bool outstanding_request;
     QVector<int> request_ids;
+    QVector<int> patron_posses;
 
-    Queue(int book_id, bool outstanding_request, QString request_ids) {
+    static QVector<int> stringToVector(QString s) {
+        QVector<int> v;
+        QStringList list = s.split(" ");
+        for (int i = 0; i < list.size(); ++i) {
+            if(list[i].isEmpty()) continue;
+            v.append(list[i].toInt());
+        }
+    }
+
+    static QString vectorToString(QVector<int> v) {
+        QString s = "";
+        for (int i = 0; i < v.size(); ++i) {
+            s += v[i] + " ";
+        }
+        return s;
+    }
+
+public:
+    Queue(int book_id, bool outstanding_request, QString request_ids, QString patron_posses) {
         this->book_id = book_id;
         this->outstanding_request = outstanding_request;
-        QStringList splited = request_ids.split(" ");
-        for (int i = 0; i < splited.size(); i++) {
-            QString s = splited[i];
-            if(s.isEmpty()) continue;
-            request_ids.append(s.toInt());
-        }
+        this->request_ids = stringToVector(request_ids).push_front(0);
+        this->patron_posses = stringToVector(patron_posses).push_front(0);
     }
 
     static Queue getFromDB(int book_id) {
         QSqlQuery query;
-        query.prepare("SELECT book_id: FROM Query");
-        query.bindValue("book_id:", book_id);
+        query.prepare("SELECT * FROM Query WHERE book_id = :book_id");
+        query.bindValue(":book_id", book_id);
         query.exec();
         query.next();
         return Queue(query.value(0).toInt(), query.value(1).toBool(), query.value(3).toString());
@@ -132,10 +148,42 @@ class Queue {
 
     static bool existInDB(int book_id) {
         QSqlQuery query;
-        query.prepare("SELECT book_id: FROM Query");
-        query.bindValue("book_id:", book_id);
+        query.prepare("SELECT :book_id FROM Query");
+        query.bindValue(":book_id", book_id);
         query.exec();
         return query.next();
+    }
+
+    void saveInDB() {
+        QSqlQuery query;
+
+        query.prepare("DELETE FROM Query WHERE book_id = :book_id");
+        query.bindValue(":book_id", this->book_id);
+        query.exec();
+
+        QString ids = vectorToString(this->request_ids);
+        QString patron_posses = vectorToString(this->patron_posses);
+
+        query.prepare("INSERT INTO Query(book_id, outstanding_request, request_ids, requests, patron_posses) VALUES (:book_id, :outstanding_request, :request_ids, :requests, :patron_posses");
+        query.bindValue(":book_id", this->book_id);
+        query.bindValue(":outstanding_request", this->outstanding_request);
+        query.bindValue(":request_ids", ids);
+        query.bindValue(":requests", this->request_ids.size());
+        query.bindValue(":patron_posses", patron_posses);
+        query.exec();
+    }
+
+    bool addPatron(PatronUser patron) {
+        int start = this->patron_posses[patron.patron_type];
+        int end = this->patron_posses[patron.patron_type + 1];
+
+        for (int i = start; i < end; ++i)
+            if(this->request_ids[i] == patron.id)
+                return false;
+
+        patron_posses.insert(end, patron.id);
+        for (int i = patron.patron_type; i < patron_posses.size(); ++i)
+            ++patron_posses[i];
     }
 };
 
