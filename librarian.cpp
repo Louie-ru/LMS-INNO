@@ -73,10 +73,9 @@ void Librarian::on_button_search_patrons_clicked(){
     QString name = ui->line_patrons_name->text();
     QString phone = ui->line_patrons_phone->text();
     QString address = ui->line_patrons_address->text();
-    bool faculty = ui->checkbox_patrons_faculty->isChecked();
     bool or_and = ui->checkbox_patrons_criteria->isChecked();
 
-    QVector<PatronUser> found = me.search_patrons(user_id, name, address, phone, faculty, or_and);
+    QVector<PatronUser> found = me.search_patrons(user_id, name, address, phone, -1, or_and);
     for (int i = 0; i < found.size(); i++){
         ui->table_patrons->insertRow(i);
         QPushButton *btn_modify = new QPushButton(this);
@@ -97,7 +96,7 @@ void Librarian::on_button_search_patrons_clicked(){
         ui->table_patrons->setItem(i, 1, new QTableWidgetItem(found[i].name));
         ui->table_patrons->setItem(i, 2, new QTableWidgetItem(found[i].address));
         ui->table_patrons->setItem(i, 3, new QTableWidgetItem(found[i].phone));
-        ui->table_patrons->setItem(i, 4, new QTableWidgetItem(found[i].faculty ? "yes" : "no"));
+        ui->table_patrons->setItem(i, 4, new QTableWidgetItem(found[i].patron_type));
         ui->table_patrons->setItem(i, 5, new QTableWidgetItem(found[i].login));
         ui->table_patrons->setCellWidget(i, 6, btn_modify);
         ui->table_patrons->setCellWidget(i, 7, btn_delete);
@@ -280,23 +279,29 @@ void Librarian::modify_patron_clicked(int user_id){
     QLabel *name = new QLabel("name:");
     QLabel *address = new QLabel("address:");
     QLabel *phone = new QLabel("phone:");
-    QLabel *faculty = new QLabel("faculty:");
+    QLabel *role = new QLabel("role:");
     QLabel *login = new QLabel("login:");
     QLabel *password = new QLabel("password:");
     clearObjects();
+    combo->addItem("Student");
+    combo->addItem("Instructor");
+    combo->addItem("TA");
+    combo->addItem("Professor");
+    combo->addItem("Visiting Professor");
     line1->setText(QString::number(patron.id));
     line2->setText(patron.name);
     line3->setText(patron.address);
     line4->setText(patron.phone);
-    check->setChecked(patron.faculty);
+    combo->setCurrentIndex(patron.patron_type - 1);
     line5->setText(patron.login);
     line6->setText("");
     line1->setEnabled(false);
+
     w_layout->addRow(id, line1);
     w_layout->addRow(name, line2);
     w_layout->addRow(address, line3);
     w_layout->addRow(phone, line4);
-    w_layout->addRow(faculty, check);
+    w_layout->addRow(role, combo);
     w_layout->addRow(login, line5);
     w_layout->addRow(password, line6);
     w_layout->addRow(cancel, ok);
@@ -702,9 +707,9 @@ void Librarian::modifyPatron(){
     QString phone = line4->text();
     QString login = line5->text();
     QString password = line6->text();
-    bool faculty = check->isChecked();
+    int role = combo->currentIndex() + 1;
 
-    me.modify_patron(id, name, address, phone, faculty, login, password);
+    me.modify_patron(id, name, address, phone, role, login, password);
     closeWidget();
     on_button_search_patrons_clicked();
 }
@@ -777,9 +782,9 @@ void Librarian::createPatron(){
     QString phone = line3->text();
     QString login = line4->text();
     QString password = line5->text();
-    bool faculty = check->isChecked();
+    int role = combo->currentIndex() + 1;
     closeWidget();
-    me.add_patron(name, address, phone, faculty, login, password);
+    me.add_patron(name, address, phone, role, login, password);
     on_button_search_patrons_clicked();
 }
 void Librarian::createLibrarian(){
@@ -846,14 +851,14 @@ void Librarian::on_button_new_patron_clicked(){
     QLabel *name = new QLabel("name:");
     QLabel *address = new QLabel("address:");
     QLabel *phone = new QLabel("phone:");
-    QLabel *faculty = new QLabel("faculty:");
+    QLabel *role = new QLabel("role:");
     QLabel *login = new QLabel("login:");
     QLabel *password = new QLabel("password:");
     clearObjects();
     w_layout->addRow(name, line1);
     w_layout->addRow(address, line2);
     w_layout->addRow(phone, line3);
-    w_layout->addRow(faculty, check);
+    w_layout->addRow(role, combo);
     w_layout->addRow(login, line4);
     w_layout->addRow(password, line5);
     w_layout->addRow(cancel, ok);

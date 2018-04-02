@@ -285,7 +285,7 @@ void Patron::on_tabWidget_tabBarClicked(int index){
 }
 
 void Patron::showName(){
-    ui->status->setText("Logged in as " + QString(me.faculty ? "faculty " : "") + "patron: " + me.name);
+    ui->status->setText("Logged in as patron: " + me.name);
 }
 void Patron::on_button_delete_account_clicked(){
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete your account?", QMessageBox::Yes|QMessageBox::No);

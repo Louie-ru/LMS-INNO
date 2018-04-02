@@ -113,7 +113,9 @@ class Queue {
     Queue(int book_id, bool outstanding_request, QString request_ids) {
         this->book_id = book_id;
         this->outstanding_request = outstanding_request;
-        for (QString s : request_ids.split(" ")) {
+        QStringList splited = request_ids.split(" ");
+        for (int i = 0; i < splited.size(); i++) {
+            QString s = splited[i];
             if(s.isEmpty()) continue;
             request_ids.append(s.toInt());
         }
@@ -735,7 +737,7 @@ public:
         return 1;
     }
 
-    PatronUser(int id_, QString name_, QString address_ , QString phone_, bool patron_type_, QString login_, QString password_, QString check_outs_){
+    PatronUser(int id_, QString name_, QString address_ , QString phone_, int patron_type_, QString login_, QString password_, QString check_outs_){
         id = id_;
         name = name_;
         address = address_;
