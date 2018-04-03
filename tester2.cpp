@@ -156,12 +156,8 @@ bool Tester2::test4(){
     p1.check_out_book(d1, &date);
     p1.renew_book(d1);
 
-    PatronUser s = Login::login_patron("a.velo","1");
-
     s.check_out_book(d2, &date);
     s.renew_book(d2);
-
-    PatronUser v = Login::login_patron("v.rama","1");
 
     v.check_out_book(d2, &date);
     v.renew_book(d2);
@@ -172,8 +168,7 @@ bool Tester2::test4(){
         return false;
     if(v.get_checked_out_books()[0].first.day_end != 5 || v.get_checked_out_books()[0].first.month_end != 4)
         return false;
-    return true;
-
+    return v.check_outs.size();
 }
 
 bool Tester2::test5(){
@@ -201,10 +196,11 @@ bool Tester2::test5(){
 
     if(p1.search_vas("Tony Hoare","","",0,0)[0].wants[0] = v.id )
         return true;
-    return false;
+    return p1.id;
 }
 
 bool Tester2::test6(){
+    PatronUser p1 = Login::login_patron("s.afonso", "1");
     int d1 = p1.search_books("Introduction to Algorithms","","","",2009,0,0,0)[0].id;
     int d2 = p1.search_books("","","","",0,1,0,1)[0].id;
 
@@ -230,5 +226,5 @@ bool Tester2::test6(){
         return false;
     if(v.get_checked_out_books()[0].first.day_end != 9 || v.get_checked_out_books()[0].first.month_end != 4)
         return false;
-    return true;
+    return v.id;
 }
