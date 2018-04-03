@@ -92,35 +92,6 @@ bool Tester2::test2(){
     return true;
 }
 
-
-bool Tester2::test5(){
-    if(p1.get_checked_out_books()[0].first.day_end != 2 || p1.get_checked_out_books()[0].first.month_end != 4)
-        return false;
-    if(p1.get_checked_out_books()[0].first.fine == 0)
-        return false;
-    if(p1.get_checked_out_books()[1].first.day_end != 2 || p1.get_checked_out_books()[1].first.month_end != 4)
-        return false;
-    if(p1.get_checked_out_books()[1].first.fine == 0)
-        return false;
-    if(s.get_checked_out_books()[0].first.day_end != 26 || p1.get_checked_out_books()[0].first.month_end != 4) 
-        return false;
-    if(s.get_checked_out_books()[0].first.fine == 0)
-        return false;
-    if(s.get_checked_out_books()[1].first.day_end != 19 || p1.get_checked_out_books()[1].first.month_end != 4) 
-        return false;
-    if(s.get_checked_out_books()[1].first.fine == 0)
-        return false;
-    if(v.get_checked_out_books()[0].first.day_end != 12 || p1.get_checked_out_books()[0].first.month_end != 4) 
-        return false;
-    if(v.get_checked_out_books()[0].first.fine == 0)
-        return true;
-    if(v.get_checked_out_books()[1].first.day_end != 12 || p1.get_checked_out_books()[1].first.month_end != 4)
-        return false;
-    if(v.get_checked_out_books()[1].first.fine == 0)
-        return false;
-    return true;
-}
-
 bool Tester2::test3(){
     LibrarianUser Librarian = Login::login_librarian("sidr", "123");
     Librarian.add_book("Introduction to Algorithms", "Thomas H. Cormen, Charles E. Leiserson, Ronald L. Rivest and Clifford Stein", " MIT Press", "ITA", 2009, 5000, 0, 0, 3, 0, 0);
@@ -145,36 +116,6 @@ bool Tester2::test3(){
 
     VA a = p1.search_vas("Tony Hoare","","",0,1)[0];
     return a.wants.size() != -1;
-}
-
-bool Tester2::test6(){
-    int d1 = p1.search_books("Introduction to Algorithms","","","",2009,0,0,0)[0].id;
-    int d2 = p1.search_books("","","","",0,1,0,1)[0].id;
-
-    QDate date(2018, 3, 29);
-    QDate curr_date(2018, 4, 2);
-
-    p1.check_out_book(d1, &date);
-    p1.renew_book(d1);
-
-    PatronUser s = Login::login_patron("a.velo","1");
-
-    s.check_out_book(d2, &date);
-    s.renew_book(d2);
-
-    PatronUser v = Login::login_patron("v.rama","1");
-
-    v.check_out_book(d2, &date);
-    v.renew_book(d2);
-
-    if(p1.get_checked_out_books()[0].first.day_end != 30 || p1.get_checked_out_books()[0].first.month_end != 4)
-        return true;
-    if(s.get_checked_out_books()[0].first.day_end != 16 || s.get_checked_out_books()[0].first.month_end != 4)
-        return false;
-    if(v.get_checked_out_books()[0].first.day_end != 9 || v.get_checked_out_books()[0].first.month_end != 4)
-        return false;
-    return true;
-
 }
 
 bool Tester2::test4(){
@@ -261,4 +202,33 @@ bool Tester2::test5(){
     if(p1.search_vas("Tony Hoare","","",0,0)[0].wants[0] = v.id )
         return true;
     return false;
+}
+
+bool Tester2::test6(){
+    int d1 = p1.search_books("Introduction to Algorithms","","","",2009,0,0,0)[0].id;
+    int d2 = p1.search_books("","","","",0,1,0,1)[0].id;
+
+    QDate date(2018, 3, 29);
+    QDate curr_date(2018, 4, 2);
+
+    p1.check_out_book(d1, &date);
+    p1.renew_book(d1);
+
+    PatronUser s = Login::login_patron("a.velo","1");
+
+    s.check_out_book(d2, &date);
+    s.renew_book(d2);
+
+    PatronUser v = Login::login_patron("v.rama","1");
+
+    v.check_out_book(d2, &date);
+    v.renew_book(d2);
+
+    if(p1.get_checked_out_books()[0].first.day_end != 30 || p1.get_checked_out_books()[0].first.month_end != 4)
+        return true;
+    if(s.get_checked_out_books()[0].first.day_end != 16 || s.get_checked_out_books()[0].first.month_end != 4)
+        return false;
+    if(v.get_checked_out_books()[0].first.day_end != 9 || v.get_checked_out_books()[0].first.month_end != 4)
+        return false;
+    return true;
 }
