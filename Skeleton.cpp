@@ -553,7 +553,6 @@ public:
         query.exec();
     }
 
-
     //parse string and add my check outs
     void add_check_outs(QString str){
         QString id = "";
@@ -884,6 +883,19 @@ public:
         query.bindValue(":document_id", document_id);
         query.exec();
         return last;
+    }
+
+    void make_outstanding(int document_id, int document_type) {
+        if(Queue.existInDB(document_id, document_type)) {
+            Queue q = Queue::getFromDB(document_id, document_type);
+            q.deleteFromDB();
+        } else {
+            QSqlQuery query;
+            query.prepare("UPDATE check_outs SET renew_state = 1 WHERE document_id = :document_id AND document_type = :document_type AND renew_state = 0");
+            query.bindValue(":document_id", document_id);
+            query.bindValue(":document_type", document_type);
+            query.exec();
+        }
     }
 
     void set_settings(int days_add_renew){
