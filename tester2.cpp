@@ -26,6 +26,14 @@ void Tester2::run_tests() {
     Login::clear_database();
     qDebug() << "TEST6: " << (test6() ? "OK" : "FAIL");
     Login::clear_database();
+    qDebug() << "TEST7: " << (test7() ? "OK" : "FAIL");
+    Login::clear_database();
+    qDebug() << "TEST8: " << (test8() ? "OK" : "FAIL");
+    Login::clear_database();
+    qDebug() << "TEST9: " << (test9() ? "OK" : "FAIL");
+    Login::clear_database();
+    qDebug() << "TEST10: " << (test10() ? "OK" : "FAIL");
+    Login::clear_database();
     sdb.close();
 }
 
@@ -224,6 +232,51 @@ bool Tester2::test6(){
         return true;
     if(s.get_checked_out_books()[0].first.day_end != 16 || s.get_checked_out_books()[0].first.month_end != 4)
         return false;
+    if(v.get_checked_out_books()[0].first.day_end != 9 || v.get_checked_out_books()[0].first.month_end != 4)
+        return false;
+    return v.id;
+}
+
+bool Tester2::test7(){
+    test6();
+    LibrarianUser librarian = Login::login_librarian("sidr", "123");
+    PatronUser p1 = Login::login_patron("s.afonso", "1");
+    int d3 = p1.search_vas("Tony Hoare","","",0,0)[0].id;
+    //librarian.oustanding_request();
+    return p1.id;
+}
+
+bool Tester2::test8(){
+    test6();
+    LibrarianUser librarian = Login::login_librarian("sidr", "123");
+    PatronUser p1 = Login::login_patron("s.afonso", "1");
+    int d3 = p1.search_vas("Tony Hoare","","",0,0)[0].id;
+    PatronUser p2 = Login::login_patron("n.teixeira", "1");
+    return librarian.return_book(d3).first;
+}
+
+bool Tester2::test9(){
+    test6();
+    LibrarianUser librarian = Login::login_librarian("sidr", "123");
+    PatronUser p1 = Login::login_patron("s.afonso", "1");
+    int d3 = p1.search_vas("Tony Hoare","","",0,0)[0].id;
+    return librarian.return_va(d3).first;
+}
+
+bool Tester2::test10(){
+    PatronUser p1 = Login::login_patron("s.afonso", "1");
+    PatronUser v = Login::login_patron("v.rama","1");
+    int d1 = p1.search_books("Introduction to Algorithms","","","",2009,0,0,0)[0].id;
+    QDate date(2018, 3, 29);
+    QDate curr_date(2018, 4, 2);
+    p1.check_out_book(d1, &date);
+    p1.renew_book(d1);
+    v.check_out_book(d1);
+    v.renew_book(d1);
+    p1.renew_book(d1);
+    v.renew_book(d1);
+    if(p1.get_checked_out_books()[0].first.day_end != 30 || p1.get_checked_out_books()[0].first.month_end != 4)
+        return true;
     if(v.get_checked_out_books()[0].first.day_end != 9 || v.get_checked_out_books()[0].first.month_end != 4)
         return false;
     return v.id;
