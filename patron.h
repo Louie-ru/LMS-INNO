@@ -35,6 +35,8 @@ private slots:
     void want_article(int);
     void want_va(int);
 
+    void take_reserved(int document_id, int document_type);
+
     void on_tabWidget_tabBarClicked(int index);
     void on_button_logout_clicked();
     void on_button_delete_account_clicked();

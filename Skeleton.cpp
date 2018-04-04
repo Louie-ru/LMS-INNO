@@ -500,6 +500,59 @@ public:
         query.exec();
     }
 
+    void take_reserved(int document_id, int document_type) {
+        Reserve r(document_id, document_type, this->id);
+        r.deleteFromDB();
+
+        QDate date = QDate::currentDate();
+        int year_start = date.year();
+        int month_start = date.month();
+        int day_start = date.day();
+
+        switch(document_type) {
+        case BOOK:
+            query.prepare("INSERT INTO check_outs (user_id,document_type,document_id,year_start,month_start,day_start) VALUES(:user_id,:document_type,:document_id,:year_start,:month_start,:day_start)");
+            query.bindValue(":user_id", id);
+            query.bindValue(":document_type", BOOK);
+            query.bindValue(":document_id", document_id);
+            query.bindValue(":year_start", year_start);
+            query.bindValue(":month_start", month_start);
+            query.bindValue(":day_start", day_start);
+            query.exec();
+            break;
+        case ARTICLE:
+            query.prepare("INSERT INTO check_outs (user_id,document_type,document_id,year_start,month_start,day_start) VALUES(:user_id,:document_type,:document_id,:year_start,:month_start,:day_start)");
+            query.bindValue(":user_id", id);
+            query.bindValue(":document_type", ARTICLE);
+            query.bindValue(":document_id", document_id);
+            query.bindValue(":year_start", year_start);
+            query.bindValue(":month_start", month_start);
+            query.bindValue(":day_start", day_start);
+            query.exec();
+            break;
+        case AV:
+            query.prepare("INSERT INTO check_outs (user_id,document_type,document_id,year_start,month_start,day_start) VALUES(:user_id,:document_type,:document_id,:year_start,:month_start,:day_start)");
+            query.bindValue(":user_id", id);
+            query.bindValue(":document_type", AV);
+            query.bindValue(":document_id", document_id);
+            query.bindValue(":year_start", year_start);
+            query.bindValue(":month_start", month_start);
+            query.bindValue(":day_start", day_start);
+            query.exec();
+            break;
+        }
+
+        //get last check out id
+        query.exec("SELECT check_out_id FROM check_outs ORDER BY check_out_id DESC LIMIT 1");
+        query.next();
+        int check_out_id = query.value(0).toInt();
+
+        query.prepare("UPDATE patrons SET check_outs = check_outs || :check_out_id WHERE id = :user_id");
+        query.bindValue(":check_out_id", QString::number(check_out_id)+";");
+        query.bindValue(":user_id", id);
+        query.exec();
+    }
+
 
     //parse string and add my check outs
     void add_check_outs(QString str){
@@ -524,8 +577,8 @@ public:
         query.bindValue(":document_type", document_type);
         query.exec();
 
-        if (Queue.existInDB(document_id, document_type)) {
-            Queue q = Queue.getFromDB(document_id, document_type);
+        if (Queue::existInDB(document_id, document_type)) {
+            Queue q = Queue::getFromDB(document_id, document_type);
             if(q.outstanding_request) return -2;
             else if(q.hasPatron(this)) return -1;
             else {
@@ -535,70 +588,6 @@ public:
             }
         } else {
             Queue q(document_id, document_type, this);
-            q.saveInDB();
-        }
-    }
-
-    void want_book(int document_id){
-        //set renew_state to 1
-        QSqlQuery query;
-        query.prepare("UPDATE check_outs SET renew_state = 1 WHERE document_type = 1 AND renew_state = 0 AND year_end IS NULL AND document_id = :document_id");
-        query.bindValue(":document_id", document_id);
-        query.exec();
-
-        if (Queue.existInDB(document_id)) {
-            Queue q = Queue.getFromDB(document_id);
-            if(q.outstanding_request) return -2;
-            else if(q.hasPatron(this)) return -1;
-            else {
-                int pos = q.addPatron(this);
-                q.saveInDB();
-                return pos;
-            }
-        } else {
-            Queue q(document_id, this);
-            q.saveInDB();
-        }
-    }
-    void want_article(int document_id){
-        //set renew_state to 1
-        QSqlQuery query;
-        query.prepare("UPDATE check_outs SET renew_state = 1 WHERE document_type = 2 AND renew_state = 0 AND year_end IS NULL AND document_id = :document_id");
-        query.bindValue(":document_id", document_id);
-        query.exec();
-
-        if (Queue.existInDB(document_id)) {
-            Queue q = Queue.getFromDB(document_id);
-            if(q.outstanding_request) return -2;
-            else if(q.hasPatron(this)) return -1;
-            else {
-                int pos = q.addPatron(this);
-                q.saveInDB();
-                return pos;
-            }
-        } else {
-            Queue q(document_id, this);
-            q.saveInDB();
-        }
-    }
-    void want_va(int document_id){
-        //set renew_state to 1
-        QSqlQuery query;
-        query.prepare("UPDATE check_outs SET renew_state = 1 WHERE document_type = 3 AND renew_state = 0 AND year_end IS NULL AND document_id = :document_id");
-        query.bindValue(":document_id", document_id);
-        query.exec();
-
-        if (Queue.existInDB(document_id)) {
-            Queue q = Queue.getFromDB(document_id);
-            if(q.outstanding_request) return -2;
-            else if(q.hasPatron(this)) return -1;
-            else {
-                int pos = q.addPatron(this);
-                q.saveInDB();
-                return pos;
-            }
-        } else {
-            Queue q(document_id, this);
             q.saveInDB();
         }
     }
@@ -1478,20 +1467,20 @@ class Reserve {
                                 "vas"};
     QDate endDate;
 
-    Reserve(int document_id, int user_id, int document_type) {
+    Reserve(int document_id, int document_type, int user_id) {
         this->document_id = document_id;
         this->user_id = user_id;
         this->document_type = document_type;
-        endDate = QDate.currentDate();
+        endDate = QDate::currentDate();
         endDate.addDays(1);
     }
 
-    Reserve(int document_id, int user_id,int document_type, QString endDate) {
+    Reserve(int document_id, int document_type, int user_id, QString endDate) {
         this->document_id = document_id;
         this->user_id = user_id;
         this->document_type = document_type;
-        QVector<QString> values = endDate.split(" ");
-        endDate(values[0].toInt(), values[1].toInt(), values[2].toInt());
+        QStringList values = endDate.split(" ");
+        this->endDate(values[0].toInt(), values[1].toInt(), values[2].toInt());
     }
 
     static bool existInDB(int document_id, int document_type, int user_id) {
@@ -1500,7 +1489,7 @@ class Reserve {
         query.bindValue(":document_id", document_id);
         query.bindValue(":document_type", document_type);
         query.exec();
-        QDate now = QDate.currentDate();
+        QDate now = QDate::currentDate();
         while(query.next()) {
             Reserve r (query.value(0).toInt(), query.value(1).toInt(), query.value(2).toInt(), query.value(3).toString());
             if(now.day() > r.endDate.day())
@@ -1530,7 +1519,7 @@ class Reserve {
         query.bindValue(":user_id", user_id);
         query.exec();
 
-        QString date = endDate.year() + " " + endDate.month() + " " + endDate.day();
+        QString date = QString(endDate.year()) + " " + QString(endDate.month()) + " " + QString(endDate.day());
         query.prepare("INSERT INTO Reserve VALUES (:document_id, :user_id, :document_type, :endDate");
         query.bindValue(":document_id", document_id);
         query.bindValue(":user_ud", user_id);
