@@ -30,7 +30,6 @@ SOURCES += \
     skeleton.cpp \
     hasher.cpp \
     sha_512.cpp \
-    tester.cpp \
     tester2.cpp
 
 HEADERS += \
