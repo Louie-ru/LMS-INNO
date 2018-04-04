@@ -18,6 +18,10 @@ using namespace std;
 #define PATRON_PROFESSOR           4
 #define PATRON_VISITINGPROFESSOR   5
 
+const QString document_names[4] = {
+        QString(""), QString("books"), QString("articles"), QString("vas")
+};
+
 
 class Document{
 public:
@@ -509,6 +513,7 @@ public:
         int month_start = date.month();
         int day_start = date.day();
 
+        QSqlQuery query;
         switch(document_type) {
         case BOOK:
             query.prepare("INSERT INTO check_outs (user_id,document_type,document_id,year_start,month_start,day_start) VALUES(:user_id,:document_type,:document_id,:year_start,:month_start,:day_start)");
@@ -886,7 +891,7 @@ public:
     }
 
     void make_outstanding(int document_id, int document_type) {
-        if(Queue.existInDB(document_id, document_type)) {
+        if(Queue::existInDB(document_id, document_type)) {
             Queue q = Queue::getFromDB(document_id, document_type);
             q.deleteFromDB();
         } else {
@@ -951,8 +956,8 @@ public:
         remove_outstanding(book_id, BOOK);
 
         int wants_id;
-        if (Queue.existInDB(book_id, BOOK)) {
-            Queue q = Queue.getFromDB(book_id, BOOK);
+        if (Queue::existInDB(book_id, BOOK)) {
+            Queue q = Queue::getFromDB(book_id, BOOK);
             wants_id = q.nextPatron();
             Reserve r(book_id, BOOK, wants_id);
             r.saveInDB();
@@ -1002,8 +1007,8 @@ public:
         remove_outstanding(article_id, ARTICLE);
 
         int wants_id;
-        if (Queue.existInDB(book_id, ARTICLE)) {
-            Queue q = Queue.getFromDB(book_id, ARTICLE);
+        if (Queue::existInDB(book_id, ARTICLE)) {
+            Queue q = Queue::getFromDB(book_id, ARTICLE);
             wants_id = q.nextPatron();
             Reserve r(book_id, ARTICLE, wants_id);
             r.saveInDB();
@@ -1053,8 +1058,8 @@ public:
         remove_outstanding(va_id, AV);
 
         int wants_id;
-        if (Queue.existInDB(va_id, AV)) {
-            Queue q = Queue.getFromDB(va_id, AV);
+        if (Queue::existInDB(va_id, AV)) {
+            Queue q = Queue::getFromDB(va_id, AV);
             wants_id = q.nextPatron();
             Reserve r(va_id, AV, wants_id);
             r.saveInDB();
@@ -1404,8 +1409,10 @@ public:
         this->document_id = document_id;
         this->document_type = document_type;
         this->outstanding_request = false;
-        this->request_ids();
-        this->patron_posses();
+        this->request_ids = QVector<int>();
+        this->patron_posses = QVector<int>();
+        for (int i = 0; i < 5; ++i)
+            this->patron_posses.append(0);
         addPatron(patron);
     }
 
@@ -1416,7 +1423,7 @@ public:
         query.bindValue(":document_type", document_type);
         query.exec();
         query.next();
-        return Queue(query.value(0).toInt(), query.value(1).toBool(), query.value(3).toString(), query.value(4).toString());
+        return Queue(query.value(0).toInt(), query.value(0).toInt(), query.value(1).toBool(), query.value(3).toString(), query.value(4).toString());
     }
 
     static bool existInDB(int document_id, int document_type) {
@@ -1469,7 +1476,7 @@ public:
         request_ids.insert(end, patron.id);
         for (int i = patron.patron_type; i < patron_posses.size(); ++i)
             ++patron_posses[i];
-        return patron_posses[patron_type];
+        return patron_posses[patron.patron_type];
     }
 
     bool hasPatron(PatronUser patron) {
@@ -1494,14 +1501,6 @@ class Reserve {
     int document_id;
     int document_type;
     int user_id;
-    static QVector<QString> & replacement_for_initialized_static_non_const_variable() {
-            static QVector<int> Static {42, 0, 1900, 1998};
-            return Static;
-        }
-    static string document_names[4] = {"",
-                                "books",
-                                "articles",
-                                "vas"};
     QDate endDate;
 
     Reserve(int document_id, int document_type, int user_id) {
