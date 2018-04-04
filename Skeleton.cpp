@@ -91,9 +91,6 @@ public:
     Article(){};
 };
 
-class Queue;
-class Reserve;
-
 class VA : public Document{
 public:
     QString authors;
@@ -133,6 +130,61 @@ public:
         fine = fine_;
     }
     Check_out(){};
+};
+
+class PatronUser;
+
+class Queue {
+public:
+    int document_id;
+    int document_type;
+    bool outstanding_request;
+    QVector<int> request_ids;
+    QVector<int> patron_posses;
+
+    static QVector<int> stringToVector(QString s);
+
+    static QString vectorToString(QVector<int> v);
+
+public:
+    Queue(int document_id, int document_type, bool outstanding_request, QString request_ids, QString patron_posses);
+
+    Queue(int document_id, int document_type, PatronUser patron);
+
+    static Queue getFromDB(int document_id, int document_type);
+
+    static bool existInDB(int document_id, int document_type);
+
+    void saveInDB();
+
+    void deleteFromDB();
+
+    //return position in queue or -1 if patron already in queue
+    int addPatron(PatronUser patron);
+
+    bool hasPatron(PatronUser patron);
+
+    int nextPatron();
+};
+
+class Reserve {
+public:
+    int document_id;
+    int document_type;
+    int user_id;
+    QDate endDate;
+
+    Reserve(int document_id, int document_type, int user_id);
+
+    Reserve(int document_id, int document_type, int user_id, QString endDate);
+
+    static bool existInDB(int document_id, int document_type, int user_id);
+
+    static Reserve getFromDB(int document_id, int document_type, int user_id);
+
+    bool saveInDB();
+
+    void deleteFromDB();
 };
 
 class User{
@@ -584,14 +636,14 @@ public:
         if (Queue::existInDB(document_id, document_type)) {
             Queue q = Queue::getFromDB(document_id, document_type);
             if(q.outstanding_request) return -2;
-            else if(q.hasPatron(this)) return -1;
+            else if(q.hasPatron(*this)) return -1;
             else {
-                int pos = q.addPatron(this);
+                int pos = q.addPatron(*this);
                 q.saveInDB();
                 return pos;
             }
         } else {
-            Queue q(document_id, document_type, this);
+            Queue q(document_id, document_type, *this);
             q.saveInDB();
         }
     }
@@ -1007,10 +1059,10 @@ public:
         remove_outstanding(article_id, ARTICLE);
 
         int wants_id;
-        if (Queue::existInDB(book_id, ARTICLE)) {
-            Queue q = Queue::getFromDB(book_id, ARTICLE);
+        if (Queue::existInDB(article_id, ARTICLE)) {
+            Queue q = Queue::getFromDB(article_id, ARTICLE);
             wants_id = q.nextPatron();
-            Reserve r(book_id, ARTICLE, wants_id);
+            Reserve r(article_id, ARTICLE, wants_id);
             r.saveInDB();
         } else {
             wants_id = -1;
@@ -1369,15 +1421,7 @@ public:
     LibrarianUser(){};
 };
 
-class Queue {
-public:
-    int document_id;
-    int document_type;
-    bool outstanding_request;
-    QVector<int> request_ids;
-    QVector<int> patron_posses;
-
-    static QVector<int> stringToVector(QString s) {
+   QVector<int> Queue::stringToVector(QString s) {
         QVector<int> v;
         QStringList list = s.split(" ");
         for (int i = 0; i < list.size(); ++i) {
@@ -1387,7 +1431,7 @@ public:
         return v;
     }
 
-    static QString vectorToString(QVector<int> v) {
+    QString Queue:: vectorToString(QVector<int> v) {
         QString s = "";
         for (int i = 0; i < v.size(); ++i) {
             s += v[i] + " ";
@@ -1395,8 +1439,7 @@ public:
         return s;
     }
 
-public:
-    Queue(int document_id, int document_type, bool outstanding_request, QString request_ids, QString patron_posses) {
+    Queue::Queue(int document_id, int document_type, bool outstanding_request, QString request_ids, QString patron_posses) {
         this->document_id = document_id;
         this->document_type = document_type;
         this->outstanding_request = outstanding_request;
@@ -1405,7 +1448,7 @@ public:
         this->patron_posses.push_front(0);
     }
 
-    Queue(int document_id, int document_type, PatronUser patron) {
+    Queue::Queue(int document_id, int document_type, PatronUser patron) {
         this->document_id = document_id;
         this->document_type = document_type;
         this->outstanding_request = false;
@@ -1416,7 +1459,7 @@ public:
         addPatron(patron);
     }
 
-    static Queue getFromDB(int document_id, int document_type) {
+    Queue Queue::getFromDB(int document_id, int document_type) {
         QSqlQuery query;
         query.prepare("SELECT * FROM Queue WHERE document_id = :document_id AND document_type = :document_type");
         query.bindValue(":document_id", document_id);
@@ -1426,7 +1469,7 @@ public:
         return Queue(query.value(0).toInt(), query.value(0).toInt(), query.value(1).toBool(), query.value(3).toString(), query.value(4).toString());
     }
 
-    static bool existInDB(int document_id, int document_type) {
+    bool Queue::existInDB(int document_id, int document_type) {
         QSqlQuery query;
         query.prepare("SELECT * FROM Queue WHERE document_id = :document_id AND document_type = :document_type");
         query.bindValue(":document_id", document_id);
@@ -1435,7 +1478,7 @@ public:
         return query.next();
     }
 
-    void saveInDB() {
+    void Queue::saveInDB() {
         QSqlQuery query;
 
         query.prepare("DELETE FROM Queue WHERE document_id = :document_id AND document_type = :document_type");
@@ -1456,7 +1499,7 @@ public:
         query.exec();
     }
 
-    void deleteFromDB() {
+    void Queue::deleteFromDB() {
         QSqlQuery query;
         query.prepare("DELETE FROM Queue WHERE document_id = :document_id AND document_type = :document_type");
         query.bindValue(":document_id", this->document_id);
@@ -1465,7 +1508,7 @@ public:
     }
 
     //return position in queue or -1 if patron already in queue
-    int addPatron(PatronUser patron) {
+    Queue::addPatron(PatronUser patron) {
         int start = this->patron_posses[patron.patron_type];
         int end = this->patron_posses[patron.patron_type + 1];
 
@@ -1479,7 +1522,7 @@ public:
         return patron_posses[patron.patron_type];
     }
 
-    bool hasPatron(PatronUser patron) {
+    bool Queue::hasPatron(PatronUser patron) {
         int start = this->patron_posses[patron.patron_type];
         int end = this->patron_posses[patron.patron_type + 1];
 
@@ -1488,22 +1531,16 @@ public:
         return false;
     }
 
-    int nextPatron() {
+    int Queue::nextPatron() {
         int result = request_ids[0];
         request_ids.removeFirst();
         if(request_ids.empty())
             deleteFromDB();
         return result;
     }
-};
 
-class Reserve {
-    int document_id;
-    int document_type;
-    int user_id;
-    QDate endDate;
 
-    Reserve(int document_id, int document_type, int user_id) {
+    Reserve::Reserve(int document_id, int document_type, int user_id) {
         this->document_id = document_id;
         this->user_id = user_id;
         this->document_type = document_type;
@@ -1511,7 +1548,7 @@ class Reserve {
         endDate.addDays(1);
     }
 
-    Reserve(int document_id, int document_type, int user_id, QString endDate) {
+    Reserve::Reserve(int document_id, int document_type, int user_id, QString endDate) {
         this->document_id = document_id;
         this->user_id = user_id;
         this->document_type = document_type;
@@ -1519,7 +1556,7 @@ class Reserve {
         this->endDate = QDate(values[0].toInt(), values[1].toInt(), values[2].toInt());
     }
 
-    static bool existInDB(int document_id, int document_type, int user_id) {
+    bool Reserve::existInDB(int document_id, int document_type, int user_id) {
         QSqlQuery query;
         query.prepare("SELECT * FROM Reserves WHERE document_id = :document_id AND document_type = :document_type");
         query.bindValue(":document_id", document_id);
@@ -1536,7 +1573,7 @@ class Reserve {
         return false;
     }
 
-    static Reserve getFromDB(int document_id, int document_type, int user_id) {
+    Reserve Reserve::getFromDB(int document_id, int document_type, int user_id) {
         QSqlQuery query;
         query.prepare("SELECT * FROM Reserves WHERE document_id = :document_id AND document_type = :document_type AND user_id = :user_id");
         query.bindValue(":document_id", document_id);
@@ -1547,7 +1584,7 @@ class Reserve {
         return Reserve(query.value(0).toInt(), query.value(1).toInt(), query.value(2).toInt(), query.value(3).toString());
     }
 
-    bool saveInDB() {
+    bool Reserve::saveInDB() {
         QSqlQuery query;
         query.prepare("DELETE FROM Reserves WHERE document_id = :document_id AND document_type = :document_type AND user_id = :user_id");
         query.bindValue(":document_id", document_id);
@@ -1565,7 +1602,7 @@ class Reserve {
         return true;
     }
 
-    void deleteFromDB() {
+    void Reserve::deleteFromDB() {
         QSqlQuery query;
 
         query.prepare("DELETE FROM Reserves WHERE document_id = :document_id AND document_type = :document_type AND user_id = :user_id");
@@ -1579,7 +1616,6 @@ class Reserve {
         query.bindValue(":documents", document_names[document_type]);
         query.exec();
     }
-};
 
 class Login{
 public:

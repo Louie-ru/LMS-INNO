@@ -117,9 +117,9 @@ void Patron::on_button_search_books_clicked(){
         ui->table_search_books->setItem(i, 4, new QTableWidgetItem(QString::number(found[i].price)));
         ui->table_search_books->setItem(i, 5, new QTableWidgetItem(QString::number(found[i].room)));
         ui->table_search_books->setItem(i, 6, new QTableWidgetItem(QString::number(found[i].level)));
-        bool reserve = Reserve.existInDB(found[i].id, BOOK, me.id);
+        bool reserve = Reserve::existInDB(found[i].id, BOOK, me.id);
         if(reserve)
-            ui->table_search_books->setItem(i, 7, new QTableWidgetItem("Reserved for you");
+            ui->table_search_books->setItem(i, 7, new QTableWidgetItem("Reserved for you"));
         else
             ui->table_search_books->setItem(i, 7, new QTableWidgetItem(QString::number(found[i].copies)));
         ui->table_search_books->setItem(i, 8, new QTableWidgetItem(found[i].bestseller ? "yes" : "no"));
@@ -175,9 +175,9 @@ void Patron::on_button_search_articles_clicked(){
         ui->table_search_articles->setItem(i, 7, new QTableWidgetItem(QString::number(found[i].price)));
         ui->table_search_articles->setItem(i, 8, new QTableWidgetItem(QString::number(found[i].room)));
         ui->table_search_articles->setItem(i, 9, new QTableWidgetItem(QString::number(found[i].level)));
-        bool reserve = Reserve.existInDB(found[i].id, BOOK, me.id);
+        bool reserve = Reserve::existInDB(found[i].id, BOOK, me.id);
         if(reserve)
-            ui->table_search_books->setItem(i, 10, new QTableWidgetItem("Reserved for you");
+            ui->table_search_books->setItem(i, 10, new QTableWidgetItem("Reserved for you"));
         else
             ui->table_search_books->setItem(i, 10, new QTableWidgetItem(QString::number(found[i].copies)));
         ui->table_search_articles->setCellWidget(i, 11, btn);
@@ -208,9 +208,9 @@ void Patron::on_button_search_va_clicked(){
         ui->table_search_va->setItem(i, 2, new QTableWidgetItem(QString::number(found[i].price)));
         ui->table_search_va->setItem(i, 3, new QTableWidgetItem(QString::number(found[i].room)));
         ui->table_search_va->setItem(i, 4, new QTableWidgetItem(QString::number(found[i].level)));
-        bool reserve = Reserve.existInDB(found[i].id, BOOK, me.id);
+        bool reserve = Reserve::existInDB(found[i].id, BOOK, me.id);
         if(reserve)
-            ui->table_search_books->setItem(i, 5, new QTableWidgetItem("Reserved for you");
+            ui->table_search_books->setItem(i, 5, new QTableWidgetItem("Reserved for you"));
         else
             ui->table_search_books->setItem(i, 5, new QTableWidgetItem(QString::number(found[i].copies)));
         ui->table_search_va->setCellWidget(i, 6, btn);

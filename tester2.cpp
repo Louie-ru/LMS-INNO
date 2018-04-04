@@ -227,7 +227,7 @@ bool Tester2::test5(){
     s.check_out_av(d3, &date);
 
     PatronUser v = Login::login_patron("v.rama","1");
-    v.want_va(d3);
+    //v.want_va(d3);
 
     if(p1.search_vas("Tony Hoare","","",0,0)[0].wants[0] = v.id )
         return true;
