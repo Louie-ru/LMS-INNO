@@ -898,6 +898,14 @@ public:
         }
     }
 
+    void remove_outstanding(int document_id, int document_type) {
+        QSqlQuery query;
+        query.prepare("UPDATE check_outs SET renew = 0 WHERE document_id = :document_id AND document_type = :document_type AND renew_state = 1");
+        query.bindValue(":document_id", document_id);
+        query.bindValue(":document_type", document_type);
+        query.exec();
+    }
+
     void set_settings(int days_add_renew){
         QSqlQuery query;
         query.prepare("UPDATE settings SET days_add_renew = :days_add_renew");
@@ -939,6 +947,8 @@ public:
         query.bindValue(":check_out_id_str", ";" + QString::number(check_out_id));
         query.bindValue(":user_id", user_id);
         query.exec();
+
+        remove_outstanding(book_id, BOOK);
 
         int wants_id;
         if (Queue.existInDB(book_id, BOOK)) {
@@ -989,6 +999,8 @@ public:
         query.bindValue(":user_id", user_id);
         query.exec();
 
+        remove_outstanding(article_id, ARTICLE);
+
         int wants_id;
         if (Queue.existInDB(book_id, ARTICLE)) {
             Queue q = Queue.getFromDB(book_id, ARTICLE);
@@ -1037,6 +1049,8 @@ public:
         query.bindValue(":check_out_id_str", ";" + QString::number(check_out_id));
         query.bindValue(":user_id", user_id);
         query.exec();
+
+        remove_outstanding(va_id, AV);
 
         int wants_id;
         if (Queue.existInDB(va_id, AV)) {
@@ -1480,7 +1494,11 @@ class Reserve {
     int document_id;
     int document_type;
     int user_id;
-    static const QString document_names[] = {"",
+    static QVector<QString> & replacement_for_initialized_static_non_const_variable() {
+            static QVector<int> Static {42, 0, 1900, 1998};
+            return Static;
+        }
+    static string document_names[4] = {"",
                                 "books",
                                 "articles",
                                 "vas"};
@@ -1499,7 +1517,7 @@ class Reserve {
         this->user_id = user_id;
         this->document_type = document_type;
         QStringList values = endDate.split(" ");
-        this->endDate(values[0].toInt(), values[1].toInt(), values[2].toInt());
+        this->endDate = QDate(values[0].toInt(), values[1].toInt(), values[2].toInt());
     }
 
     static bool existInDB(int document_id, int document_type, int user_id) {
@@ -1545,6 +1563,7 @@ class Reserve {
         query.bindValue(":document_type", document_type);
         query.bindValue(":endDate", date);
         query.exec();
+        return true;
     }
 
     void deleteFromDB() {
