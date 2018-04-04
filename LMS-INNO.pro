@@ -38,7 +38,6 @@ HEADERS += \
     librarian.h \
     hasher.h \
     sha_512.h \
-    tester.h \
     tester2.h
 
 FORMS += \

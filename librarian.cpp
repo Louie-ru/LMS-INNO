@@ -168,6 +168,13 @@ void Librarian::on_button_search_books_clicked(){
         connect(btn_delete, SIGNAL(clicked()), sm2, SLOT(map()));
         sm2->setMapping(btn_delete, found[i].id);
 
+        QPushButton *btn_request = new QPushButton(this);
+        btn_request->setText("request");
+        QSignalMapper *sm3 = new QSignalMapper(this);
+        connect(sm3, SIGNAL(mapped(int)), this, SLOT(request_book_clicked(int)));
+        connect(btn_request, SIGNAL(clicked()), sm3, SLOT(map()));
+        sm3->setMapping(btn_request, found[i].id);
+
         ui->table_search_books->setItem(i, 0, new QTableWidgetItem(found[i].title));
         ui->table_search_books->setItem(i, 1, new QTableWidgetItem(found[i].authors));
         ui->table_search_books->setItem(i, 2, new QTableWidgetItem(found[i].publisher));
@@ -181,6 +188,7 @@ void Librarian::on_button_search_books_clicked(){
         ui->table_search_books->setItem(i, 10, new QTableWidgetItem(found[i].reference ? "yes" : "no"));
         ui->table_search_books->setCellWidget(i, 11, btn_modify);
         ui->table_search_books->setCellWidget(i, 12, btn_delete);
+        ui->table_search_books->setCellWidget(i, 13, btn_request);
     }
     ui->table_search_books->resizeColumnsToContents();
 }
@@ -215,6 +223,13 @@ void Librarian::on_button_search_articles_clicked(){
         connect(btn_delete, SIGNAL(clicked()), sm2, SLOT(map()));
         sm2->setMapping(btn_delete, found[i].id);
 
+        QPushButton *btn_request = new QPushButton(this);
+        btn_request->setText("request");
+        QSignalMapper *sm3 = new QSignalMapper(this);
+        connect(sm3, SIGNAL(mapped(int)), this, SLOT(request_article_clicked(int)));
+        connect(btn_request, SIGNAL(clicked()), sm3, SLOT(map()));
+        sm3->setMapping(btn_request, found[i].id);
+
         ui->table_search_articles->setItem(i, 0, new QTableWidgetItem(found[i].title));
         ui->table_search_articles->setItem(i, 1, new QTableWidgetItem(found[i].authors));
         ui->table_search_articles->setItem(i, 2, new QTableWidgetItem(found[i].publisher));
@@ -229,6 +244,7 @@ void Librarian::on_button_search_articles_clicked(){
         ui->table_search_articles->setItem(i, 11, new QTableWidgetItem(found[i].reference ? "yes" : "no"));
         ui->table_search_articles->setCellWidget(i, 12, btn_modify);
         ui->table_search_articles->setCellWidget(i, 13, btn_delete);
+        ui->table_search_articles->setCellWidget(i, 14, btn_request);
     }
     ui->table_search_articles->resizeColumnsToContents();
 }
@@ -258,6 +274,13 @@ void Librarian::on_button_search_vas_clicked(){
         connect(btn_delete, SIGNAL(clicked()), sm2, SLOT(map()));
         sm2->setMapping(btn_delete, found[i].id);
 
+        QPushButton *btn_request = new QPushButton(this);
+        btn_request->setText("request");
+        QSignalMapper *sm3 = new QSignalMapper(this);
+        connect(sm3, SIGNAL(mapped(int)), this, SLOT(request_va_clicked(int)));
+        connect(btn_request, SIGNAL(clicked()), sm3, SLOT(map()));
+        sm3->setMapping(btn_request, found[i].id);
+
         ui->table_search_va->setItem(i, 0, new QTableWidgetItem(found[i].title));
         ui->table_search_va->setItem(i, 1, new QTableWidgetItem(found[i].authors));
         ui->table_search_va->setItem(i, 2, new QTableWidgetItem(QString::number(found[i].price)));
@@ -267,6 +290,7 @@ void Librarian::on_button_search_vas_clicked(){
         ui->table_search_va->setItem(i, 6, new QTableWidgetItem(found[i].reference ? "yes" : "no"));
         ui->table_search_va->setCellWidget(i, 7, btn_modify);
         ui->table_search_va->setCellWidget(i, 8, btn_delete);
+        ui->table_search_va->setCellWidget(i, 9, btn_request);
     }
     ui->table_search_va->resizeColumnsToContents();
 }
@@ -989,6 +1013,18 @@ void Librarian::on_button_new_va_clicked(){
     connect(ok, SIGNAL (clicked()),this, SLOT (createVA()));
     widget->setLayout(w_layout);
     widget->show();
+}
+
+void Librarian::request_book_clicked(int book_id){
+    //me.make_outstanding_request(book_id, 1);
+}
+
+void Librarian::request_article_clicked(int article_id){
+    //me.make_outstanding_request(article_id, 2);
+}
+
+void Librarian::request_va_clicked(int va_id){
+    //me.make_outstanding_request(va_id, 3);
 }
 
 void Librarian::on_button_logout_clicked(){

@@ -65,6 +65,10 @@ private slots:
     void closeWidget();
     void on_button_logout_clicked();
     void on_button_settings_clicked();
+
+    void request_book_clicked(int);
+    void request_article_clicked(int);
+    void request_va_clicked(int);
 private:
     Ui::Librarian *ui;
     void clearObjects();
