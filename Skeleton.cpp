@@ -1267,6 +1267,13 @@ public:
         return 1;
     }
 
+    void notify(int user_id, QString message){
+        PatronUser p = get_patron(user_id);
+        QString phone = p.phone;
+        //SMS_Sender.send(phone, message);
+        qDebug() << "message: \"" + message + "\" sent to user " + QString(user_id);
+    }
+
     LibrarianUser(int id_, QString name_, QString address_, QString phone_, QString login_, QString password_){
         id = id_;
         name = name_;
