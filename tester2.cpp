@@ -232,8 +232,8 @@ bool Tester2::test5(){
     if(p1.search_vas("Tony Hoare","","",0,0)[0].wants[0] = v.id )
         return true;
     return p1.id;
-}
 
+}
 bool Tester2::test6(){
     PatronUser p1 = Login::login_patron("s.afonso", "1");
     int d1 = p1.search_books("Introduction to Algorithms","","","",2009,0,0,0)[0].id;

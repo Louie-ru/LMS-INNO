@@ -30,7 +30,6 @@ SOURCES += \
     skeleton.cpp \
     hasher.cpp \
     sha_512.cpp \
-    tester.cpp \
     tester2.cpp
 
 HEADERS += \
@@ -39,7 +38,6 @@ HEADERS += \
     librarian.h \
     hasher.h \
     sha_512.h \
-    tester.h \
     tester2.h
 
 FORMS += \
