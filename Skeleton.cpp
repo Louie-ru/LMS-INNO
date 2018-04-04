@@ -87,6 +87,9 @@ public:
     Article(){};
 };
 
+class Queue;
+class Reserve;
+
 class VA : public Document{
 public:
     QString authors;
@@ -511,6 +514,31 @@ public:
         }
     }
 
+    //return -1 if user already in base
+    //return -2 if for this document set outstanding request
+    //otherwise return position in queue
+    int want_document(int document_id, int document_type) {
+        QSqlQuery query;
+        query.prepare("UPDATE check_outs SET renew_state = 1 WHERE document_type = :document_type AND renew_state = 0 AND year_end IS NULL AND document_id = :document_id");
+        query.bindValue(":document_id", document_id);
+        query.bindValue(":document_type", document_type);
+        query.exec();
+
+        if (Queue.existInDB(document_id, document_type)) {
+            Queue q = Queue.getFromDB(document_id, document_type);
+            if(q.outstanding_request) return -2;
+            else if(q.hasPatron(this)) return -1;
+            else {
+                int pos = q.addPatron(this);
+                q.saveInDB();
+                return pos;
+            }
+        } else {
+            Queue q(document_id, document_type, this);
+            q.saveInDB();
+        }
+    }
+
     void want_book(int document_id){
         //set renew_state to 1
         QSqlQuery query;
@@ -518,12 +546,18 @@ public:
         query.bindValue(":document_id", document_id);
         query.exec();
 
-        Book book = get_book(document_id);
-        if (!book.wants.contains(id)){
-            query.prepare("UPDATE books SET wants = wants || :user_id WHERE id = :document_id");
-            query.bindValue(":user_id", QString::number(id)+";");
-            query.bindValue(":document_id", document_id);
-            query.exec();
+        if (Queue.existInDB(document_id)) {
+            Queue q = Queue.getFromDB(document_id);
+            if(q.outstanding_request) return -2;
+            else if(q.hasPatron(this)) return -1;
+            else {
+                int pos = q.addPatron(this);
+                q.saveInDB();
+                return pos;
+            }
+        } else {
+            Queue q(document_id, this);
+            q.saveInDB();
         }
     }
     void want_article(int document_id){
@@ -533,12 +567,18 @@ public:
         query.bindValue(":document_id", document_id);
         query.exec();
 
-        Article article = get_article(document_id);
-        if (!article.wants.contains(id)){
-            query.prepare("UPDATE articles SET wants = wants || :user_id WHERE id = :document_id");
-            query.bindValue(":user_id", QString::number(id)+";");
-            query.bindValue(":document_id", document_id);
-            query.exec();
+        if (Queue.existInDB(document_id)) {
+            Queue q = Queue.getFromDB(document_id);
+            if(q.outstanding_request) return -2;
+            else if(q.hasPatron(this)) return -1;
+            else {
+                int pos = q.addPatron(this);
+                q.saveInDB();
+                return pos;
+            }
+        } else {
+            Queue q(document_id, this);
+            q.saveInDB();
         }
     }
     void want_va(int document_id){
@@ -548,12 +588,18 @@ public:
         query.bindValue(":document_id", document_id);
         query.exec();
 
-        VA va = get_va(document_id);
-        if (!va.wants.contains(id)){
-            query.prepare("UPDATE vas SET wants = wants || :user_id WHERE id = :document_id");
-            query.bindValue(":user_id", QString::number(id)+";");
-            query.bindValue(":document_id", document_id);
-            query.exec();
+        if (Queue.existInDB(document_id)) {
+            Queue q = Queue.getFromDB(document_id);
+            if(q.outstanding_request) return -2;
+            else if(q.hasPatron(this)) return -1;
+            else {
+                int pos = q.addPatron(this);
+                q.saveInDB();
+                return pos;
+            }
+        } else {
+            Queue q(document_id, this);
+            q.saveInDB();
         }
     }
 
@@ -893,18 +939,24 @@ public:
         query.bindValue(":user_id", user_id);
         query.exec();
 
-        query.prepare("UPDATE books SET copies = copies + 1 WHERE id = :document_id");
-        query.bindValue(":document_id", book.id);
-        query.exec();
+        int wants_id;
+        if (Queue.existInDB(book_id, BOOK)) {
+            Queue q = Queue.getFromDB(book_id, BOOK);
+            wants_id = q.nextPatron();
+            Reserve r(book_id, BOOK, wants_id);
+            r.saveInDB();
+        } else {
+            wants_id = -1;
+            query.prepare("UPDATE books SET copies = copies + 1 WHERE id = :document_id");
+            query.bindValue(":document_id", book.id);
+            query.exec();
+        }
 
         query.prepare("DELETE FROM check_outs WHERE check_out_id = :check_out_id");
         query.bindValue(":check_out_id", check_out_id);
         query.exec();
 
-        int wants_id = remove_last_wants_book(book.id);
-        if (wants_id != -1)
-            return make_pair(fine, wants_id);
-        return make_pair(fine, -1);
+        return make_pair(fine, wants_id);
     }
 
     std::pair<int, int> return_article(int check_out_id){
@@ -936,18 +988,24 @@ public:
         query.bindValue(":user_id", user_id);
         query.exec();
 
-        query.prepare("UPDATE articles SET copies = copies + 1 WHERE id = :document_id");
-        query.bindValue(":document_id", article.id);
-        query.exec();
+        int wants_id;
+        if (Queue.existInDB(book_id, ARTICLE)) {
+            Queue q = Queue.getFromDB(book_id, ARTICLE);
+            wants_id = q.nextPatron();
+            Reserve r(book_id, ARTICLE, wants_id);
+            r.saveInDB();
+        } else {
+            wants_id = -1;
+            query.prepare("UPDATE articles SET copies = copies + 1 WHERE id = :document_id");
+            query.bindValue(":document_id", article.id);
+            query.exec();
+        }
 
         query.prepare("DELETE FROM check_outs WHERE check_out_id = :check_out_id");
         query.bindValue(":check_out_id", check_out_id);
         query.exec();
 
-        int wants_id = remove_last_wants_article(article.id);
-        if (wants_id != -1)
-            return make_pair(fine, wants_id);
-        return make_pair(fine, -1);
+        return make_pair(fine, wants_id);
     }
 
     std::pair<int, int> return_va(int check_out_id){
@@ -979,18 +1037,24 @@ public:
         query.bindValue(":user_id", user_id);
         query.exec();
 
-        query.prepare("UPDATE vas SET copies = copies + 1 WHERE id = :document_id");
-        query.bindValue(":document_id", va.id);
-        query.exec();
+        int wants_id;
+        if (Queue.existInDB(va_id, AV)) {
+            Queue q = Queue.getFromDB(va_id, AV);
+            wants_id = q.nextPatron();
+            Reserve r(va_id, AV, wants_id);
+            r.saveInDB();
+        } else {
+            wants_id = -1;
+            query.prepare("UPDATE vas SET copies = copies + 1 WHERE id = :document_id");
+            query.bindValue(":document_id", va.id);
+            query.exec();
+        }
 
         query.prepare("DELETE FROM check_outs WHERE check_out_id = :check_out_id");
         query.bindValue(":check_out_id", check_out_id);
         query.exec();
 
-        int wants_id = remove_last_wants_va(va.id);
-        if (wants_id != -1)
-            return make_pair(fine, wants_id);
-        return make_pair(fine, -1);
+        return make_pair(fine, wants_id);
     }
 
     QVector<PatronUser> search_patrons(int user_id, QString name, QString address, QString phone, int patron_type, bool or_and){
@@ -1280,7 +1344,8 @@ public:
 
 class Queue {
 public:
-    int book_id;
+    int document_id;
+    int document_type;
     bool outstanding_request;
     QVector<int> request_ids;
     QVector<int> patron_posses;
@@ -1304,27 +1369,39 @@ public:
     }
 
 public:
-    Queue(int book_id, bool outstanding_request, QString request_ids, QString patron_posses) {
-        this->book_id = book_id;
+    Queue(int document_id, int document_type, bool outstanding_request, QString request_ids, QString patron_posses) {
+        this->document_id = document_id;
+        this->document_type = document_type;
         this->outstanding_request = outstanding_request;
         this->request_ids = stringToVector(request_ids);
         this->patron_posses = stringToVector(patron_posses);
         this->patron_posses.push_front(0);
     }
 
-    static Queue getFromDB(int book_id) {
+    Queue(int document_id, int document_type, PatronUser patron) {
+        this->document_id = document_id;
+        this->document_type = document_type;
+        this->outstanding_request = false;
+        this->request_ids();
+        this->patron_posses();
+        addPatron(patron);
+    }
+
+    static Queue getFromDB(int document_id, int document_type) {
         QSqlQuery query;
-        query.prepare("SELECT * FROM Query WHERE book_id = :book_id");
-        query.bindValue(":book_id", book_id);
+        query.prepare("SELECT * FROM Queue WHERE document_id = :document_id AND document_type = :document_type");
+        query.bindValue(":document_id", document_id);
+        query.bindValue(":document_type", document_type);
         query.exec();
         query.next();
         return Queue(query.value(0).toInt(), query.value(1).toBool(), query.value(3).toString(), query.value(4).toString());
     }
 
-    static bool existInDB(int book_id) {
+    static bool existInDB(int document_id, int document_type) {
         QSqlQuery query;
-        query.prepare("SELECT :book_id FROM Query");
-        query.bindValue(":book_id", book_id);
+        query.prepare("SELECT * FROM Queue WHERE document_id = :document_id AND document_type = :document_type");
+        query.bindValue(":document_id", document_id);
+        query.bindValue(":document_type", document_type);
         query.exec();
         return query.next();
     }
@@ -1332,15 +1409,17 @@ public:
     void saveInDB() {
         QSqlQuery query;
 
-        query.prepare("DELETE FROM Query WHERE book_id = :book_id");
-        query.bindValue(":book_id", this->book_id);
+        query.prepare("DELETE FROM Queue WHERE document_id = :document_id AND document_type = :document_type");
+        query.bindValue(":document_id", this->document_id);
+        query.bindValue(":document_type", this->document_type);
         query.exec();
 
         QString ids = vectorToString(this->request_ids);
         QString patron_posses = vectorToString(this->patron_posses);
 
-        query.prepare("INSERT INTO Query(book_id, outstanding_request, request_ids, requests, patron_posses) VALUES (:book_id, :outstanding_request, :request_ids, :requests, :patron_posses");
-        query.bindValue(":book_id", this->book_id);
+        query.prepare("INSERT INTO Queue VALUES (:document_id, :document_type, :outstanding_request, :request_ids, :requests, :patron_posses");
+        query.bindValue(":document_id", this->document_id);
+        query.bindValue(":document_type", this->document_type);
         query.bindValue(":outstanding_request", this->outstanding_request);
         query.bindValue(":request_ids", ids);
         query.bindValue(":requests", this->request_ids.size());
@@ -1348,17 +1427,131 @@ public:
         query.exec();
     }
 
-    bool addPatron(PatronUser patron) {
+    void deleteFromDB() {
+        QSqlQuery query;
+        query.prepare("DELETE FROM Queue WHERE document_id = :document_id AND document_type = :document_type");
+        query.bindValue(":document_id", this->document_id);
+        query.bindValue(":document_type", this->document_type);
+        query.exec();
+    }
+
+    //return position in queue or -1 if patron already in queue
+    int addPatron(PatronUser patron) {
         int start = this->patron_posses[patron.patron_type];
         int end = this->patron_posses[patron.patron_type + 1];
 
         for (int i = start; i < end; ++i)
             if(this->request_ids[i] == patron.id)
-                return false;
+                return -1;
 
-        patron_posses.insert(end, patron.id);
+        request_ids.insert(end, patron.id);
         for (int i = patron.patron_type; i < patron_posses.size(); ++i)
             ++patron_posses[i];
+        return patron_posses[patron_type];
+    }
+
+    bool hasPatron(PatronUser patron) {
+        int start = this->patron_posses[patron.patron_type];
+        int end = this->patron_posses[patron.patron_type + 1];
+
+        for (int i = start; i < end; ++i)
+            if (request_ids[i] == patron.id) return true;
+        return false;
+    }
+
+    int nextPatron() {
+        int result = request_ids[0];
+        request_ids.removeFirst();
+        if(request_ids.empty())
+            deleteFromDB();
+        return result;
+    }
+};
+
+class Reserve {
+    int document_id;
+    int document_type;
+    int user_id;
+    static const QString document_names[] = {"",
+                                "books",
+                                "articles",
+                                "vas"};
+    QDate endDate;
+
+    Reserve(int document_id, int user_id, int document_type) {
+        this->document_id = document_id;
+        this->user_id = user_id;
+        this->document_type = document_type;
+        endDate = QDate.currentDate();
+        endDate.addDays(1);
+    }
+
+    Reserve(int document_id, int user_id,int document_type, QString endDate) {
+        this->document_id = document_id;
+        this->user_id = user_id;
+        this->document_type = document_type;
+        QVector<QString> values = endDate.split(" ");
+        endDate(values[0].toInt(), values[1].toInt(), values[2].toInt());
+    }
+
+    static bool existInDB(int document_id, int document_type, int user_id) {
+        QSqlQuery query;
+        query.prepare("SELECT * FROM Reserves WHERE document_id = :document_id AND document_type = :document_type");
+        query.bindValue(":document_id", document_id);
+        query.bindValue(":document_type", document_type);
+        query.exec();
+        QDate now = QDate.currentDate();
+        while(query.next()) {
+            Reserve r (query.value(0).toInt(), query.value(1).toInt(), query.value(2).toInt(), query.value(3).toString());
+            if(now.day() > r.endDate.day())
+                r.deleteFromDB();
+                if (r.user_id == user_id) return false;
+            if(r.user_id == user_id) return true;
+        }
+        return false;
+    }
+
+    static Reserve getFromDB(int document_id, int document_type, int user_id) {
+        QSqlQuery query;
+        query.prepare("SELECT * FROM Reserves WHERE document_id = :document_id AND document_type = :document_type AND user_id = :user_id");
+        query.bindValue(":document_id", document_id);
+        query.bindValue(":document_type", document_type);
+        query.bindValue(":user_id", user_id);
+        query.exec();
+        query.next();
+        return Reserve(query.value(0).toInt(), query.value(1).toInt(), query.value(2).toInt(), query.value(3).toString());
+    }
+
+    bool saveInDB() {
+        QSqlQuery query;
+        query.prepare("DELETE FROM Reserves WHERE document_id = :document_id AND document_type = :document_type AND user_id = :user_id");
+        query.bindValue(":document_id", document_id);
+        query.bindValue(":document_type", document_type);
+        query.bindValue(":user_id", user_id);
+        query.exec();
+
+        QString date = endDate.year() + " " + endDate.month() + " " + endDate.day();
+        query.prepare("INSERT INTO Reserve VALUES (:document_id, :user_id, :document_type, :endDate");
+        query.bindValue(":document_id", document_id);
+        query.bindValue(":user_ud", user_id);
+        query.bindValue(":document_type", document_type);
+        query.bindValue(":endDate", date);
+        query.exec();
+    }
+
+    void deleteFromDB() {
+        QSqlQuery query;
+
+        query.prepare("DELETE FROM Reserves WHERE document_id = :document_id AND document_type = :document_type AND user_id = :user_id");
+        query.bindValue(":document_id", document_id);
+        query.bindValue(":document_type", document_type);
+        query.bindValue(":user_id", user_id);
+        query.exec();
+
+        query.prepare("UPDATE :documents SET copies = copies + 1 WHERE document_id = :document_id");
+        query.bindValue(":document_id", document_id);
+        query.bindValue(":documents", document_names[document_type]);
+        query.exec();
     }
 };
 

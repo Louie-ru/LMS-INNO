@@ -543,8 +543,9 @@ void Librarian::return_book(int check_out_id){
         QMessageBox::information(0, "Fine", "Fine size: " + QString::number(fine));
     if (user_id == -1)
         ui->status->setText("Document returned successfully");
-    else
-        ui->status->setText("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
+    else {
+        ui->status->setText("Document returned successfully; This document reserved for patron " + QString(user_id));
+    }
     on_button_show_checked_out_books_clicked();
 }
 
@@ -558,7 +559,7 @@ void Librarian::return_article(int check_out_id){
     if (user_id == -1)
         ui->status->setText("Document returned successfully");
     else
-        ui->status->setText("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
+        ui->status->setText("Document returned successfully; This document reserved for patron " + QString(user_id));
     on_button_show_checked_out_articles_clicked();
 }
 
@@ -572,7 +573,7 @@ void Librarian::return_va(int check_out_id){
     if (user_id == -1)
         ui->status->setText("Document returned successfully");
     else
-        ui->status->setText("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
+        ui->status->setText("Document returned successfully; This document reserved for patron " + QString(user_id));
     on_button_show_checked_out_vas_clicked();
 }
 
