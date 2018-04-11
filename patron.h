@@ -18,6 +18,7 @@ public:
     void showName();
 private:
     Ui::Patron *ui;
+    void set_status(QString);
 private slots:
     void on_button_search_books_clicked();
     void on_button_search_articles_clicked();

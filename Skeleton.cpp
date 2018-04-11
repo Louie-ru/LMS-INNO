@@ -1416,13 +1416,10 @@ public:
     }
 };
 
-static void log(QString str1){
-    string str;
-    str = str1.toStdString();
-    ofstream out;
-    out.open("log.txt", ios::in);
-    out.seekp(0, ios::end);
-    out << str;
-    out << endl;
-    out.close();
+static void append_log(QString data){
+    QFile writeFile("log.txt");
+    if(!writeFile.open(QFile::Append | QFile::Text)) return;
+    QTextStream in(&writeFile);
+    in << data << "\r";
+    writeFile.close();
 }

@@ -61,6 +61,7 @@ private slots:
 private:
     Ui::Librarian *ui;
     void clearObjects();
+    void set_status(QString);
 };
 
 #endif // LIBRARIAN_H

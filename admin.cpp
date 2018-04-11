@@ -87,6 +87,7 @@ void Admin::on_button_search_librarians_clicked(){
         ui->table_librarian->setCellWidget(i, 6, btn_modify);
         ui->table_librarian->setCellWidget(i, 7, btn_delete);
     }
+    set_status("Search complete. " + QString::number(found.size()) + " librarians found");
     ui->table_librarian->resizeColumnsToContents();
 }
 
@@ -131,10 +132,10 @@ void Admin::delete_librarian_clicked(int id){
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this librarian?\nname: " + librarian.name + "\nlogin: " + librarian.login, QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
     if (!me.delete_librarian(id)){
-        ui->status->setText("Error deleting librarian");
+        set_status("Error deleting librarian");
         return;
     }
-    ui->status->setText("Librarian deleted successfully");
+    set_status("Librarian deleted successfully");
     on_button_search_librarians_clicked();
 }
 
@@ -150,6 +151,7 @@ void Admin::modifyLibrarian(){
     me.modify_librarian(user_id, name, address, phone, login, password, privileges);
     closeWidget();
     on_button_search_librarians_clicked();
+    set_status("Librarian modified successfully");
 }
 
 void Admin::createLibrarian(){
@@ -162,6 +164,7 @@ void Admin::createLibrarian(){
     closeWidget();
     me.add_librarian(name, address, phone, login, password, privileges);
     on_button_search_librarians_clicked();
+    set_status("Librarian " + login + " added successfully");
 }
 
 void Admin::on_button_new_librarian_clicked(){
@@ -193,11 +196,18 @@ void Admin::closeWidget(){
     widget_->close();
 }
 
+void Admin::set_status(QString status){
+    ui->status->setText(status);
+    append_log(status);
+}
+
+
 void Admin::showName(){
-    ui->status->setText("Logged in as admin: " + me.name);
+    set_status("Logged in as admin");
 }
 void Admin::on_button_logout_clicked(){
     MainWindow *mainwindow = new MainWindow();
+    set_status("Admin log out");
     mainwindow->show();
     this->close();
 }

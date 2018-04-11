@@ -18,39 +18,50 @@ Patron::~Patron(){
     delete ui;
 }
 
+void Patron::set_status(QString status){
+    ui->status->setText(status);
+    append_log(status);
+}
+
 void Patron::check_out_book(int document_id){
     me.check_out_book(document_id);
     on_button_search_books_clicked();
+    set_status("Patron " + me.login + " checked out book " + QString::number(document_id) + " successfully");
 }
 void Patron::check_out_article(int document_id){
     me.check_out_article(document_id);
     on_button_search_articles_clicked();
+    set_status("Patron " + me.login + " checked out article " + QString::number(document_id) + " successfully");
 }
 void Patron::check_out_va(int document_id){
     me.check_out_av(document_id);
     on_button_search_va_clicked();
+    set_status("Patron " + me.login + " checked out audio/video " + QString::number(document_id) + " successfully");
 }
 
 void Patron::want_book(int document_id){
     me.want_book(document_id);
+    set_status("Patron " + me.login + " want book " + QString::number(document_id));
 }
 void Patron::want_article(int document_id){
     me.want_article(document_id);
+    set_status("Patron " + me.login + " want article " + QString::number(document_id));
 }
 void Patron::want_va(int document_id){
     me.want_va(document_id);
+    set_status("Patron " + me.login + " want audio/video " + QString::number(document_id));
 }
 
 void Patron::renew_book(int check_out_id){
     int ret = me.renew_book(check_out_id);
     if (ret == 0)
-        ui->status->setText("Error renewing");
+        set_status("Error renewing");
     else if (ret == 1)
-        ui->status->setText("Error: this document is in demand");
+        set_status("Error renewing: document is in demand");
     else if (ret == 2)
-        ui->status->setText("Error: can renew only one day before return day");
+        set_status("Error: can renew only one day before return day");
     else{
-        ui->status->setText("Document renewed successfully");
+        set_status("Check out " + QString::number(check_out_id) + " renewed successfully");
         on_tabWidget_tabBarClicked(3);
     }
 }
@@ -58,13 +69,13 @@ void Patron::renew_book(int check_out_id){
 void Patron::renew_article(int check_out_id){
     int ret = me.renew_article(check_out_id);
     if (ret == 0)
-        ui->status->setText("Error renewing");
+        set_status("Error renewing");
     else if (ret == 1)
-        ui->status->setText("Error: this document is in demand");
+        set_status("Error: document is in demand");
     else if (ret == 2)
-        ui->status->setText("Error: can renew only one day before return day");
+        set_status("Error: can renew only one day before return day");
     else{
-        ui->status->setText("Document renewed successfully");
+        set_status("Check out " + QString::number(check_out_id) + " renewed successfully");
         on_tabWidget_tabBarClicked(3);
     }
 }
@@ -72,13 +83,13 @@ void Patron::renew_article(int check_out_id){
 void Patron::renew_va(int check_out_id){
     int ret = me.renew_va(check_out_id);
     if (ret == 0)
-        ui->status->setText("Error renewing");
+        set_status("Error renewing");
     else if (ret == 1)
-        ui->status->setText("Error: this document is in demand");
+        set_status("Error: document is in demand");
     else if (ret == 2)
-        ui->status->setText("Error: can renew only one day before return day");
+        set_status("Error: can renew only one day before return day");
     else{
-        ui->status->setText("Document renewed successfully");
+        set_status("Check out " + QString::number(check_out_id) + " renewed successfully");
         on_tabWidget_tabBarClicked(3);
     }
 }
@@ -121,6 +132,7 @@ void Patron::on_button_search_books_clicked(){
             ui->table_search_books->setCellWidget(i, 9, btn);//insert in table
         }
     }
+    set_status("Search complete. " + QString::number(found.size()) + " books found");
     ui->table_search_books->resizeColumnsToContents();
 }
 
@@ -160,6 +172,7 @@ void Patron::on_button_search_articles_clicked(){
         ui->table_search_articles->setItem(i, 10, new QTableWidgetItem(QString::number(found[i].copies)));
         ui->table_search_articles->setCellWidget(i, 11, btn);
     }
+    set_status("Search complete. " + QString::number(found.size()) + " articles found");
     ui->table_search_articles->resizeColumnsToContents();
 }
 
@@ -189,11 +202,13 @@ void Patron::on_button_search_va_clicked(){
         ui->table_search_va->setItem(i, 5, new QTableWidgetItem(QString::number(found[i].copies)));
         ui->table_search_va->setCellWidget(i, 6, btn);
     }
+    set_status("Search complete. " + QString::number(found.size()) + " audio/video found");
     ui->table_search_va->resizeColumnsToContents();
 }
 
 void Patron::on_button_logout_clicked(){
     MainWindow *mainwindow = new MainWindow();
+    set_status("Patron " + me.login + " log out");
     mainwindow->show();
     this->close();
 }
@@ -281,16 +296,19 @@ void Patron::on_tabWidget_tabBarClicked(int index){
         ui->table_my_vas->setItem(i, 6, new QTableWidgetItem(date_end));
         ui->table_my_vas->setCellWidget(i, 7, btn_renew);
     }
+    set_status("Check outs updated successfully");
     ui->table_my_vas->resizeColumnsToContents();
 }
 
 void Patron::showName(){
-    ui->status->setText("Logged in as " + QString(me.faculty ? "faculty " : "") + "patron: " + me.name);
+    set_status("Logged in as patron: " + me.login);
 }
 void Patron::on_button_delete_account_clicked(){
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete your account?", QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
-    if(me.delete_me())
+    if(me.delete_me()){
+        set_status("Patron: " + me.login + " deleted himself successfully");
         on_button_logout_clicked();
+    }
     else ui->status->setText("You need to return all checked out documents");
 }

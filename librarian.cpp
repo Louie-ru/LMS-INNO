@@ -66,6 +66,13 @@ void Librarian::clearObjects(){
     widget->setWindowFlags(Qt::WindowStaysOnTopHint);
 }
 
+
+void Librarian::set_status(QString status){
+    ui->status->setText(status);
+    append_log(status);
+}
+
+
 void Librarian::on_button_search_patrons_clicked(){
     ui->table_patrons->setRowCount(0);
 
@@ -111,6 +118,7 @@ void Librarian::on_button_search_patrons_clicked(){
         ui->table_patrons->setCellWidget(i, 6, btn_modify);
         ui->table_patrons->setCellWidget(i, 7, btn_delete);
     }
+    set_status("Search complete. " + QString::number(found.size()) + " patrons found");
     ui->table_patrons->resizeColumnsToContents();
 }
 
@@ -157,6 +165,7 @@ void Librarian::on_button_search_books_clicked(){
         ui->table_search_books->setCellWidget(i, 11, btn_modify);
         ui->table_search_books->setCellWidget(i, 12, btn_delete);
     }
+    set_status("Search complete. " + QString::number(found.size()) + " books found");
     ui->table_search_books->resizeColumnsToContents();
 }
 void Librarian::on_button_search_articles_clicked(){
@@ -205,6 +214,7 @@ void Librarian::on_button_search_articles_clicked(){
         ui->table_search_articles->setCellWidget(i, 12, btn_modify);
         ui->table_search_articles->setCellWidget(i, 13, btn_delete);
     }
+    set_status("Search complete. " + QString::number(found.size()) + " articles found");
     ui->table_search_articles->resizeColumnsToContents();
 }
 void Librarian::on_button_search_vas_clicked(){
@@ -243,6 +253,7 @@ void Librarian::on_button_search_vas_clicked(){
         ui->table_search_va->setCellWidget(i, 7, btn_modify);
         ui->table_search_va->setCellWidget(i, 8, btn_delete);
     }
+    set_status("Search complete. " + QString::number(found.size()) + " audio/video found");
     ui->table_search_va->resizeColumnsToContents();
 }
 
@@ -441,7 +452,7 @@ void Librarian::delete_patron_clicked(int id){
         ui->status->setText("This patron has actual check outs");
         return;
     }
-    ui->status->setText("Patron deleted successfully");
+    set_status("Patron " + QString::number(id) + " deleted successfully");
     on_button_search_patrons_clicked();
 }
 
@@ -450,18 +461,21 @@ void Librarian::delete_book_clicked(int id){
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this book?\ntitle: " + book.title, QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
     me.delete_book(id);
+    set_status("Book " + QString::number(id) + " deleted successfully");
     on_button_search_books_clicked();
 }
 void Librarian::delete_article_clicked(int id){
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this article?", QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
     me.delete_article(id);
+    set_status("Article " + QString::number(id) + " deleted successfully");
     on_button_search_articles_clicked();
 }
 void Librarian::delete_va_clicked(int id){
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this va?", QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
     me.delete_va(id);
+    set_status("Audio/video " + QString::number(id) + " deleted successfully");
     on_button_search_vas_clicked();
 }
 
@@ -469,13 +483,13 @@ void Librarian::return_book(int check_out_id){
     std::pair<int, int> ret = me.return_book(check_out_id);
     int fine = ret.first, user_id = ret.second;
     if (fine == -1)
-        ui->status->setText("Error returning document");
+        set_status("Error returning document");
     else if (fine > 0)
         QMessageBox::information(0, "Fine", "Fine size: " + QString::number(fine));
     if (user_id == -1)
-        ui->status->setText("Document returned successfully");
+        set_status("Document returned successfully");
     else
-        ui->status->setText("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
+        set_status("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
     on_button_show_checked_out_books_clicked();
 }
 
@@ -483,13 +497,13 @@ void Librarian::return_article(int check_out_id){
     std::pair<int, int> ret = me.return_article(check_out_id);
     int fine = ret.first, user_id = ret.second;
     if (fine == -1)
-        ui->status->setText("Error returning document");
+        set_status("Error returning document");
     else if (fine > 0)
         QMessageBox::information(0, "Fine", "Fine size: " + QString::number(fine));
     if (user_id == -1)
-        ui->status->setText("Document returned successfully");
+        set_status("Document returned successfully");
     else
-        ui->status->setText("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
+        set_status("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
     on_button_show_checked_out_articles_clicked();
 }
 
@@ -497,13 +511,13 @@ void Librarian::return_va(int check_out_id){
     std::pair<int, int> ret = me.return_va(check_out_id);
     int fine = ret.first, user_id = ret.second;
     if (fine == -1)
-        ui->status->setText("Error returning document");
+        set_status("Error returning document");
     else if (fine > 0)
         QMessageBox::information(0, "Fine", "Fine size: " + QString::number(fine));
     if (user_id == -1)
-        ui->status->setText("Document returned successfully");
+        set_status("Document returned successfully");
     else
-        ui->status->setText("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
+        set_status("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
     on_button_show_checked_out_vas_clicked();
 }
 
@@ -546,6 +560,7 @@ void Librarian::on_button_show_checked_out_books_clicked(){
         ui->table_checked_out_books->setItem(i, 11, new QTableWidgetItem(QString::number(found[i].first.fine)));
         ui->table_checked_out_books->setCellWidget(i, 12, btn_return);
     }
+    set_status("Search in check outs complete. " + QString::number(found.size()) + " books found");
     ui->table_checked_out_books->resizeColumnsToContents();
 }
 void Librarian::on_button_show_checked_out_articles_clicked(){
@@ -592,6 +607,7 @@ void Librarian::on_button_show_checked_out_articles_clicked(){
         ui->table_checked_out_articles->setItem(i, 13, new QTableWidgetItem(QString::number(found[i].first.fine)));
         ui->table_checked_out_articles->setCellWidget(i, 14, btn_return);
     }
+    set_status("Search in check outs complete. " + QString::number(found.size()) + " articles found");
     ui->table_checked_out_articles->resizeColumnsToContents();
 }
 void Librarian::on_button_show_checked_out_vas_clicked(){
@@ -628,6 +644,7 @@ void Librarian::on_button_show_checked_out_vas_clicked(){
         ui->table_checked_out_vas->setItem(i, 8, new QTableWidgetItem(QString::number(found[i].first.fine)));
         ui->table_checked_out_vas->setCellWidget(i, 9, btn_return);
     }
+    set_status("Search in check outs complete. " + QString::number(found.size()) + " audio/video found");
     ui->table_checked_out_vas->resizeColumnsToContents();
 }
 
@@ -641,6 +658,7 @@ void Librarian::modifyPatron(){
     bool role = combo->currentIndex() + 1;
 
     me.modify_patron(id, name, address, phone, role, login, password);
+    set_status("Patron " + login + " modified successfully");
     closeWidget();
     on_button_search_patrons_clicked();
 }
@@ -659,6 +677,7 @@ void Librarian::modifyBook(){
     bool bestseller = check->isChecked();
     bool reference = check2->isChecked();
     me.modify_book(id, title, authors, publisher, keywords, year, price, room, level, copies, bestseller, reference);
+    set_status("Book " + title + " modified successfully");
     on_button_search_books_clicked();
     closeWidget();
 }
@@ -678,6 +697,7 @@ void Librarian::modifyArticle(){
     int copies = line12->text().toInt();
     bool reference = check->isChecked();
     me.modify_article(id, title, authors, journal, keywords, publisher, editors, year, month, price, room, level, copies, reference);
+    set_status("Article " + title + " modified successfully");
     on_button_search_articles_clicked();
     closeWidget();
 }
@@ -692,6 +712,7 @@ void Librarian::modifyVA(){
     int copies = line8->text().toInt();
     bool reference = check->isChecked();
     me.modify_va(id, title, authors, keywords, price, room, level, copies, reference);
+    set_status("Audio/video " + title + " modified successfully");
     on_button_search_vas_clicked();
     closeWidget();
 }
@@ -705,6 +726,7 @@ void Librarian::createPatron(){
     bool faculty = check->isChecked();
     closeWidget();
     me.add_patron(name, address, phone, faculty, login, password);
+    set_status("Patron " + login + " created successfully");
     on_button_search_patrons_clicked();
 }
 
@@ -721,6 +743,7 @@ void Librarian::createBook(){
     bool bestseller = check->isChecked();
     bool reference = check2->isChecked();
     me.add_book(title, authors, publisher, keywords, year, price, room, level, copies, bestseller, reference);
+    set_status("Book " + title + " created successfully");
     on_button_search_books_clicked();
     closeWidget();
 }
@@ -739,6 +762,7 @@ void Librarian::createArticle(){
     int copies = line11->text().toInt();
     bool reference = check->isChecked();
     me.add_article(title, authors, journal, publisher, keywords, editors, year, month, price, room, level, copies, reference);
+    set_status("Article " + title + " created successfully");
     on_button_search_articles_clicked();
     closeWidget();
 }
@@ -752,6 +776,7 @@ void Librarian::createVA(){
     int copies = line7->text().toInt();
     bool reference = check->isChecked();
     me.add_va(title, authors, keywords, price, room, level, copies, reference);
+    set_status("Audio/video " + title + " created successfully");
     on_button_search_vas_clicked();
     closeWidget();
 }
@@ -886,16 +911,18 @@ void Librarian::on_button_new_va_clicked(){
 
 void Librarian::on_button_logout_clicked(){
     MainWindow *mainwindow = new MainWindow();
+    set_status("Librarian " + me.login + " log out");
     mainwindow->show();
     this->close();
 }
 
 void Librarian::showName(){
-    ui->status->setText("Logged in as librarian: " + me.name);
+    set_status("Logged in as librarian: " + me.login);
 }
 void Librarian::modifySettings(){
     int days = line1->text().toInt();
     me.set_settings(days);
+    set_status("Days to renew changed: " + QString::number(days));
     closeWidget();
 }
 void Librarian::on_button_settings_clicked(){

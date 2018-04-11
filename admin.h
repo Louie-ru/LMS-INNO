@@ -30,6 +30,7 @@ private slots:
 private:
     Ui::Admin *ui;
     void clearObjects();
+    void set_status(QString);
 };
 
 #endif // ADMIN_H
