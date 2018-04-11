@@ -4,6 +4,7 @@
 #include <QtSql>
 #include <unistd.h>
 #include <hasher.h>
+#include <fstream>
 
 
 using namespace std;
@@ -1373,3 +1374,14 @@ public:
                      "days_add_renew INTEGER DEFAULT 7)");
     }
 };
+
+static void log(QString str1){
+    string str;
+    str = str1.toStdString();
+    ofstream out;
+    out.open("log.txt", ios::in);
+    out.seekp(0, ios::end);
+    out << str;
+    out << endl;
+    out.close();
+}
