@@ -1185,7 +1185,7 @@ public:
 
 class AdminUser : public User{
 public:
-    QVector<LibrarianUser> search_librarians(int user_id, QString name, QString address, QString phone, bool or_and){
+    QVector<LibrarianUser> search_librarians(int user_id, QString name, QString address, QString phone, int privileges, bool or_and){
         QSqlQuery query;
         QString ins = or_and ? " AND " : " OR ";
         name = name.toLower();
@@ -1196,6 +1196,7 @@ public:
         if (name != "") req += "instr(lower(name), '"+name+"') > 0" + ins;
         if (address != "") req += "instr(lower(address), '"+address+"') > 0" + ins;
         if (phone != "") req += "instr(lower(phone), '"+phone+"') > 0" + ins;
+        if (privileges != 0) req += "privileges = " + QString::number(privileges) + ins;
         req += "1 = " + QString(or_and ? "1" : "0");//nice hack to finish statement correctly
         if (req.length() == 36)//no parameters given
             req = "SELECT * FROM librarians";

@@ -25,6 +25,8 @@ private slots:
     void modifyLibrarian();
     void createLibrarian();
     void closeWidget();
+    void on_button_logout_clicked();
+
 private:
     Ui::Admin *ui;
     void clearObjects();

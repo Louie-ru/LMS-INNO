@@ -1,6 +1,7 @@
 #include "admin.h"
 #include "ui_admin.h"
 #include <QMessageBox>
+#include <mainwindow.h>
 
 Admin::Admin(QWidget *parent) : QWidget(parent), ui(new Ui::Admin){
     ui->setupUi(this);
@@ -50,9 +51,10 @@ void Admin::on_button_search_librarians_clicked(){
     QString name = ui->line_librarian_name->text();
     QString phone = ui->line_librarian_phone->text();
     QString address = ui->line_librarian_adress->text();
+    int privel = ui->combo_privileges->currentIndex();
     bool or_and = ui->checkbox_librarian_criteria->isChecked();
 
-    QVector<LibrarianUser> found = me.search_librarians(user_id, name, address, phone, or_and);
+    QVector<LibrarianUser> found = me.search_librarians(user_id, name, address, phone, privel, or_and);
     for (int i = 0; i < found.size(); i++){
         ui->table_librarian->insertRow(i);
         QPushButton *btn_modify = new QPushButton(this);
@@ -69,13 +71,21 @@ void Admin::on_button_search_librarians_clicked(){
         connect(btn_delete, SIGNAL(clicked()), sm2, SLOT(map()));
         sm2->setMapping(btn_delete, found[i].id);
 
+        QString priveleges = "";
+        switch(found[i].privileges){
+            case 1: priveleges = "Priv1"; break;
+            case 2: priveleges = "Priv2"; break;
+            case 3: priveleges = "Priv3"; break;
+        }
+
         ui->table_librarian->setItem(i, 0, new QTableWidgetItem(QString::number(found[i].id)));
         ui->table_librarian->setItem(i, 1, new QTableWidgetItem(found[i].name));
         ui->table_librarian->setItem(i, 2, new QTableWidgetItem(found[i].address));
         ui->table_librarian->setItem(i, 3, new QTableWidgetItem(found[i].phone));
         ui->table_librarian->setItem(i, 4, new QTableWidgetItem(found[i].login));
-        ui->table_librarian->setCellWidget(i, 5, btn_modify);
-        ui->table_librarian->setCellWidget(i, 6, btn_delete);
+        ui->table_librarian->setItem(i, 5, new QTableWidgetItem(priveleges));
+        ui->table_librarian->setCellWidget(i, 6, btn_modify);
+        ui->table_librarian->setCellWidget(i, 7, btn_delete);
     }
     ui->table_librarian->resizeColumnsToContents();
 }
@@ -101,6 +111,7 @@ void Admin::modify_librarian_clicked(int user_id){
     combo_->addItem("Priv1");
     combo_->addItem("Priv2");
     combo_->addItem("Priv3");
+    combo_->setCurrentIndex(librarian.privileges - 1);
     line1_->setEnabled(false);
     w_layout_->addRow(id, line1_);
     w_layout_->addRow(name, line2_);
@@ -108,7 +119,7 @@ void Admin::modify_librarian_clicked(int user_id){
     w_layout_->addRow(phone, line4_);
     w_layout_->addRow(login, line5_);
     w_layout_->addRow(password, line6_);
-    w_layout_->addRow(password, combo_);
+    w_layout_->addRow(privileges, combo_);
     w_layout_->addRow(cancel_, ok_);
     connect(ok_, SIGNAL (clicked()),this, SLOT (modifyLibrarian()));
     widget_->setLayout(w_layout_);
@@ -184,4 +195,9 @@ void Admin::closeWidget(){
 
 void Admin::showName(){
     ui->status->setText("Logged in as admin: " + me.name);
+}
+void Admin::on_button_logout_clicked(){
+    MainWindow *mainwindow = new MainWindow();
+    mainwindow->show();
+    this->close();
 }
