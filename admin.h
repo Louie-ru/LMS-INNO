@@ -2,20 +2,21 @@
 #define ADMIN_H
 
 #include <QWidget>
-#include "skeleton.cpp"
+#include <skeleton.cpp>
 
 namespace Ui {
-class admin;
+class Admin;
 }
 
-class admin : public QWidget
+class Admin : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit admin(QWidget *parent = 0);
-    ~admin();
+    explicit Admin(QWidget *parent = 0);
+    ~Admin();
     AdminUser me;
+    void showName();
 private slots:
     void on_button_search_librarians_clicked();
     void on_button_new_librarian_clicked();
@@ -25,7 +26,7 @@ private slots:
     void createLibrarian();
     void closeWidget();
 private:
-    Ui::admin *ui;
+    Ui::Admin *ui;
     void clearObjects();
 };
 

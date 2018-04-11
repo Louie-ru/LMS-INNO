@@ -1,19 +1,12 @@
-#pragma once
 #include "admin.h"
 #include "ui_admin.h"
-#include <QSignalMapper>
-#include <mainwindow.h>
-#include <QWidget>
-#include <QFormLayout>
-#include <QLabel>
-#include <QDebug>
-#include <QLineEdit>
 #include <QMessageBox>
 
-admin::admin(QWidget *parent) : QWidget(parent), ui(new Ui::admin){
+Admin::Admin(QWidget *parent) : QWidget(parent), ui(new Ui::Admin){
     ui->setupUi(this);
 }
-admin::~admin(){
+
+Admin::~Admin(){
     delete ui;
 }
 
@@ -33,7 +26,7 @@ QPushButton *cancel_;
 QFormLayout *w_layout_;
 
 //make new input fields
-void admin::clearObjects(){
+void Admin::clearObjects(){
     line1_ = new QLineEdit();
     line2_ = new QLineEdit();
     line3_ = new QLineEdit();
@@ -50,7 +43,7 @@ void admin::clearObjects(){
     widget_->setWindowFlags(Qt::WindowStaysOnTopHint);
 }
 
-void admin::on_button_search_librarians_clicked(){
+void Admin::on_button_search_librarians_clicked(){
     ui->table_librarian->setRowCount(0);
 
     int user_id = ui->line_librarian_id->text().toInt();
@@ -87,7 +80,7 @@ void admin::on_button_search_librarians_clicked(){
     ui->table_librarian->resizeColumnsToContents();
 }
 
-void admin::modify_librarian_clicked(int user_id){
+void Admin::modify_librarian_clicked(int user_id){
     if (widget_ != NULL && !widget_->isHidden()) return;
     LibrarianUser librarian = me.get_librarian(user_id);
     widget_ = new QWidget();
@@ -122,7 +115,7 @@ void admin::modify_librarian_clicked(int user_id){
     widget_->show();
 }
 
-void admin::delete_librarian_clicked(int id){
+void Admin::delete_librarian_clicked(int id){
     LibrarianUser librarian = me.get_librarian(id);
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this librarian?\nname: " + librarian.name + "\nlogin: " + librarian.login, QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::No) return;
@@ -134,7 +127,7 @@ void admin::delete_librarian_clicked(int id){
     on_button_search_librarians_clicked();
 }
 
-void admin::modifyLibrarian(){
+void Admin::modifyLibrarian(){
     int user_id = line1_->text().toInt();
     QString name = line2_->text();
     QString address = line3_->text();
@@ -148,7 +141,7 @@ void admin::modifyLibrarian(){
     on_button_search_librarians_clicked();
 }
 
-void admin::createLibrarian(){
+void Admin::createLibrarian(){
     QString name = line1_->text();
     QString address = line2_->text();
     QString phone = line3_->text();
@@ -160,7 +153,7 @@ void admin::createLibrarian(){
     on_button_search_librarians_clicked();
 }
 
-void admin::on_button_new_librarian_clicked(){
+void Admin::on_button_new_librarian_clicked(){
     if (widget_ != NULL && !widget_->isHidden()) return;
     widget_ = new QWidget();
     QLabel *name = new QLabel("name:");
@@ -185,6 +178,10 @@ void admin::on_button_new_librarian_clicked(){
     widget_->show();
 }
 
-void admin::closeWidget(){
+void Admin::closeWidget(){
     widget_->close();
+}
+
+void Admin::showName(){
+    ui->status->setText("Logged in as admin: " + me.name);
 }

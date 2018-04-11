@@ -38,4 +38,13 @@ void MainWindow::on_button_login_clicked(){
         librarian->showName();
         this->close();
     }
+
+    AdminUser adminUser = mainLogin.login_admin(login, password);
+    if (adminUser.id != -1){
+        admin = new Admin();
+        admin->me = adminUser;
+        admin->show();
+        admin->showName();
+        this->close();
+    }
 }
