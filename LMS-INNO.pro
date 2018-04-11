@@ -13,7 +13,6 @@ TARGET = LMS-INNO
 TEMPLATE = app
 DEFINES += QT_DEPRECATED_WARNINGS
 
-
 #Lines for Nikolai only
 CONFIG += release
 CONFIG += static
@@ -29,16 +28,14 @@ SOURCES += \
     librarian.cpp \
     skeleton.cpp \
     hasher.cpp \
-    sha_512.cpp \
-    tester2.cpp
+    sha_512.cpp
 
 HEADERS += \
         mainwindow.h \
     patron.h \
     librarian.h \
     hasher.h \
-    sha_512.h \
-    tester2.h
+    sha_512.h
 
 FORMS += \
         mainwindow.ui \

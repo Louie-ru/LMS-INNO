@@ -32,25 +32,13 @@ void Patron::check_out_va(int document_id){
 }
 
 void Patron::want_book(int document_id){
-    me.want_document(document_id, BOOK);
+    me.want_book(document_id);
 }
 void Patron::want_article(int document_id){
-    me.want_document(document_id, ARTICLE);
+    me.want_article(document_id);
 }
 void Patron::want_va(int document_id){
-    me.want_document(document_id, AV);
-}
-
-void Patron::take_reserved_book(int document_id) {
-    me.take_reserved(document_id, BOOK);
-}
-
-void Patron::take_reserved_article(int document_id) {
-    me.take_reserved(document_id, ARTICLE);
-}
-
-void Patron::take_reserved_av(int document_id) {
-    me.take_reserved(document_id, AV);
+    me.want_va(document_id);
 }
 
 void Patron::renew_book(int check_out_id){
@@ -117,20 +105,14 @@ void Patron::on_button_search_books_clicked(){
         ui->table_search_books->setItem(i, 4, new QTableWidgetItem(QString::number(found[i].price)));
         ui->table_search_books->setItem(i, 5, new QTableWidgetItem(QString::number(found[i].room)));
         ui->table_search_books->setItem(i, 6, new QTableWidgetItem(QString::number(found[i].level)));
-        bool reserve = Reserve::existInDB(found[i].id, BOOK, me.id);
-        if(reserve)
-            ui->table_search_books->setItem(i, 7, new QTableWidgetItem("Reserved for you"));
-        else
-            ui->table_search_books->setItem(i, 7, new QTableWidgetItem(QString::number(found[i].copies)));
+        ui->table_search_books->setItem(i, 7, new QTableWidgetItem(QString::number(found[i].copies)));
         ui->table_search_books->setItem(i, 8, new QTableWidgetItem(found[i].bestseller ? "yes" : "no"));
         if (!found[i].reference){//dont make check_out button for references
             QPushButton *btn;
             btn = new QPushButton(this);
             btn->setText(found[i].copies > 0 ? "check out" : "want it");
             QSignalMapper *sm = new QSignalMapper(this);//mapper catch signal from button and direct to SLOT. Need this to transfer parameters
-            if(reserve)
-                connect(sm, SIGNAL(mapped(int)), this, SLOT(take_reserved_book(int)));
-            else if (found[i].copies > 0)//set mapper SLOT function
+            if (found[i].copies > 0)//set mapper SLOT function
                 connect(sm, SIGNAL(mapped(int)), this, SLOT(check_out_book(int)));
             else
                 connect(sm, SIGNAL(mapped(int)), this, SLOT(want_book(int)));
@@ -175,11 +157,7 @@ void Patron::on_button_search_articles_clicked(){
         ui->table_search_articles->setItem(i, 7, new QTableWidgetItem(QString::number(found[i].price)));
         ui->table_search_articles->setItem(i, 8, new QTableWidgetItem(QString::number(found[i].room)));
         ui->table_search_articles->setItem(i, 9, new QTableWidgetItem(QString::number(found[i].level)));
-        bool reserve = Reserve::existInDB(found[i].id, BOOK, me.id);
-        if(reserve)
-            ui->table_search_books->setItem(i, 10, new QTableWidgetItem("Reserved for you"));
-        else
-            ui->table_search_books->setItem(i, 10, new QTableWidgetItem(QString::number(found[i].copies)));
+        ui->table_search_articles->setItem(i, 10, new QTableWidgetItem(QString::number(found[i].copies)));
         ui->table_search_articles->setCellWidget(i, 11, btn);
     }
     ui->table_search_articles->resizeColumnsToContents();
@@ -208,11 +186,7 @@ void Patron::on_button_search_va_clicked(){
         ui->table_search_va->setItem(i, 2, new QTableWidgetItem(QString::number(found[i].price)));
         ui->table_search_va->setItem(i, 3, new QTableWidgetItem(QString::number(found[i].room)));
         ui->table_search_va->setItem(i, 4, new QTableWidgetItem(QString::number(found[i].level)));
-        bool reserve = Reserve::existInDB(found[i].id, BOOK, me.id);
-        if(reserve)
-            ui->table_search_books->setItem(i, 5, new QTableWidgetItem("Reserved for you"));
-        else
-            ui->table_search_books->setItem(i, 5, new QTableWidgetItem(QString::number(found[i].copies)));
+        ui->table_search_va->setItem(i, 5, new QTableWidgetItem(QString::number(found[i].copies)));
         ui->table_search_va->setCellWidget(i, 6, btn);
     }
     ui->table_search_va->resizeColumnsToContents();
@@ -311,7 +285,7 @@ void Patron::on_tabWidget_tabBarClicked(int index){
 }
 
 void Patron::showName(){
-    ui->status->setText("Logged in as patron: " + me.name);
+    ui->status->setText("Logged in as " + QString(me.faculty ? "faculty " : "") + "patron: " + me.name);
 }
 void Patron::on_button_delete_account_clicked(){
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete your account?", QMessageBox::Yes|QMessageBox::No);

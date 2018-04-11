@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>953</width>
-    <height>492</height>
+    <width>1004</width>
+    <height>478</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_patrons">
       <attribute name="title">
@@ -205,7 +205,7 @@
          </column>
          <column>
           <property name="text">
-           <string>role</string>
+           <string>faculty</string>
           </property>
          </column>
          <column>
@@ -687,11 +687,6 @@
            <string>delete</string>
           </property>
          </column>
-         <column>
-          <property name="text">
-           <string>request</string>
-          </property>
-         </column>
         </widget>
        </item>
       </layout>
@@ -1046,11 +1041,6 @@
            <string>delete</string>
           </property>
          </column>
-         <column>
-          <property name="text">
-           <string>request</string>
-          </property>
-         </column>
         </widget>
        </item>
       </layout>
@@ -1239,11 +1229,6 @@
          <column>
           <property name="text">
            <string>delete</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>request</string>
           </property>
          </column>
         </widget>
@@ -1599,8 +1584,8 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>911</width>
-            <height>318</height>
+            <width>962</width>
+            <height>304</height>
            </rect>
           </property>
           <attribute name="label">

@@ -73,9 +73,10 @@ void Librarian::on_button_search_patrons_clicked(){
     QString name = ui->line_patrons_name->text();
     QString phone = ui->line_patrons_phone->text();
     QString address = ui->line_patrons_address->text();
+    bool faculty = ui->checkbox_patrons_faculty->isChecked();
     bool or_and = ui->checkbox_patrons_criteria->isChecked();
 
-    QVector<PatronUser> found = me.search_patrons(user_id, name, address, phone, -1, or_and);
+    QVector<PatronUser> found = me.search_patrons(user_id, name, address, phone, faculty, or_and);
     for (int i = 0; i < found.size(); i++){
         ui->table_patrons->insertRow(i);
         QPushButton *btn_modify = new QPushButton(this);
@@ -96,7 +97,7 @@ void Librarian::on_button_search_patrons_clicked(){
         ui->table_patrons->setItem(i, 1, new QTableWidgetItem(found[i].name));
         ui->table_patrons->setItem(i, 2, new QTableWidgetItem(found[i].address));
         ui->table_patrons->setItem(i, 3, new QTableWidgetItem(found[i].phone));
-        ui->table_patrons->setItem(i, 4, new QTableWidgetItem(found[i].patron_type));
+        ui->table_patrons->setItem(i, 4, new QTableWidgetItem(found[i].faculty ? "yes" : "no"));
         ui->table_patrons->setItem(i, 5, new QTableWidgetItem(found[i].login));
         ui->table_patrons->setCellWidget(i, 6, btn_modify);
         ui->table_patrons->setCellWidget(i, 7, btn_delete);
@@ -168,13 +169,6 @@ void Librarian::on_button_search_books_clicked(){
         connect(btn_delete, SIGNAL(clicked()), sm2, SLOT(map()));
         sm2->setMapping(btn_delete, found[i].id);
 
-        QPushButton *btn_request = new QPushButton(this);
-        btn_request->setText("request");
-        QSignalMapper *sm3 = new QSignalMapper(this);
-        connect(sm3, SIGNAL(mapped(int)), this, SLOT(request_book_clicked(int)));
-        connect(btn_request, SIGNAL(clicked()), sm3, SLOT(map()));
-        sm3->setMapping(btn_request, found[i].id);
-
         ui->table_search_books->setItem(i, 0, new QTableWidgetItem(found[i].title));
         ui->table_search_books->setItem(i, 1, new QTableWidgetItem(found[i].authors));
         ui->table_search_books->setItem(i, 2, new QTableWidgetItem(found[i].publisher));
@@ -188,7 +182,6 @@ void Librarian::on_button_search_books_clicked(){
         ui->table_search_books->setItem(i, 10, new QTableWidgetItem(found[i].reference ? "yes" : "no"));
         ui->table_search_books->setCellWidget(i, 11, btn_modify);
         ui->table_search_books->setCellWidget(i, 12, btn_delete);
-        ui->table_search_books->setCellWidget(i, 13, btn_request);
     }
     ui->table_search_books->resizeColumnsToContents();
 }
@@ -223,13 +216,6 @@ void Librarian::on_button_search_articles_clicked(){
         connect(btn_delete, SIGNAL(clicked()), sm2, SLOT(map()));
         sm2->setMapping(btn_delete, found[i].id);
 
-        QPushButton *btn_request = new QPushButton(this);
-        btn_request->setText("request");
-        QSignalMapper *sm3 = new QSignalMapper(this);
-        connect(sm3, SIGNAL(mapped(int)), this, SLOT(request_article_clicked(int)));
-        connect(btn_request, SIGNAL(clicked()), sm3, SLOT(map()));
-        sm3->setMapping(btn_request, found[i].id);
-
         ui->table_search_articles->setItem(i, 0, new QTableWidgetItem(found[i].title));
         ui->table_search_articles->setItem(i, 1, new QTableWidgetItem(found[i].authors));
         ui->table_search_articles->setItem(i, 2, new QTableWidgetItem(found[i].publisher));
@@ -244,7 +230,6 @@ void Librarian::on_button_search_articles_clicked(){
         ui->table_search_articles->setItem(i, 11, new QTableWidgetItem(found[i].reference ? "yes" : "no"));
         ui->table_search_articles->setCellWidget(i, 12, btn_modify);
         ui->table_search_articles->setCellWidget(i, 13, btn_delete);
-        ui->table_search_articles->setCellWidget(i, 14, btn_request);
     }
     ui->table_search_articles->resizeColumnsToContents();
 }
@@ -274,13 +259,6 @@ void Librarian::on_button_search_vas_clicked(){
         connect(btn_delete, SIGNAL(clicked()), sm2, SLOT(map()));
         sm2->setMapping(btn_delete, found[i].id);
 
-        QPushButton *btn_request = new QPushButton(this);
-        btn_request->setText("request");
-        QSignalMapper *sm3 = new QSignalMapper(this);
-        connect(sm3, SIGNAL(mapped(int)), this, SLOT(request_va_clicked(int)));
-        connect(btn_request, SIGNAL(clicked()), sm3, SLOT(map()));
-        sm3->setMapping(btn_request, found[i].id);
-
         ui->table_search_va->setItem(i, 0, new QTableWidgetItem(found[i].title));
         ui->table_search_va->setItem(i, 1, new QTableWidgetItem(found[i].authors));
         ui->table_search_va->setItem(i, 2, new QTableWidgetItem(QString::number(found[i].price)));
@@ -290,7 +268,6 @@ void Librarian::on_button_search_vas_clicked(){
         ui->table_search_va->setItem(i, 6, new QTableWidgetItem(found[i].reference ? "yes" : "no"));
         ui->table_search_va->setCellWidget(i, 7, btn_modify);
         ui->table_search_va->setCellWidget(i, 8, btn_delete);
-        ui->table_search_va->setCellWidget(i, 9, btn_request);
     }
     ui->table_search_va->resizeColumnsToContents();
 }
@@ -303,29 +280,23 @@ void Librarian::modify_patron_clicked(int user_id){
     QLabel *name = new QLabel("name:");
     QLabel *address = new QLabel("address:");
     QLabel *phone = new QLabel("phone:");
-    QLabel *role = new QLabel("role:");
+    QLabel *faculty = new QLabel("faculty:");
     QLabel *login = new QLabel("login:");
     QLabel *password = new QLabel("password:");
     clearObjects();
-    combo->addItem("Student");
-    combo->addItem("Instructor");
-    combo->addItem("TA");
-    combo->addItem("Professor");
-    combo->addItem("Visiting Professor");
     line1->setText(QString::number(patron.id));
     line2->setText(patron.name);
     line3->setText(patron.address);
     line4->setText(patron.phone);
-    combo->setCurrentIndex(patron.patron_type - 1);
+    check->setChecked(patron.faculty);
     line5->setText(patron.login);
     line6->setText("");
     line1->setEnabled(false);
-
     w_layout->addRow(id, line1);
     w_layout->addRow(name, line2);
     w_layout->addRow(address, line3);
     w_layout->addRow(phone, line4);
-    w_layout->addRow(role, combo);
+    w_layout->addRow(faculty, check);
     w_layout->addRow(login, line5);
     w_layout->addRow(password, line6);
     w_layout->addRow(cancel, ok);
@@ -567,10 +538,8 @@ void Librarian::return_book(int check_out_id){
         QMessageBox::information(0, "Fine", "Fine size: " + QString::number(fine));
     if (user_id == -1)
         ui->status->setText("Document returned successfully");
-    else {
-        me.notify(user_id, "Come here and take it, man!");
-        ui->status->setText("Document returned successfully; This document reserved for patron " + QString(user_id));
-    }
+    else
+        ui->status->setText("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
     on_button_show_checked_out_books_clicked();
 }
 
@@ -583,10 +552,8 @@ void Librarian::return_article(int check_out_id){
         QMessageBox::information(0, "Fine", "Fine size: " + QString::number(fine));
     if (user_id == -1)
         ui->status->setText("Document returned successfully");
-    else{
-        me.notify(user_id, "Come here and take it, man!");
-        ui->status->setText("Document returned successfully; This document reserved for patron " + QString(user_id));
-    }
+    else
+        ui->status->setText("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
     on_button_show_checked_out_articles_clicked();
 }
 
@@ -599,10 +566,8 @@ void Librarian::return_va(int check_out_id){
         QMessageBox::information(0, "Fine", "Fine size: " + QString::number(fine));
     if (user_id == -1)
         ui->status->setText("Document returned successfully");
-    else {
-        me.notify(user_id, "Come here and take it, man!");
-        ui->status->setText("Document returned successfully; This document reserved for patron " + QString(user_id));
-    }
+    else
+        ui->status->setText("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
     on_button_show_checked_out_vas_clicked();
 }
 
@@ -737,9 +702,9 @@ void Librarian::modifyPatron(){
     QString phone = line4->text();
     QString login = line5->text();
     QString password = line6->text();
-    int role = combo->currentIndex() + 1;
+    bool faculty = check->isChecked();
 
-    me.modify_patron(id, name, address, phone, role, login, password);
+    me.modify_patron(id, name, address, phone, faculty, login, password);
     closeWidget();
     on_button_search_patrons_clicked();
 }
@@ -812,9 +777,9 @@ void Librarian::createPatron(){
     QString phone = line3->text();
     QString login = line4->text();
     QString password = line5->text();
-    int role = combo->currentIndex() + 1;
+    bool faculty = check->isChecked();
     closeWidget();
-    me.add_patron(name, address, phone, role, login, password);
+    me.add_patron(name, address, phone, faculty, login, password);
     on_button_search_patrons_clicked();
 }
 void Librarian::createLibrarian(){
@@ -881,14 +846,14 @@ void Librarian::on_button_new_patron_clicked(){
     QLabel *name = new QLabel("name:");
     QLabel *address = new QLabel("address:");
     QLabel *phone = new QLabel("phone:");
-    QLabel *role = new QLabel("role:");
+    QLabel *faculty = new QLabel("faculty:");
     QLabel *login = new QLabel("login:");
     QLabel *password = new QLabel("password:");
     clearObjects();
     w_layout->addRow(name, line1);
     w_layout->addRow(address, line2);
     w_layout->addRow(phone, line3);
-    w_layout->addRow(role, combo);
+    w_layout->addRow(faculty, check);
     w_layout->addRow(login, line4);
     w_layout->addRow(password, line5);
     w_layout->addRow(cancel, ok);
@@ -1019,18 +984,6 @@ void Librarian::on_button_new_va_clicked(){
     connect(ok, SIGNAL (clicked()),this, SLOT (createVA()));
     widget->setLayout(w_layout);
     widget->show();
-}
-
-void Librarian::request_book_clicked(int book_id){
-    //me.make_outstanding_request(book_id, 1);
-}
-
-void Librarian::request_article_clicked(int article_id){
-    //me.make_outstanding_request(article_id, 2);
-}
-
-void Librarian::request_va_clicked(int va_id){
-    //me.make_outstanding_request(va_id, 3);
 }
 
 void Librarian::on_button_logout_clicked(){
