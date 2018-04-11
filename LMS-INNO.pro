@@ -28,19 +28,22 @@ SOURCES += \
     librarian.cpp \
     skeleton.cpp \
     hasher.cpp \
-    sha_512.cpp
+    sha_512.cpp \
+    admin.cpp
 
 HEADERS += \
         mainwindow.h \
     patron.h \
     librarian.h \
     hasher.h \
-    sha_512.h
+    sha_512.h \
+    admin.h
 
 FORMS += \
         mainwindow.ui \
     patron.ui \
-    librarian.ui
+    librarian.ui \
+    admin.ui
 
 RESOURCES += \
     logo_name.qrc

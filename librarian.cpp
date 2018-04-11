@@ -113,42 +113,7 @@ void Librarian::on_button_search_patrons_clicked(){
     }
     ui->table_patrons->resizeColumnsToContents();
 }
-void Librarian::on_button_search_librarians_clicked(){
-    ui->table_librarian->setRowCount(0);
 
-    int user_id = ui->line_librarian_id->text().toInt();
-    QString name = ui->line_librarian_name->text();
-    QString phone = ui->line_librarian_phone->text();
-    QString address = ui->line_librarian_adress->text();
-    bool or_and = ui->checkbox_librarian_criteria->isChecked();
-
-    QVector<LibrarianUser> found = me.search_librarians(user_id, name, address, phone, or_and);
-    for (int i = 0; i < found.size(); i++){
-        ui->table_librarian->insertRow(i);
-        QPushButton *btn_modify = new QPushButton(this);
-        btn_modify->setText("modify");
-        QSignalMapper *sm = new QSignalMapper(this);
-        connect(sm, SIGNAL(mapped(int)), this, SLOT(modify_librarian_clicked(int)));
-        connect(btn_modify, SIGNAL(clicked()), sm, SLOT(map()));
-        sm->setMapping(btn_modify, found[i].id);
-
-        QPushButton *btn_delete = new QPushButton(this);
-        btn_delete->setText("delete");
-        QSignalMapper *sm2 = new QSignalMapper(this);
-        connect(sm2, SIGNAL(mapped(int)), this, SLOT(delete_librarian_clicked(int)));
-        connect(btn_delete, SIGNAL(clicked()), sm2, SLOT(map()));
-        sm2->setMapping(btn_delete, found[i].id);
-
-        ui->table_librarian->setItem(i, 0, new QTableWidgetItem(QString::number(found[i].id)));
-        ui->table_librarian->setItem(i, 1, new QTableWidgetItem(found[i].name));
-        ui->table_librarian->setItem(i, 2, new QTableWidgetItem(found[i].address));
-        ui->table_librarian->setItem(i, 3, new QTableWidgetItem(found[i].phone));
-        ui->table_librarian->setItem(i, 4, new QTableWidgetItem(found[i].login));
-        ui->table_librarian->setCellWidget(i, 5, btn_modify);
-        ui->table_librarian->setCellWidget(i, 6, btn_delete);
-    }
-    ui->table_librarian->resizeColumnsToContents();
-}
 void Librarian::on_button_search_books_clicked(){
     ui->table_search_books->setRowCount(0);
 
@@ -314,35 +279,7 @@ void Librarian::modify_patron_clicked(int user_id){
     widget->setLayout(w_layout);
     widget->show();
 }
-void Librarian::modify_librarian_clicked(int user_id){
-    if (widget != NULL && !widget->isHidden()) return;
-    LibrarianUser librarian = me.get_librarian(user_id);
-    widget = new QWidget();
-    QLabel *id = new QLabel("card id:");
-    QLabel *name = new QLabel("name:");
-    QLabel *address = new QLabel("address:");
-    QLabel *phone = new QLabel("phone:");
-    QLabel *login = new QLabel("login:");
-    QLabel *password = new QLabel("password:");
-    clearObjects();
-    line1->setText(QString::number(librarian.id));
-    line2->setText(librarian.name);
-    line3->setText(librarian.address);
-    line4->setText(librarian.phone);
-    line5->setText(librarian.login);
-    line6->setText("");
-    line1->setEnabled(false);
-    w_layout->addRow(id, line1);
-    w_layout->addRow(name, line2);
-    w_layout->addRow(address, line3);
-    w_layout->addRow(phone, line4);
-    w_layout->addRow(login, line5);
-    w_layout->addRow(password, line6);
-    w_layout->addRow(cancel, ok);
-    connect(ok, SIGNAL (clicked()),this, SLOT (modifyLibrarian()));
-    widget->setLayout(w_layout);
-    widget->show();
-}
+
 void Librarian::modify_book_clicked(int document_id){
     if (widget != NULL && !widget->isHidden()) return;
     widget = new QWidget();
@@ -507,17 +444,7 @@ void Librarian::delete_patron_clicked(int id){
     ui->status->setText("Patron deleted successfully");
     on_button_search_patrons_clicked();
 }
-void Librarian::delete_librarian_clicked(int id){
-    LibrarianUser librarian = me.get_librarian(id);
-    QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this librarian?\nname: " + librarian.name + "\nlogin: " + librarian.login, QMessageBox::Yes|QMessageBox::No);
-    if (reply == QMessageBox::No) return;
-    if (!me.delete_librarian(id)){
-        ui->status->setText("Error deleting librarian");
-        return;
-    }
-    ui->status->setText("Librarian deleted successfully");
-    on_button_search_librarians_clicked();
-}
+
 void Librarian::delete_book_clicked(int id){
     Book book = me.get_book(id);
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to delete this book?\ntitle: " + book.title, QMessageBox::Yes|QMessageBox::No);
@@ -717,18 +644,7 @@ void Librarian::modifyPatron(){
     closeWidget();
     on_button_search_patrons_clicked();
 }
-void Librarian::modifyLibrarian(){
-    int user_id = line1->text().toInt();
-    QString name = line2->text();
-    QString address = line3->text();
-    QString phone = line4->text();
-    QString login = line5->text();
-    QString password = line6->text();
 
-    me.modify_librarian(user_id, name, address, phone, login, password);
-    closeWidget();
-    on_button_search_librarians_clicked();
-}
 void Librarian::modifyBook(){
     int id = line1->text().toInt();
     QString title = line2->text();
@@ -791,16 +707,7 @@ void Librarian::createPatron(){
     me.add_patron(name, address, phone, faculty, login, password);
     on_button_search_patrons_clicked();
 }
-void Librarian::createLibrarian(){
-    QString name = line1->text();
-    QString address = line2->text();
-    QString phone = line3->text();
-    QString login = line4->text();
-    QString password = line5->text();
-    closeWidget();
-    me.add_librarian(name, address, phone, login, password);
-    on_button_search_librarians_clicked();
-}
+
 void Librarian::createBook(){
     QString title = line1->text();
     QString authors = line2->text();
@@ -870,25 +777,7 @@ void Librarian::on_button_new_patron_clicked(){
     widget->setLayout(w_layout);
     widget->show();
 }
-void Librarian::on_button_new_librarian_clicked(){
-    if (widget != NULL && !widget->isHidden()) return;
-    widget = new QWidget();
-    QLabel *name = new QLabel("name:");
-    QLabel *address = new QLabel("address:");
-    QLabel *phone = new QLabel("phone:");
-    QLabel *login = new QLabel("login:");
-    QLabel *password = new QLabel("password:");
-    clearObjects();
-    w_layout->addRow(name, line1);
-    w_layout->addRow(address, line2);
-    w_layout->addRow(phone, line3);
-    w_layout->addRow(login, line4);
-    w_layout->addRow(password, line5);
-    w_layout->addRow(cancel, ok);
-    connect(ok, SIGNAL (clicked()),this, SLOT (createLibrarian()));
-    widget->setLayout(w_layout);
-    widget->show();
-}
+
 void Librarian::on_button_new_book_clicked(){
     if (widget != NULL && !widget->isHidden()) return;
     widget = new QWidget();

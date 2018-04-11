@@ -699,6 +699,7 @@ public:
 //search/add/delete/modify users, search/add/delete/modify documents, search overdue documents
 class LibrarianUser : public User{
 public:
+    int privileges;
     QVector<std::pair<Check_out, Book> > search_books_checked_out(int user_id, QString authors, QString title, QString keywords, QString publisher, int year, bool bestseller, bool overdue, bool or_and){
         QSqlQuery query;
         QVector<Book> books = search_books(authors, title, keywords, publisher, year, bestseller, 0, or_and);
@@ -1000,34 +1001,6 @@ public:
         return ans;
     }
 
-    QVector<LibrarianUser> search_librarians(int user_id, QString name, QString address, QString phone, bool or_and){
-        QSqlQuery query;
-        QString ins = or_and ? " AND " : " OR ";
-        name = name.toLower();
-        address = address.toLower();
-        phone = phone.toLower();
-        QString req = "SELECT * FROM librarians WHERE ";
-        if (user_id != 0) req += "id = " + QString::number(user_id) + ins;
-        if (name != "") req += "instr(lower(name), '"+name+"') > 0" + ins;
-        if (address != "") req += "instr(lower(address), '"+address+"') > 0" + ins;
-        if (phone != "") req += "instr(lower(phone), '"+phone+"') > 0" + ins;
-        req += "1 = " + QString(or_and ? "1" : "0");//nice hack to finish statement correctly
-        if (req.length() == 36)//no parameters given
-            req = "SELECT * FROM librarians";
-        query.exec(req);
-        QVector<LibrarianUser> ans;
-        while (query.next()) {
-            int user_id = query.value(0).toInt();
-            QString name = query.value(1).toString();
-            QString address = query.value(2).toString();
-            QString phone = query.value(3).toString();
-            QString login = query.value(4).toString();
-            QString password = query.value(5).toString();
-            ans.push_back(LibrarianUser(user_id, name, address, phone, login, password));
-        }
-        return ans;
-    }
-
     void add_patron(QString name, QString address, QString phone, int role, QString login, QString password){
         password = Hasher::hash_password(login,password);
         QSqlQuery query;
@@ -1036,17 +1009,6 @@ public:
         query.bindValue(":address", address);
         query.bindValue(":phone", phone);
         query.bindValue(":role", role);
-        query.bindValue(":login", login);
-        query.bindValue(":password", password);
-        query.exec();
-    }
-    void add_librarian(QString name, QString address, QString phone, QString login, QString password){
-        password = Hasher::hash_password(login,password);
-        QSqlQuery query;
-        query.prepare("INSERT INTO librarians (name, address, phone, login, password) VALUES(:name, :address, :phone, :login, :password)");
-        query.bindValue(":name", name);
-        query.bindValue(":address", address);
-        query.bindValue(":phone", phone);
         query.bindValue(":login", login);
         query.bindValue(":password", password);
         query.exec();
@@ -1067,20 +1029,6 @@ public:
         return 1;//mb change to void
     }
 
-    bool modify_librarian(int user_id, QString name, QString address, QString phone, QString login, QString password){
-        password = Hasher::hash_password(login,password);
-        QSqlQuery query;
-        query.prepare("UPDATE librarians SET name = :name, address = :address, phone = :phone, login = :login, password = :password WHERE id = :user_id");
-        query.bindValue(":name", name);
-        query.bindValue(":address", address);
-        query.bindValue(":phone", phone);
-        query.bindValue(":login", login);
-        query.bindValue(":password", password);
-        query.bindValue(":user_id", user_id);
-        query.exec();
-        return 1;
-    }
-
     PatronUser get_patron(int user_id){
         QSqlQuery query;
         query.exec("SELECT * FROM patrons WHERE id = " + QString::number(user_id));
@@ -1095,28 +1043,11 @@ public:
         return PatronUser(user_id, name, address, phone, role, login, password, check_outs);
     }
 
-    LibrarianUser get_librarian(int user_id){
-        QSqlQuery query;
-        query.exec("SELECT * FROM librarians WHERE id = " + QString::number(user_id));
-        if (!query.next()) return LibrarianUser(-1, "", "", "", "", "");
-        QString name = query.value(1).toString();
-        QString address = query.value(2).toString();
-        QString phone = query.value(3).toString();
-        QString login = query.value(4).toString();
-        QString password = query.value(5).toString();
-        return LibrarianUser(user_id, name, address, phone, login, password);
-    }
-
     bool delete_patron(int user_id){
         QSqlQuery query;
         if (get_patron(user_id).check_outs.size() > 0)
             return 0; //cant delete if has check outs
         query.exec("DELETE FROM patrons WHERE id = " + QString::number(user_id));
-        return 1;
-    }
-    bool delete_librarian(int user_id){
-        QSqlQuery query;
-        query.exec("DELETE FROM librarians WHERE id = " + QString::number(user_id));
         return 1;
     }
 
@@ -1240,7 +1171,97 @@ public:
         return 1;
     }
 
-    LibrarianUser(int id_, QString name_, QString address_, QString phone_, QString login_, QString password_){
+    LibrarianUser(int id_, QString name_, QString address_, QString phone_, QString login_, QString password_, int privileges_){
+        id = id_;
+        name = name_;
+        address = address_;
+        phone = phone_;
+        login = login_;
+        password = password_;
+        privileges = privileges_;
+    }
+    LibrarianUser(){};
+};
+
+class AdminUser : public User{
+public:
+    QVector<LibrarianUser> search_librarians(int user_id, QString name, QString address, QString phone, bool or_and){
+        QSqlQuery query;
+        QString ins = or_and ? " AND " : " OR ";
+        name = name.toLower();
+        address = address.toLower();
+        phone = phone.toLower();
+        QString req = "SELECT * FROM librarians WHERE ";
+        if (user_id != 0) req += "id = " + QString::number(user_id) + ins;
+        if (name != "") req += "instr(lower(name), '"+name+"') > 0" + ins;
+        if (address != "") req += "instr(lower(address), '"+address+"') > 0" + ins;
+        if (phone != "") req += "instr(lower(phone), '"+phone+"') > 0" + ins;
+        req += "1 = " + QString(or_and ? "1" : "0");//nice hack to finish statement correctly
+        if (req.length() == 36)//no parameters given
+            req = "SELECT * FROM librarians";
+        query.exec(req);
+        QVector<LibrarianUser> ans;
+        while (query.next()) {
+            int user_id = query.value(0).toInt();
+            QString name = query.value(1).toString();
+            QString address = query.value(2).toString();
+            QString phone = query.value(3).toString();
+            QString login = query.value(4).toString();
+            QString password = query.value(5).toString();
+            int privileges = query.value(6).toInt();
+            ans.push_back(LibrarianUser(user_id, name, address, phone, login, password, privileges));
+        }
+        return ans;
+    }
+
+    void add_librarian(QString name, QString address, QString phone, QString login, QString password, int privileges){
+        password = Hasher::hash_password(login,password);
+        QSqlQuery query;
+        query.prepare("INSERT INTO librarians (name, address, phone, login, password, privileges) VALUES(:name, :address, :phone, :login, :password, :privileges)");
+        query.bindValue(":name", name);
+        query.bindValue(":address", address);
+        query.bindValue(":phone", phone);
+        query.bindValue(":login", login);
+        query.bindValue(":password", password);
+        query.bindValue(":privileges", privileges);
+        query.exec();
+    }
+
+    bool modify_librarian(int user_id, QString name, QString address, QString phone, QString login, QString password, int privileges){
+        password = Hasher::hash_password(login,password);
+        QSqlQuery query;
+        query.prepare("UPDATE librarians SET name = :name, address = :address, phone = :phone, login = :login, password = :password, privileges = :privileges WHERE id = :user_id");
+        query.bindValue(":name", name);
+        query.bindValue(":address", address);
+        query.bindValue(":phone", phone);
+        query.bindValue(":login", login);
+        query.bindValue(":password", password);
+        query.bindValue(":user_id", user_id);
+        query.bindValue(":privileges", privileges);
+        query.exec();
+        return 1;
+    }
+
+    LibrarianUser get_librarian(int user_id){
+        QSqlQuery query;
+        query.exec("SELECT * FROM librarians WHERE id = " + QString::number(user_id));
+        if (!query.next()) return LibrarianUser(-1, "", "", "", "", "", 0);
+        QString name = query.value(1).toString();
+        QString address = query.value(2).toString();
+        QString phone = query.value(3).toString();
+        QString login = query.value(4).toString();
+        QString password = query.value(5).toString();
+        int privileges = query.value(6).toInt();
+        return LibrarianUser(user_id, name, address, phone, login, password, privileges);
+    }
+
+    bool delete_librarian(int user_id){
+        QSqlQuery query;
+        query.exec("DELETE FROM librarians WHERE id = " + QString::number(user_id));
+        return 1;
+    }
+
+    AdminUser(int id_, QString name_, QString address_, QString phone_, QString login_, QString password_){
         id = id_;
         name = name_;
         address = address_;
@@ -1248,7 +1269,7 @@ public:
         login = login_;
         password = password_;
     }
-    LibrarianUser(){};
+    AdminUser(){};
 };
 
 
@@ -1288,9 +1309,28 @@ public:
             QString phone = query.value(3).toString();
             QString user_login = query.value(4).toString();
             QString user_password = query.value(5).toString();
-            return LibrarianUser(user_id, name, address, phone, user_login, user_password);
+            int privileges = query.value(6).toInt();
+            return LibrarianUser(user_id, name, address, phone, user_login, user_password, privileges);
         }
-        return LibrarianUser(-1,"","","","","");
+        return LibrarianUser(-1,"","","","","", 0);
+    }
+    AdminUser login_admin(QString login, QString password){
+        password = Hasher::hash_password(login, password);
+        QSqlQuery query;
+        query.prepare("SELECT * from admin WHERE login = :login and password = :password");
+        query.bindValue(":login", login);
+        query.bindValue(":password", password);
+        query.exec();
+        if (query.next()){
+            int user_id = query.value(0).toInt();
+            QString name = query.value(1).toString();
+            QString address = query.value(2).toString();
+            QString phone = query.value(3).toString();
+            QString user_login = query.value(4).toString();
+            QString user_password = query.value(5).toString();
+            return AdminUser(user_id, name, address, phone, user_login, user_password);
+        }
+        return AdminUser(-1,"","","","","");
     }
     void make_database(){
         QSqlQuery query;
