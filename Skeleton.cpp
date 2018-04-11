@@ -554,12 +554,12 @@ public:
         int day_start = query.value(6).toInt();
         int renew_state = query.value(10).toInt();
 
-        if (renew_state != 0) return 1; //someone wants
+        if (id != PATRON_VP && renew_state != 0) return 1; //someone wants
 
         Book book = get_book(book_id);
         std::pair<QDate, int> end = calculate_check_out(1, year_start, month_start, day_start, role, book.bestseller, book.price, renew_state);
 
-        if (today.daysTo(end.first) != 0 && today.daysTo(end.first) != 1)
+        if (id != PATRON_VP && today.daysTo(end.first) != 0 && today.daysTo(end.first) != 1)
             return 2; //too late or early
 
         query.prepare("UPDATE check_outs SET renew_state = 2 WHERE check_out_id = :check_out_id");
