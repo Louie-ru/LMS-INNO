@@ -73,10 +73,10 @@ void Librarian::on_button_search_patrons_clicked(){
     QString name = ui->line_patrons_name->text();
     QString phone = ui->line_patrons_phone->text();
     QString address = ui->line_patrons_address->text();
-    bool faculty = ui->checkbox_patrons_faculty->isChecked();
+    int role = ui->combobox_role_patros->currentIndex();
     bool or_and = ui->checkbox_patrons_criteria->isChecked();
 
-    QVector<PatronUser> found = me.search_patrons(user_id, name, address, phone, faculty, or_and);
+    QVector<PatronUser> found = me.search_patrons(user_id, name, address, phone, role, or_and);
     for (int i = 0; i < found.size(); i++){
         ui->table_patrons->insertRow(i);
         QPushButton *btn_modify = new QPushButton(this);
@@ -93,11 +93,20 @@ void Librarian::on_button_search_patrons_clicked(){
         connect(btn_delete, SIGNAL(clicked()), sm2, SLOT(map()));
         sm2->setMapping(btn_delete, found[i].id);
 
+        QString role_string = "";
+        switch (found[i].role){
+            case 1: role_string = "Student"; break;
+            case 2: role_string = "Instructor"; break;
+            case 3: role_string = "Technical Assistant"; break;
+            case 4: role_string = "professor"; break;
+            case 5: role_string = "Visiting professor"; break;
+        }
+
         ui->table_patrons->setItem(i, 0, new QTableWidgetItem(QString::number(found[i].id)));
         ui->table_patrons->setItem(i, 1, new QTableWidgetItem(found[i].name));
         ui->table_patrons->setItem(i, 2, new QTableWidgetItem(found[i].address));
         ui->table_patrons->setItem(i, 3, new QTableWidgetItem(found[i].phone));
-        ui->table_patrons->setItem(i, 4, new QTableWidgetItem(found[i].faculty ? "yes" : "no"));
+        ui->table_patrons->setItem(i, 4, new QTableWidgetItem(role_string));
         ui->table_patrons->setItem(i, 5, new QTableWidgetItem(found[i].login));
         ui->table_patrons->setCellWidget(i, 6, btn_modify);
         ui->table_patrons->setCellWidget(i, 7, btn_delete);
@@ -280,7 +289,7 @@ void Librarian::modify_patron_clicked(int user_id){
     QLabel *name = new QLabel("name:");
     QLabel *address = new QLabel("address:");
     QLabel *phone = new QLabel("phone:");
-    QLabel *faculty = new QLabel("faculty:");
+    QLabel *role = new QLabel("role:");
     QLabel *login = new QLabel("login:");
     QLabel *password = new QLabel("password:");
     clearObjects();
@@ -288,7 +297,7 @@ void Librarian::modify_patron_clicked(int user_id){
     line2->setText(patron.name);
     line3->setText(patron.address);
     line4->setText(patron.phone);
-    check->setChecked(patron.faculty);
+    combo->setCurrentIndex(patron.role - 1);
     line5->setText(patron.login);
     line6->setText("");
     line1->setEnabled(false);
@@ -296,7 +305,7 @@ void Librarian::modify_patron_clicked(int user_id){
     w_layout->addRow(name, line2);
     w_layout->addRow(address, line3);
     w_layout->addRow(phone, line4);
-    w_layout->addRow(faculty, check);
+    w_layout->addRow(role, combo);
     w_layout->addRow(login, line5);
     w_layout->addRow(password, line6);
     w_layout->addRow(cancel, ok);
@@ -702,9 +711,9 @@ void Librarian::modifyPatron(){
     QString phone = line4->text();
     QString login = line5->text();
     QString password = line6->text();
-    bool faculty = check->isChecked();
+    bool role = combo->currentIndex() + 1;
 
-    me.modify_patron(id, name, address, phone, faculty, login, password);
+    me.modify_patron(id, name, address, phone, role, login, password);
     closeWidget();
     on_button_search_patrons_clicked();
 }
