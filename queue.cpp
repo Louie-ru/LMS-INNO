@@ -15,7 +15,8 @@ Queue::Queue(QString users) {
 
 void Queue::from_db(QString users) {
     QStringList pairs = users.split(";");
-    for(QString user : pairs) {
+    for (int i = 0; i < pairs.size(); i++){
+        QString user = pairs[i];
         QStringList user_data = user.split(":");
         this->users.append(QPair<int,int>(user_data.at(0).toInt(), user_data.at(1).toInt()));
     }
@@ -23,7 +24,8 @@ void Queue::from_db(QString users) {
 
 QString Queue::to_db() {
     QString result;
-    for (QPair<int,int> user : this->users) {
+    for (int i = 0; i < this->users.size(); i++){
+        QPair<int,int> user = users[i];
         result += QString::number(user.first) + ':' + QString::number(user.second) + ';';
     }
     result.chop(1);

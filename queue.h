@@ -7,19 +7,13 @@
 class Queue
 {
 public:
-    QVector<QPair<int,int>> users;
-
+    QVector<QPair<int,int> > users;
     Queue();
     Queue(QString users);
-
     void from_db(QString users);
-
     QString to_db();
-
     void add_patron(QPair<int,int>);
-
     int next_user();
-
     void delete_next();
 };
 

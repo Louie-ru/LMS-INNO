@@ -29,7 +29,8 @@ SOURCES += \
     skeleton.cpp \
     hasher.cpp \
     sha_512.cpp \
-    admin.cpp
+    admin.cpp \
+    queue.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -37,7 +38,8 @@ HEADERS += \
     librarian.h \
     hasher.h \
     sha_512.h \
-    admin.h
+    admin.h \
+    queue.h
 
 FORMS += \
         mainwindow.ui \
