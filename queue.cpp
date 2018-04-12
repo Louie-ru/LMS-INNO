@@ -15,18 +15,16 @@ Queue::Queue(QString users) {
 
 void Queue::from_db(QString users) {
     QStringList pairs = users.split(";");
-    for (int i = 0; i < pairs.size(); i++){
-        QString user = pairs[i];
-        QStringList user_data = user.split(":");
+    for(int i = 0; i < pairs.size(); ++i) {
+        QStringList user_data = pairs[i].split(":");
         this->users.append(QPair<int,int>(user_data.at(0).toInt(), user_data.at(1).toInt()));
     }
 }
 
 QString Queue::to_db() {
     QString result;
-    for (int i = 0; i < this->users.size(); i++){
-        QPair<int,int> user = users[i];
-        result += QString::number(user.first) + ':' + QString::number(user.second) + ';';
+    for (int i = 0; i < this->users.size(); ++i) {
+        result += QString::number(this->users[i].first) + ':' + QString::number(this->users[i].second) + ';';
     }
     result.chop(1);
     return result;
