@@ -119,6 +119,10 @@ void Librarian::on_button_search_patrons_clicked(){
         ui->table_patrons->setCellWidget(i, 7, btn_delete);
     }
     set_status("Search complete. " + QString::number(found.size()) + " patrons found");
+    if (me.privileges == 2)
+        ui->table_patrons->setColumnCount(7);
+    if (me.privileges == 1)
+        ui->table_patrons->setColumnCount(6);
     ui->table_patrons->resizeColumnsToContents();
 }
 
@@ -166,6 +170,10 @@ void Librarian::on_button_search_books_clicked(){
         ui->table_search_books->setCellWidget(i, 12, btn_delete);
     }
     set_status("Search complete. " + QString::number(found.size()) + " books found");
+    if (me.privileges == 2)
+        ui->table_search_books->setColumnCount(12);
+    if (me.privileges == 1)
+        ui->table_search_books->setColumnCount(11);
     ui->table_search_books->resizeColumnsToContents();
 }
 void Librarian::on_button_search_articles_clicked(){
@@ -215,6 +223,10 @@ void Librarian::on_button_search_articles_clicked(){
         ui->table_search_articles->setCellWidget(i, 13, btn_delete);
     }
     set_status("Search complete. " + QString::number(found.size()) + " articles found");
+    if (me.privileges == 2)
+        ui->table_search_articles->setColumnCount(13);
+    if (me.privileges == 1)
+        ui->table_search_articles->setColumnCount(12);
     ui->table_search_articles->resizeColumnsToContents();
 }
 void Librarian::on_button_search_vas_clicked(){
@@ -254,6 +266,10 @@ void Librarian::on_button_search_vas_clicked(){
         ui->table_search_va->setCellWidget(i, 8, btn_delete);
     }
     set_status("Search complete. " + QString::number(found.size()) + " audio/video found");
+    if (me.privileges == 2)
+        ui->table_search_va->setColumnCount(8);
+    if (me.privileges == 1)
+        ui->table_search_va->setColumnCount(7);
     ui->table_search_va->resizeColumnsToContents();
 }
 
@@ -918,6 +934,12 @@ void Librarian::on_button_logout_clicked(){
 
 void Librarian::showName(){
     set_status("Logged in as librarian: " + me.login);
+    if (me.privileges == 1){
+        ui->button_new_book->setVisible(false);
+        ui->button_new_article->hide();
+        ui->button_new_va->hide();
+        ui->button_new_patron->hide();
+    }
 }
 void Librarian::modifySettings(){
     int days = line1->text().toInt();
