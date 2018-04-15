@@ -26,6 +26,8 @@ private slots:
     void createLibrarian();
     void closeWidget();
     void on_button_logout_clicked();
+    void change_profile();
+    void on_button_my_profile_clicked();
 
 private:
     Ui::Admin *ui;

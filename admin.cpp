@@ -211,3 +211,39 @@ void Admin::on_button_logout_clicked(){
     mainwindow->show();
     this->close();
 }
+
+void Admin::change_profile(){
+    QString name = line1_->text();
+    QString address = line2_->text();
+    QString phone = line3_->text();
+    QString login = line4_->text();
+    QString password = line5_->text();
+    closeWidget();
+    me.set_profile(name, address, phone, login, password);
+    set_status("Admin profile changed successfully");
+}
+
+void Admin::on_button_my_profile_clicked(){
+    if (widget_ != NULL && !widget_->isHidden()) return;
+    widget_ = new QWidget();
+    QLabel *name = new QLabel("name:");
+    QLabel *address = new QLabel("address:");
+    QLabel *phone = new QLabel("phone:");
+    QLabel *login = new QLabel("login:");
+    QLabel *password = new QLabel("password:");
+    clearObjects();
+    line1_->setText(me.name);
+    line2_->setText(me.address);
+    line3_->setText(me.phone);
+    line4_->setText(me.login);
+    line5_->setText("");
+    w_layout_->addRow(name, line1_);
+    w_layout_->addRow(address, line2_);
+    w_layout_->addRow(phone, line3_);
+    w_layout_->addRow(login, line4_);
+    w_layout_->addRow(password, line5_);
+    w_layout_->addRow(cancel_, ok_);
+    connect(ok_, SIGNAL (clicked()),this, SLOT (change_profile()));
+    widget_->setLayout(w_layout_);
+    widget_->show();
+}

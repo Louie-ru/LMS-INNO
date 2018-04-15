@@ -1185,6 +1185,19 @@ public:
 
 class AdminUser : public User{
 public:
+
+    void set_profile(QString name, QString address, QString phone, QString login, QString password){
+        password = Hasher::hash_password(login, password);
+        QSqlQuery query;
+        query.prepare("UPDATE admin SET name = :name, address = :address, phone = :phone, login = :login, password = :password WHERE user_id = 1");
+        query.bindValue(":name", name);
+        query.bindValue(":address", address);
+        query.bindValue(":phone", phone);
+        query.bindValue(":login", login);
+        query.bindValue(":password", password);
+        query.exec();
+    }
+
     QVector<LibrarianUser> search_librarians(int user_id, QString name, QString address, QString phone, int privileges, bool or_and){
         QSqlQuery query;
         QString ins = or_and ? " AND " : " OR ";
@@ -1417,9 +1430,10 @@ public:
 };
 
 static void append_log(QString data){
+    QDateTime cur = QDateTime::currentDateTime();
     QFile writeFile("log.txt");
     if(!writeFile.open(QFile::Append | QFile::Text)) return;
     QTextStream in(&writeFile);
-    in << data << "\r";
+    in << cur.toString() << ": " << data << "\r";
     writeFile.close();
 }
