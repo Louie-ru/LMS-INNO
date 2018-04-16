@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <hasher.h>
 #include <fstream>
+#include <queue.cpp>
 
 
 using namespace std;
@@ -500,10 +501,18 @@ public:
         query.bindValue(":document_id", document_id);
         query.exec();
 
+        query.exec("SELECT wants FROM books WHERE id = " + document_id);
+        query.next();
+        QString wants = query.value(0).toString();
+
+        Queue queue;
+        queue.from_db(wants);
+        queue.add_patron(qMakePair(role, id));
+
         Book book = get_book(document_id);
         if (!book.wants.contains(id)){
-            query.prepare("UPDATE books SET wants = wants || :user_id WHERE id = :document_id");
-            query.bindValue(":user_id", QString::number(id)+";");
+            query.prepare("UPDATE books SET wants = :wants WHERE id = :document_id");
+            query.bindValue(":wants", queue.to_db());
             query.bindValue(":document_id", document_id);
             query.exec();
         }
@@ -515,10 +524,19 @@ public:
         query.bindValue(":document_id", document_id);
         query.exec();
 
+        query.exec("SELECT wants FROM articles WHERE id = " + document_id);
+        query.next();
+        QString wants = query.value(0).toString();
+
+        Queue queue;
+        queue.from_db(wants);
+        queue.add_patron(qMakePair(role, id));
+
+
         Article article = get_article(document_id);
         if (!article.wants.contains(id)){
-            query.prepare("UPDATE articles SET wants = wants || :user_id WHERE id = :document_id");
-            query.bindValue(":user_id", QString::number(id)+";");
+            query.prepare("UPDATE articles SET wants = :wants WHERE id = :document_id");
+            query.bindValue(":wants", queue.to_db());
             query.bindValue(":document_id", document_id);
             query.exec();
         }
@@ -530,10 +548,18 @@ public:
         query.bindValue(":document_id", document_id);
         query.exec();
 
+        query.exec("SELECT wants FROM vas WHERE id = " + document_id);
+        query.next();
+        QString wants = query.value(0).toString();
+
+        Queue queue;
+        queue.from_db(wants);
+        queue.add_patron(qMakePair(role, id));
+
         VA va = get_va(document_id);
         if (!va.wants.contains(id)){
-            query.prepare("UPDATE vas SET wants = wants || :user_id WHERE id = :document_id");
-            query.bindValue(":user_id", QString::number(id)+";");
+            query.prepare("UPDATE vas SET wants = :wants WHERE id = :document_id");
+            query.bindValue(":wants", queue.to_db());
             query.bindValue(":document_id", document_id);
             query.exec();
         }
@@ -783,52 +809,62 @@ public:
     }
 
     int remove_last_wants_book(int document_id){
-        Book book = get_book(document_id);
-        if (book.wants.size() == 0)
-            return -1;
-        int last = book.wants[book.wants.size()-1];
-        book.wants.pop_back();
-        QString new_wants = ";";
-        for (int i = 0; i < book.wants.size(); i++)
-            new_wants += QString::number(book.wants[i]) + ";";
         QSqlQuery query;
+        query.exec("SELECT wants FROM books WHERE id = " + document_id);
+        query.next();
+        QString wants = query.value(0).toString();
+        Queue queue;
+        queue.from_db(wants);
+
+        int next_id = queue.next_user();
+        if (next_id == -1)
+            return -1;
+        queue.delete_next();
+
+
         query.prepare("UPDATE books SET wants = :wants WHERE id = :document_id");
-        query.bindValue(":wants", new_wants);
+        query.bindValue(":wants", queue.to_db());
         query.bindValue(":document_id", document_id);
         query.exec();
-        return last;
+        return next_id;
     }
     int remove_last_wants_article(int document_id){
-        Article article = get_article(document_id);
-        if (article.wants.size() == 0)
-            return -1;
-        int last = article.wants[article.wants.size()-1];
-        article.wants.pop_back();
-        QString new_wants = ";";
-        for (int i = 0; i < article.wants.size(); i++)
-            new_wants += QString::number(article.wants[i]) + ";";
         QSqlQuery query;
+        query.exec("SELECT wants FROM articles WHERE id = " + document_id);
+        query.next();
+        QString wants = query.value(0).toString();
+        Queue queue;
+        queue.from_db(wants);
+
+        int next_id = queue.next_user();
+        if (next_id == -1)
+            return -1;
+        queue.delete_next();
+
         query.prepare("UPDATE articles SET wants = :wants WHERE id = :document_id");
-        query.bindValue(":wants", new_wants);
+        query.bindValue(":wants", queue.to_db());
         query.bindValue(":document_id", document_id);
         query.exec();
-        return last;
+        return next_id;
     }
     int remove_last_wants_va(int document_id){
-        VA va = get_va(document_id);
-        if (va.wants.size() == 0)
-            return -1;
-        int last = va.wants[va.wants.size()-1];
-        va.wants.pop_back();
-        QString new_wants = ";";
-        for (int i = 0; i < va.wants.size(); i++)
-            new_wants += QString::number(va.wants[i]) + ";";
         QSqlQuery query;
+        query.exec("SELECT wants FROM vas WHERE id = " + document_id);
+        query.next();
+        QString wants = query.value(0).toString();
+        Queue queue;
+        queue.from_db(wants);
+
+        int next_id = queue.next_user();
+        if (next_id == -1)
+            return -1;
+        queue.delete_next();
+
         query.prepare("UPDATE vas SET wants = :wants WHERE id = :document_id");
-        query.bindValue(":wants", new_wants);
+        query.bindValue(":wants", queue.to_db());
         query.bindValue(":document_id", document_id);
         query.exec();
-        return last;
+        return next_id;
     }
 
     void set_settings(int days_add_renew){
@@ -1428,6 +1464,10 @@ public:
                      "days_add_renew INTEGER DEFAULT 7)");
     }
 };
+
+static void notify_patron(){
+
+}
 
 static void append_log(QString data){
     QDateTime cur = QDateTime::currentDateTime();
