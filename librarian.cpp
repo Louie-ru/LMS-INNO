@@ -174,14 +174,14 @@ void Librarian::on_button_search_books_clicked(){
         ui->table_search_books->setItem(i, 9, new QTableWidgetItem(found[i].bestseller ? "yes" : "no"));
         ui->table_search_books->setItem(i, 10, new QTableWidgetItem(found[i].reference ? "yes" : "no"));
         ui->table_search_books->setCellWidget(i, 11, btn_modify);
-        ui->table_search_books->setCellWidget(i, 12, btn_delete);
-        ui->table_search_books->setCellWidget(i, 13, btn_outstanding);
+        ui->table_search_books->setCellWidget(i, 12, btn_outstanding);
+        ui->table_search_books->setCellWidget(i, 13, btn_delete);
     }
     set_status("Search complete. " + QString::number(found.size()) + " books found");
     if (me.privileges == 2)
-        ui->table_search_books->setColumnCount(12);
+        ui->table_search_books->setColumnCount(13);
     if (me.privileges == 1)
-        ui->table_search_books->setColumnCount(11);
+        ui->table_search_books->setColumnCount(12);
     ui->table_search_books->resizeColumnsToContents();
 }
 void Librarian::on_button_search_articles_clicked(){
@@ -235,14 +235,14 @@ void Librarian::on_button_search_articles_clicked(){
         ui->table_search_articles->setItem(i, 10, new QTableWidgetItem(QString::number(found[i].copies)));
         ui->table_search_articles->setItem(i, 11, new QTableWidgetItem(found[i].reference ? "yes" : "no"));
         ui->table_search_articles->setCellWidget(i, 12, btn_modify);
-        ui->table_search_articles->setCellWidget(i, 13, btn_delete);
-        ui->table_search_articles->setCellWidget(i, 14, btn_outstanding);
+        ui->table_search_articles->setCellWidget(i, 13, btn_outstanding);
+        ui->table_search_articles->setCellWidget(i, 14, btn_delete);
     }
     set_status("Search complete. " + QString::number(found.size()) + " articles found");
     if (me.privileges == 2)
-        ui->table_search_articles->setColumnCount(13);
+        ui->table_search_articles->setColumnCount(14);
     if (me.privileges == 1)
-        ui->table_search_articles->setColumnCount(12);
+        ui->table_search_articles->setColumnCount(13);
     ui->table_search_articles->resizeColumnsToContents();
 }
 void Librarian::on_button_search_vas_clicked(){
@@ -286,14 +286,14 @@ void Librarian::on_button_search_vas_clicked(){
         ui->table_search_va->setItem(i, 5, new QTableWidgetItem(QString::number(found[i].copies)));
         ui->table_search_va->setItem(i, 6, new QTableWidgetItem(found[i].reference ? "yes" : "no"));
         ui->table_search_va->setCellWidget(i, 7, btn_modify);
-        ui->table_search_va->setCellWidget(i, 8, btn_delete);
-        ui->table_search_va->setCellWidget(i, 9, btn_outstanding);
+        ui->table_search_va->setCellWidget(i, 8, btn_outstanding);
+        ui->table_search_va->setCellWidget(i, 9, btn_delete);
     }
     set_status("Search complete. " + QString::number(found.size()) + " audio/video found");
     if (me.privileges == 2)
-        ui->table_search_va->setColumnCount(8);
+        ui->table_search_va->setColumnCount(9);
     if (me.privileges == 1)
-        ui->table_search_va->setColumnCount(7);
+        ui->table_search_va->setColumnCount(8);
     ui->table_search_va->resizeColumnsToContents();
 }
 
