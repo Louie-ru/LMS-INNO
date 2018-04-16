@@ -581,6 +581,11 @@
            <string>delete</string>
           </property>
          </column>
+         <column>
+          <property name="text">
+           <string>outstanding</string>
+          </property>
+         </column>
         </widget>
        </item>
       </layout>
@@ -935,6 +940,11 @@
            <string>delete</string>
           </property>
          </column>
+         <column>
+          <property name="text">
+           <string>outstanding</string>
+          </property>
+         </column>
         </widget>
        </item>
       </layout>
@@ -1123,6 +1133,11 @@
          <column>
           <property name="text">
            <string>delete</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>outstanding</string>
           </property>
          </column>
         </widget>

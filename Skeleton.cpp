@@ -917,11 +917,8 @@ public:
         query.exec();
 
         int wants_id = remove_last_wants_book(book.id);
-        if (wants_id != -1){
-            notify_patron(wants_id, "Book you was waiting for is free now. Please come to library to take it.");
-            append_log("User " + QString::number(wants_id) + " notified that he can take book he was waiting for");
+        if (wants_id != -1)
             return make_pair(fine, wants_id);
-        }
         return make_pair(fine, -1);
     }
     std::pair<int, int> return_article(int check_out_id){
@@ -962,11 +959,8 @@ public:
         query.exec();
 
         int wants_id = remove_last_wants_article(article.id);
-        if (wants_id != -1){
-            notify_patron(wants_id, "Article you was waiting for is free now. Please come to library to take it.");
-            append_log("User " + QString::number(wants_id) + " notified that he can take article he was waiting for");
+        if (wants_id != -1)
             return make_pair(fine, wants_id);
-        }
         return make_pair(fine, -1);
     }
     std::pair<int, int> return_va(int check_out_id){
@@ -1007,11 +1001,8 @@ public:
         query.exec();
 
         int wants_id = remove_last_wants_va(va.id);
-        if (wants_id != -1){
-            notify_patron(wants_id, "Video/audio you was waiting for is free now. Please come to library to take it.");
-            append_log("User " + QString::number(wants_id) + " notified that he can take va he was waiting for");
+        if (wants_id != -1)
             return make_pair(fine, wants_id);
-        }
         return make_pair(fine, -1);
     }
 
@@ -1214,6 +1205,97 @@ public:
         query.bindValue(":reference", reference);
         query.exec();
         return 1;
+    }
+
+    void outstanding_book(int document_id){
+        QSqlQuery query;
+        query.exec("SELECT wants FROM books WHERE id = " + document_id);
+        query.next();
+        QString wants = query.value(0).toString();
+
+        Queue queue;
+        queue.from_db(wants);
+
+        while(queue.next_user() != -1){
+            int next_id = queue.next_user();
+            queue.delete_next();
+            notify_patron(next_id, "You was removed from waiting list for a book due to outstanding request");
+        }
+        query.exec("UPDATE books SET wants = ';' WHERE id = " + QString::number(document_id));
+    }
+
+    void outstanding_article(int document_id){
+        QSqlQuery query;
+        query.exec("SELECT wants FROM articles WHERE id = " + document_id);
+        query.next();
+        QString wants = query.value(0).toString();
+
+        Queue queue;
+        queue.from_db(wants);
+
+        while(queue.next_user() != -1){
+            int next_id = queue.next_user();
+            queue.delete_next();
+            notify_patron(next_id, "You was removed from waiting list for a article due to outstanding request");
+        }
+        query.exec("UPDATE articles SET wants = ';' WHERE id = " + QString::number(document_id));
+    }
+
+    void outstanding_va(int document_id){
+        QSqlQuery query;
+        query.exec("SELECT wants FROM vas WHERE id = " + document_id);
+        query.next();
+        QString wants = query.value(0).toString();
+
+        Queue queue;
+        queue.from_db(wants);
+
+        while(queue.next_user() != -1){
+            int next_id = queue.next_user();
+            queue.delete_next();
+            notify_patron(next_id, "You was removed from waiting list for a video/audio due to outstanding request");
+        }
+        query.exec("UPDATE vas SET wants = ';' WHERE id = " + QString::number(document_id));
+    }
+
+    void notify_patron(int patron_id, QString message){
+        QSqlQuery query;
+        query.prepare("SELECT phone from patrons WHERE id = :user_id");
+        query.bindValue(":user_id", patron_id);
+        query.exec();
+        if (!query.next()) return;
+        QString phone = query.value(0).toString();
+
+        QString host = "www.twilio.com"; //sms api
+        int port = 9502;
+        /*
+        //need to pay for sms send
+        stringstream url;
+        url << "/api?action=sendmessage&username=" << encode(username);
+        url << "&password=" << encode(password);
+        url << "&recipient=" << encode(recipient);
+        url << "&messagetype=SMS:TEXT&messagedata=" << encode(message);
+        url << "&originator=" << encode(originator);
+        url << "&responseformat=xml";
+        HINTERNET inet = InternetOpen("Ozeki", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+        HINTERNET conn = InternetConnect(inet, host.c_str() , port, NULL, NULL,
+        INTERNET_SERVICE_HTTP, 0, 0);
+        HINTERNET sess = HttpOpenRequest(conn, "GET", url.str().c_str(), "HTTP/1.1",
+        NULL, NULL, INTERNET_FLAG_PRAGMA_NOCACHE | INTERNET_FLAG_RELOAD, 0);
+        int error = GetLastError();
+        if(error == NO_ERROR){
+            HttpSendRequest(sess, NULL, 0, NULL,0);
+            int size = 1024;
+            char *buffer = new char[size + 1];
+            DWORD read;
+            int rsize = InternetReadFile(sess, (void *)buffer, size, &read);
+            string s = buffer;
+            s = s.substr(0, read);
+            int pos = s.find("<statuscode>0</statuscode>");
+            if(pos > 0) cout << "Message sent." << endl;
+            else cout << "Error." << endl;
+        }
+        */
     }
 
     LibrarianUser(int id_, QString name_, QString address_, QString phone_, QString login_, QString password_, int privileges_){
@@ -1473,46 +1555,6 @@ public:
                      "days_add_renew INTEGER DEFAULT 7)");
     }
 };
-
-static void notify_patron(int patron_id, QString message){
-    QSqlQuery query;
-    query.prepare("SELECT phone from patrons WHERE id = :user_id");
-    query.bindValue(":user_id", patron_id);
-    query.exec();
-    if (!query.next()) return;
-    QString phone = query.value(0).toString();
-
-    QString host = "www.twilio.com"; //sms api
-    int port = 9502;
-    /*
-    //need to pay for sms send
-    stringstream url;
-    url << "/api?action=sendmessage&username=" << encode(username);
-    url << "&password=" << encode(password);
-    url << "&recipient=" << encode(recipient);
-    url << "&messagetype=SMS:TEXT&messagedata=" << encode(message);
-    url << "&originator=" << encode(originator);
-    url << "&responseformat=xml";
-    HINTERNET inet = InternetOpen("Ozeki", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
-    HINTERNET conn = InternetConnect(inet, host.c_str() , port, NULL, NULL,
-    INTERNET_SERVICE_HTTP, 0, 0);
-    HINTERNET sess = HttpOpenRequest(conn, "GET", url.str().c_str(), "HTTP/1.1",
-    NULL, NULL, INTERNET_FLAG_PRAGMA_NOCACHE | INTERNET_FLAG_RELOAD, 0);
-    int error = GetLastError();
-    if(error == NO_ERROR){
-        HttpSendRequest(sess, NULL, 0, NULL,0);
-        int size = 1024;
-        char *buffer = new char[size + 1];
-        DWORD read;
-        int rsize = InternetReadFile(sess, (void *)buffer, size, &read);
-        string s = buffer;
-        s = s.substr(0, read);
-        int pos = s.find("<statuscode>0</statuscode>");
-        if(pos > 0) cout << "Message sent." << endl;
-        else cout << "Error." << endl;
-    }
-    */
-}
 
 static void append_log(QString data){
     QDateTime cur = QDateTime::currentDateTime();

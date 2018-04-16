@@ -40,6 +40,10 @@ private slots:
     void delete_article_clicked(int);
     void delete_va_clicked(int);
 
+    void outstanding_request_book(int);
+    void outstanding_request_article(int);
+    void outstanding_request_va(int);
+
     void modifyBook();
     void modifyArticle();
     void modifyVA();

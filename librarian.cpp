@@ -155,6 +155,13 @@ void Librarian::on_button_search_books_clicked(){
         connect(btn_delete, SIGNAL(clicked()), sm2, SLOT(map()));
         sm2->setMapping(btn_delete, found[i].id);
 
+        QPushButton *btn_outstanding = new QPushButton(this);
+        btn_outstanding->setText("request");
+        QSignalMapper *sm3 = new QSignalMapper(this);
+        connect(sm3, SIGNAL(mapped(int)), this, SLOT(outstanding_request_book(int)));
+        connect(btn_outstanding, SIGNAL(clicked()), sm3, SLOT(map()));
+        sm3->setMapping(btn_outstanding, found[i].id);
+
         ui->table_search_books->setItem(i, 0, new QTableWidgetItem(found[i].title));
         ui->table_search_books->setItem(i, 1, new QTableWidgetItem(found[i].authors));
         ui->table_search_books->setItem(i, 2, new QTableWidgetItem(found[i].publisher));
@@ -168,6 +175,7 @@ void Librarian::on_button_search_books_clicked(){
         ui->table_search_books->setItem(i, 10, new QTableWidgetItem(found[i].reference ? "yes" : "no"));
         ui->table_search_books->setCellWidget(i, 11, btn_modify);
         ui->table_search_books->setCellWidget(i, 12, btn_delete);
+        ui->table_search_books->setCellWidget(i, 13, btn_outstanding);
     }
     set_status("Search complete. " + QString::number(found.size()) + " books found");
     if (me.privileges == 2)
@@ -207,6 +215,13 @@ void Librarian::on_button_search_articles_clicked(){
         connect(btn_delete, SIGNAL(clicked()), sm2, SLOT(map()));
         sm2->setMapping(btn_delete, found[i].id);
 
+        QPushButton *btn_outstanding = new QPushButton(this);
+        btn_outstanding->setText("request");
+        QSignalMapper *sm3 = new QSignalMapper(this);
+        connect(sm3, SIGNAL(mapped(int)), this, SLOT(outstanding_request_article(int)));
+        connect(btn_outstanding, SIGNAL(clicked()), sm3, SLOT(map()));
+        sm3->setMapping(btn_outstanding, found[i].id);
+
         ui->table_search_articles->setItem(i, 0, new QTableWidgetItem(found[i].title));
         ui->table_search_articles->setItem(i, 1, new QTableWidgetItem(found[i].authors));
         ui->table_search_articles->setItem(i, 2, new QTableWidgetItem(found[i].publisher));
@@ -221,6 +236,7 @@ void Librarian::on_button_search_articles_clicked(){
         ui->table_search_articles->setItem(i, 11, new QTableWidgetItem(found[i].reference ? "yes" : "no"));
         ui->table_search_articles->setCellWidget(i, 12, btn_modify);
         ui->table_search_articles->setCellWidget(i, 13, btn_delete);
+        ui->table_search_articles->setCellWidget(i, 14, btn_outstanding);
     }
     set_status("Search complete. " + QString::number(found.size()) + " articles found");
     if (me.privileges == 2)
@@ -255,6 +271,13 @@ void Librarian::on_button_search_vas_clicked(){
         connect(btn_delete, SIGNAL(clicked()), sm2, SLOT(map()));
         sm2->setMapping(btn_delete, found[i].id);
 
+        QPushButton *btn_outstanding = new QPushButton(this);
+        btn_outstanding->setText("request");
+        QSignalMapper *sm3 = new QSignalMapper(this);
+        connect(sm3, SIGNAL(mapped(int)), this, SLOT(outstanding_request_va(int)));
+        connect(btn_outstanding, SIGNAL(clicked()), sm3, SLOT(map()));
+        sm3->setMapping(btn_outstanding, found[i].id);
+
         ui->table_search_va->setItem(i, 0, new QTableWidgetItem(found[i].title));
         ui->table_search_va->setItem(i, 1, new QTableWidgetItem(found[i].authors));
         ui->table_search_va->setItem(i, 2, new QTableWidgetItem(QString::number(found[i].price)));
@@ -264,6 +287,7 @@ void Librarian::on_button_search_vas_clicked(){
         ui->table_search_va->setItem(i, 6, new QTableWidgetItem(found[i].reference ? "yes" : "no"));
         ui->table_search_va->setCellWidget(i, 7, btn_modify);
         ui->table_search_va->setCellWidget(i, 8, btn_delete);
+        ui->table_search_va->setCellWidget(i, 9, btn_outstanding);
     }
     set_status("Search complete. " + QString::number(found.size()) + " audio/video found");
     if (me.privileges == 2)
@@ -504,8 +528,11 @@ void Librarian::return_book(int check_out_id){
         QMessageBox::information(0, "Fine", "Fine size: " + QString::number(fine));
     if (user_id == -1)
         set_status("Document returned successfully");
-    else
+    else{
         set_status("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
+        me.notify_patron(user_id, "Book you was waiting for is free now. Please come to library to take it.");
+        append_log("User " + QString::number(user_id) + " notified that he can take book he was waiting for");
+    }
     on_button_show_checked_out_books_clicked();
 }
 
@@ -518,8 +545,11 @@ void Librarian::return_article(int check_out_id){
         QMessageBox::information(0, "Fine", "Fine size: " + QString::number(fine));
     if (user_id == -1)
         set_status("Document returned successfully");
-    else
+    else{
         set_status("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
+        me.notify_patron(user_id, "Article you was waiting for is free now. Please come to library to take it.");
+        append_log("User " + QString::number(user_id) + " notified that he can take article he was waiting for");
+    }
     on_button_show_checked_out_articles_clicked();
 }
 
@@ -532,8 +562,11 @@ void Librarian::return_va(int check_out_id){
         QMessageBox::information(0, "Fine", "Fine size: " + QString::number(fine));
     if (user_id == -1)
         set_status("Document returned successfully");
-    else
+    else{
         set_status("Document returned successfully; Patron " + QString::number(user_id) + " wants this document");
+        me.notify_patron(user_id, "Video/audio you was waiting for is free now. Please come to library to take it.");
+        append_log("User " + QString::number(user_id) + " notified that he can take va he was waiting for");
+    }
     on_button_show_checked_out_vas_clicked();
 }
 
@@ -923,6 +956,24 @@ void Librarian::on_button_new_va_clicked(){
     connect(ok, SIGNAL (clicked()),this, SLOT (createVA()));
     widget->setLayout(w_layout);
     widget->show();
+}
+
+void Librarian::outstanding_request_book(int document_id){
+    QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to make outstanding request?", QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::No) return;
+    me.outstanding_book(document_id);
+}
+
+void Librarian::outstanding_request_article(int document_id){
+    QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to make outstanding request?", QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::No) return;
+    me.outstanding_article(document_id);
+}
+
+void Librarian::outstanding_request_va(int document_id){
+    QMessageBox::StandardButton reply = QMessageBox::question(this, "Delete", "Are you sure you want to make outstanding request?", QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::No) return;
+    me.outstanding_va(document_id);
 }
 
 void Librarian::on_button_logout_clicked(){
