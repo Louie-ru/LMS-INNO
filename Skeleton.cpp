@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include <hasher.h>
 #include <fstream>
-#include <queue.cpp>
+#include <queue.h>
 
 
 using namespace std;
@@ -917,8 +917,11 @@ public:
         query.exec();
 
         int wants_id = remove_last_wants_book(book.id);
-        if (wants_id != -1)
+        if (wants_id != -1){
+            notify_patron(wants_id, "Book you was waiting for is free now. Please come to library to take it.");
+            append_log("User " + QString::number(wants_id) + " notified that he can take book he was waiting for");
             return make_pair(fine, wants_id);
+        }
         return make_pair(fine, -1);
     }
     std::pair<int, int> return_article(int check_out_id){
@@ -959,8 +962,11 @@ public:
         query.exec();
 
         int wants_id = remove_last_wants_article(article.id);
-        if (wants_id != -1)
+        if (wants_id != -1){
+            notify_patron(wants_id, "Article you was waiting for is free now. Please come to library to take it.");
+            append_log("User " + QString::number(wants_id) + " notified that he can take article he was waiting for");
             return make_pair(fine, wants_id);
+        }
         return make_pair(fine, -1);
     }
     std::pair<int, int> return_va(int check_out_id){
@@ -1001,8 +1007,11 @@ public:
         query.exec();
 
         int wants_id = remove_last_wants_va(va.id);
-        if (wants_id != -1)
+        if (wants_id != -1){
+            notify_patron(wants_id, "Video/audio you was waiting for is free now. Please come to library to take it.");
+            append_log("User " + QString::number(wants_id) + " notified that he can take va he was waiting for");
             return make_pair(fine, wants_id);
+        }
         return make_pair(fine, -1);
     }
 
@@ -1465,8 +1474,44 @@ public:
     }
 };
 
-static void notify_patron(){
+static void notify_patron(int patron_id, QString message){
+    QSqlQuery query;
+    query.prepare("SELECT phone from patrons WHERE id = :user_id");
+    query.bindValue(":user_id", patron_id);
+    query.exec();
+    if (!query.next()) return;
+    QString phone = query.value(0).toString();
 
+    QString host = "www.twilio.com"; //sms api
+    int port = 9502;
+    /*
+    //need to pay for sms send
+    stringstream url;
+    url << "/api?action=sendmessage&username=" << encode(username);
+    url << "&password=" << encode(password);
+    url << "&recipient=" << encode(recipient);
+    url << "&messagetype=SMS:TEXT&messagedata=" << encode(message);
+    url << "&originator=" << encode(originator);
+    url << "&responseformat=xml";
+    HINTERNET inet = InternetOpen("Ozeki", INTERNET_OPEN_TYPE_PRECONFIG, NULL, NULL, 0);
+    HINTERNET conn = InternetConnect(inet, host.c_str() , port, NULL, NULL,
+    INTERNET_SERVICE_HTTP, 0, 0);
+    HINTERNET sess = HttpOpenRequest(conn, "GET", url.str().c_str(), "HTTP/1.1",
+    NULL, NULL, INTERNET_FLAG_PRAGMA_NOCACHE | INTERNET_FLAG_RELOAD, 0);
+    int error = GetLastError();
+    if(error == NO_ERROR){
+        HttpSendRequest(sess, NULL, 0, NULL,0);
+        int size = 1024;
+        char *buffer = new char[size + 1];
+        DWORD read;
+        int rsize = InternetReadFile(sess, (void *)buffer, size, &read);
+        string s = buffer;
+        s = s.substr(0, read);
+        int pos = s.find("<statuscode>0</statuscode>");
+        if(pos > 0) cout << "Message sent." << endl;
+        else cout << "Error." << endl;
+    }
+    */
 }
 
 static void append_log(QString data){
