@@ -1535,7 +1535,8 @@ public:
                      "address VARCHAR(255), "
                      "phone VARCHAR(255), "
                      "login VARCHAR(255), "
-                     "password VARCHAR(255));");
+                     "password VARCHAR(255), "
+                     "privileges INTEGER);");
 
         query.exec("CREATE TABLE IF NOT EXISTS check_outs ("
                      "check_out_id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -1548,11 +1549,21 @@ public:
                      "year_end INTEGER, "
                      "month_end INTEGER, "
                      "day_end INTEGER, "
-                     "renew_state INTEGER DEFAULT 0,"
-                     "return_state INTEGER DEFAULT 0)");
+                     "renew_state INTEGER DEFAULT 0);");
 
         query.exec("CREATE TABLE IF NOT EXISTS settings ("
                      "days_add_renew INTEGER DEFAULT 7)");
+
+        query.exec("CREATE TABLE IF NOT EXISTS admin ("
+                     "user_id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                     "name VARCHAR(255), "
+                     "address VARCHAR(255), "
+                     "phone VARCHAR(255), "
+                     "login VARCHAR(255), "
+                     "password VARCHAR(255));");
+
+        query.prepare("INSERT INTO librarians (name, address, phone, login, password) VALUES('admin', '', '', 'admin', 'admin')");
+        query.exec();
     }
 };
 
