@@ -14,11 +14,11 @@ TEMPLATE = app
 DEFINES += QT_DEPRECATED_WARNINGS
 
 #Lines for Nikolai only
-CONFIG += release
-CONFIG += static
-QMAKE_LFLAGS_RELEASE += -static -static-libgcc
-QMAKE_LFLAGS += -static -static-libgcc
-LIBS += -static-libgcc
+#CONFIG += release
+#CONFIG += static
+#QMAKE_LFLAGS_RELEASE += -static -static-libgcc
+#QMAKE_LFLAGS += -static -static-libgcc
+#LIBS += -static-libgcc
 #end
 
 SOURCES += \
@@ -30,7 +30,8 @@ SOURCES += \
     hasher.cpp \
     sha_512.cpp \
     admin.cpp \
-    queue.cpp
+    queue.cpp \
+    tester.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -39,7 +40,8 @@ HEADERS += \
     hasher.h \
     sha_512.h \
     admin.h \
-    queue.h
+    queue.h \
+    tester.h
 
 FORMS += \
         mainwindow.ui \

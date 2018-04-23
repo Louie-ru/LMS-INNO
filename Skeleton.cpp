@@ -1416,7 +1416,7 @@ public:
 
 class Login{
 public:
-    PatronUser login_patron(QString login, QString password){
+    static PatronUser login_patron(QString login, QString password){
         password = Hasher::hash_password(login,password);
         QSqlQuery query;
         query.prepare("SELECT * from patrons WHERE login = :login and password = :password");
@@ -1436,7 +1436,7 @@ public:
         }
         return PatronUser(-1,"","","",0,"","","");
     }
-    LibrarianUser login_librarian(QString login, QString password){
+    static LibrarianUser login_librarian(QString login, QString password){
         password = Hasher::hash_password(login,password);
         QSqlQuery query;
         query.prepare("SELECT * from librarians WHERE login = :login and password = :password");
@@ -1455,7 +1455,7 @@ public:
         }
         return LibrarianUser(-1,"","","","","", 0);
     }
-    AdminUser login_admin(QString login, QString password){
+    static AdminUser login_admin(QString login, QString password){
         password = Hasher::hash_password(login, password);
         QSqlQuery query;
         query.prepare("SELECT * from admin WHERE login = :login and password = :password");
@@ -1473,7 +1473,23 @@ public:
         }
         return AdminUser(-1,"","","","","");
     }
-    void make_database(){
+
+    static void clear_database(){
+        QSqlQuery query;
+        query.exec("DELETE FROM librarians");
+        query.exec("DELETE FROM patrons");
+        query.exec("DELETE FROM books");
+        query.exec("DELETE FROM articles");
+        query.exec("DELETE FROM vas");
+        query.exec("DELETE FROM check_outs");
+        AdminUser admin = Login::login_admin("sidr", "123");
+        //admin.add_librarian("Сидорович", "Бункер на Кордоне", "88005553535", "sidr", "123");
+        admin.add_librarian("libr", "inno", "234", "sidr", "123", 1);
+
+
+    }
+
+    static void make_database(){
         QSqlQuery query;
         query.exec("CREATE TABLE IF NOT EXISTS books ("
                      "id INTEGER PRIMARY KEY AUTOINCREMENT, "
