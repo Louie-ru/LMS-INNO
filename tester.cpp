@@ -130,7 +130,7 @@ bool Tester::test7(){
 
     int d3 = p1.search_books("Donald E. Knuth","","","",0,0,0,0)[0].id;
 
-    p1.check_out_book(d3);
+    p1.check_out_book(d3);//s
 
     PatronUser p2 = Login::login_patron("n.teixeira", "1");
 
