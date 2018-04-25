@@ -34,15 +34,15 @@ void Tester::run_tests() {
 }
 
 bool Tester::test1(){
-    AdminUser admin1 = Login::login_admin("sidr", "123");
-    return true;
+    AdminUser admin = Login::login_admin("admin", "NotAdminpassword");
+    return admin.id == -1;
 }
 
 bool Tester::test2(){
-    AdminUser admin1 = Login::login_admin("sidr", "123");
-    admin1.add_librarian("l1","Innopolis", "3333", "l1", "1", 1);
-    admin1.add_librarian("l2","Innopolis", "3333", "l2", "1", 3);
-    admin1.add_librarian("l3","Innopolis", "3333", "l3", "1", 3);
+    AdminUser admin = Login::login_admin("admin", "admin");
+    admin.add_librarian("l1","Innopolis", "3333", "l1", "1", 1);
+    admin.add_librarian("l2","Innopolis", "3333", "l2", "1", 3);
+    admin.add_librarian("l3","Innopolis", "3333", "l3", "1", 3);
     return true;
 }
 
