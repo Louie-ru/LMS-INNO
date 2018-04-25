@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>4</number>
      </property>
      <widget class="QWidget" name="tab_patrons">
       <attribute name="title">
@@ -578,12 +578,12 @@
          </column>
          <column>
           <property name="text">
-           <string>delete</string>
+           <string>outstanding</string>
           </property>
          </column>
          <column>
           <property name="text">
-           <string>outstanding</string>
+           <string>delete</string>
           </property>
          </column>
         </widget>
@@ -937,12 +937,12 @@
          </column>
          <column>
           <property name="text">
-           <string>delete</string>
+           <string>outstanding</string>
           </property>
          </column>
          <column>
           <property name="text">
-           <string>outstanding</string>
+           <string>delete</string>
           </property>
          </column>
         </widget>
@@ -1132,12 +1132,12 @@
          </column>
          <column>
           <property name="text">
-           <string>delete</string>
+           <string>outstanding</string>
           </property>
          </column>
          <column>
           <property name="text">
-           <string>outstanding</string>
+           <string>delete</string>
           </property>
          </column>
         </widget>

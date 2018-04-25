@@ -297,6 +297,8 @@ void Librarian::on_button_search_vas_clicked(){
     ui->table_search_va->resizeColumnsToContents();
 }
 
+
+
 void Librarian::modify_patron_clicked(int user_id){
     if (widget != NULL && !widget->isHidden()) return;
     PatronUser patron = me.get_patron(user_id);
@@ -313,6 +315,11 @@ void Librarian::modify_patron_clicked(int user_id){
     line2->setText(patron.name);
     line3->setText(patron.address);
     line4->setText(patron.phone);
+    combo->addItem("Student");
+    combo->addItem("Instructor");
+    combo->addItem("TA");
+    combo->addItem("Professor");
+    combo->addItem("VP");
     combo->setCurrentIndex(patron.role - 1);
     line5->setText(patron.login);
     line6->setText("");
@@ -704,8 +711,7 @@ void Librarian::modifyPatron(){
     QString phone = line4->text();
     QString login = line5->text();
     QString password = line6->text();
-    bool role = combo->currentIndex() + 1;
-
+    int role = combo->currentIndex() + 1;
     me.modify_patron(id, name, address, phone, role, login, password);
     set_status("Patron " + login + " modified successfully");
     closeWidget();

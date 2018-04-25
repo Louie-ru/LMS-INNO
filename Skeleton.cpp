@@ -1578,7 +1578,6 @@ public:
                      "login VARCHAR(255), "
                      "password VARCHAR(255));");
 
-        query.prepare("INSERT INTO librarians (name, address, phone, login, password) VALUES('admin', '', '', 'admin', 'admin')");
         query.exec();
     }
 };
