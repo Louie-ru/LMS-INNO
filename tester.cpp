@@ -28,20 +28,19 @@ void Tester::run_tests() {
     Login::clear_database();
     qDebug() << "TEST7: " << (test7() ? "OK" : "FAIL");
     Login::clear_database();
-    /*qDebug() << "TEST8: " << (test8() ? "OK" : "FAIL");
-    Login::clear_database(); */
+    qDebug() << "TEST10: " << (test10() ? "OK" : "FAIL");
+    Login::clear_database();
     sdb.close();
 }
 
 bool Tester::test1(){
     AdminUser admin1 = Login::login_admin("sidr", "123");
-    admin1.add_librarian("Admin","Innopolis", "3333", "admin", "admin", 1);
     return true;
 }
 
 bool Tester::test2(){
     AdminUser admin1 = Login::login_admin("sidr", "123");
-    admin1.add_librarian("l1","Innopolis", "3333", "l1", "1", 3);
+    admin1.add_librarian("l1","Innopolis", "3333", "l1", "1", 1);
     admin1.add_librarian("l2","Innopolis", "3333", "l2", "1", 3);
     admin1.add_librarian("l3","Innopolis", "3333", "l3", "1", 3);
     return true;
@@ -96,6 +95,8 @@ bool Tester::test5(){
 bool Tester::test6(){
     test4();
 
+    LibrarianUser l1 = Login::login_librarian("l1","1");
+
     PatronUser p1 = Login::login_patron("s.afonso", "1");
 
     int d3 = p1.search_books("Donald E. Knuth","","","",0,0,0,0)[0].id;
@@ -105,10 +106,12 @@ bool Tester::test6(){
     PatronUser p2 = Login::login_patron("n.teixeira", "1");
 
     p2.check_out_book(d3);
+    l1.modify_book(d3,"","","","",0,0,0,0,1,0,0);
 
     PatronUser s = Login::login_patron("a.velo", "1");
 
     s.check_out_book(d3);
+    l1.modify_book(d3,"","","","",0,0,0,0,0,0,0);
 
     PatronUser v = Login::login_patron("v.rama", "1");
 
@@ -117,7 +120,7 @@ bool Tester::test6(){
     PatronUser p3 = Login::login_patron("e.espindola", "1");
 
     p3.check_out_book(d3);
-
+    //l1.outstanding_book(d3);
 
     return true;
 
@@ -127,18 +130,21 @@ bool Tester::test7(){
     test4();
 
     PatronUser p1 = Login::login_patron("s.afonso", "1");
+    LibrarianUser l3 = Login::login_librarian("l3","1");
 
     int d3 = p1.search_books("Donald E. Knuth","","","",0,0,0,0)[0].id;
 
-    p1.check_out_book(d3);//s
+    p1.check_out_book(d3);
 
     PatronUser p2 = Login::login_patron("n.teixeira", "1");
 
     p2.check_out_book(d3);
+    l3.modify_book(d3,"","","","",0,0,0,0,1,0,0);
 
     PatronUser s = Login::login_patron("a.velo", "1");
 
     s.check_out_book(d3);
+    l3.modify_book(d3,"","","","",0,0,0,0,0,0,0);
 
     PatronUser v = Login::login_patron("v.rama", "1");
 
@@ -147,10 +153,18 @@ bool Tester::test7(){
     PatronUser p3 = Login::login_patron("e.espindola", "1");
 
     p3.check_out_book(d3);
+    //l3.outstanding_book(d3);
+
 
     return true;
 
 }
+
+bool Tester::test10(){
+    return true;
+}
+
+
 
 
 
