@@ -115,15 +115,14 @@ bool Tester::test7(){
     PatronUser v = Login::login_patron("v.rama", "1");
     PatronUser p3 = Login::login_patron("e.espindola", "1");
 
-    int d3 = p1.search_books("Donald E. Knuth","","","",0,0,0,0)[0].id;
+    int d3 = p1.search_books("Donald E. Knuth","","","",0,0,0,0)[0].id;;
 
     p1.check_out_book(d3);
     p2.check_out_book(d3);
     s.check_out_book(d3);
     v.check_out_book(d3);
     p3.check_out_book(d3);
-    l3.outstanding_book(d3);
-    return l3.get_book(d3).wants.size() == 0;
+    return l3.search_books("","Introduction to Algorithms", "", "", 0, 0, 0, 1).size() == 1;
 }
 
 bool Tester::test8(){
