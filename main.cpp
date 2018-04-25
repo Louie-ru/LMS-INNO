@@ -7,7 +7,7 @@ QSqlDatabase sdb;
 
 int main(int argc, char *argv[]){
 
-    //Tester::run_tests();
+    Tester::run_tests();
     QApplication a(argc, argv);
     sdb = QSqlDatabase::addDatabase("QSQLITE");
     sdb.setDatabaseName("db.sqlite");

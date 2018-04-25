@@ -1088,6 +1088,7 @@ public:
     }
 
     bool add_book(QString title, QString authors, QString publisher, QString keywords, int year, int price, int room, int level, int copies, int bestseller, bool reference){
+        if(privileges == 1) return 0;
         QSqlQuery query;
         query.prepare("INSERT INTO books (title, authors, publisher, keywords, year, price, room, level, copies, bestseller, reference) VALUES(:title, :authors, :publisher , :keywords, :year, :price, :room, :level, :copies, :bestseller, :reference)");
         query.bindValue(":title", title);
@@ -1207,7 +1208,8 @@ public:
         return 1;
     }
 
-    void outstanding_book(int document_id){
+    bool outstanding_book(int document_id){
+        if (privileges == 1) return 0;
         QSqlQuery query;
         query.exec("SELECT wants FROM books WHERE id = " + document_id);
         query.next();
@@ -1222,9 +1224,11 @@ public:
             notify_patron(next_id, "You was removed from waiting list for a book due to outstanding request");
         }
         query.exec("UPDATE books SET wants = ';' WHERE id = " + QString::number(document_id));
+        return 1;
     }
 
-    void outstanding_article(int document_id){
+    bool outstanding_article(int document_id){
+        if (privileges == 1) return 0;
         QSqlQuery query;
         query.exec("SELECT wants FROM articles WHERE id = " + document_id);
         query.next();
@@ -1239,9 +1243,11 @@ public:
             notify_patron(next_id, "You was removed from waiting list for a article due to outstanding request");
         }
         query.exec("UPDATE articles SET wants = ';' WHERE id = " + QString::number(document_id));
+        return 1;
     }
 
-    void outstanding_va(int document_id){
+    bool outstanding_va(int document_id){
+        if (privileges == 1) return 0;
         QSqlQuery query;
         query.exec("SELECT wants FROM vas WHERE id = " + document_id);
         query.next();
@@ -1256,6 +1262,7 @@ public:
             notify_patron(next_id, "You was removed from waiting list for a video/audio due to outstanding request");
         }
         query.exec("UPDATE vas SET wants = ';' WHERE id = " + QString::number(document_id));
+        return 1;
     }
 
     void notify_patron(int patron_id, QString message){
