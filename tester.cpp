@@ -161,6 +161,11 @@ bool Tester::test7(){
 }
 
 bool Tester::test10(){
+    test4();
+
+    PatronUser v = Login::login_patron("v.rama", "1");
+
+    v.search_books("","","Algorithms to Algorithms", "", 0, 0, 0, 0);
     return true;
 }
 
