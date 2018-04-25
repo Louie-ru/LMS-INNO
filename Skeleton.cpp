@@ -134,6 +134,15 @@ public:
     QString name, address, phone, login, password;
     int id;
 
+    void append_log(QString data){
+        QDateTime cur = QDateTime::currentDateTime();
+        QFile writeFile("log.txt");
+        if(!writeFile.open(QFile::Append | QFile::Text)) return;
+        QTextStream in(&writeFile);
+        in << cur.toString() << ": " << data << "\r";
+        writeFile.close();
+    }
+
     //bestseller can be any if not book given
     std::pair<QDate, int> calculate_check_out(int document_type, int year_start, int month_start, int day_start, int role, bool bestseller, int price, int renew_state){
         QDate date_start;
@@ -388,6 +397,7 @@ public:
         query.bindValue(":check_out_id", QString::number(check_out_id)+";");
         query.bindValue(":user_id", id);
         query.exec();
+        append_log("Patron " + this->name + " checked out " + document_id);
     }
     void check_out_article(int document_id) {
         QSqlQuery query;
@@ -1048,6 +1058,7 @@ public:
         query.bindValue(":login", login);
         query.bindValue(":password", password);
         query.exec();
+        append_log("Librarian " + this->name + " created patron " + name);
     }
 
     bool modify_patron(int user_id, QString name, QString address, QString phone, int role, QString login, QString password){
@@ -1103,6 +1114,8 @@ public:
         query.bindValue(":bestseller", (bestseller ? 1 : 0));
         query.bindValue(":reference", reference);
         query.exec();
+
+        append_log("Book " + title + " created successfully");
         return 1;
     }
     bool add_article(QString title, QString authors, QString journal, QString publisher, QString keywords, QString editors, int year, int month, int price, int room, int level, int copies, bool reference){
@@ -1224,6 +1237,7 @@ public:
             notify_patron(next_id, "You was removed from waiting list for a book due to outstanding request");
         }
         query.exec("UPDATE books SET wants = ';' WHERE id = " + QString::number(document_id));
+        append_log("Librarian " + this->login + " made outstanding request for book " + document_id);
         return 1;
     }
 
@@ -1373,6 +1387,8 @@ public:
         query.bindValue(":password", password);
         query.bindValue(":privileges", privileges);
         query.exec();
+
+        append_log("Librarian " + login + " added successfully");
     }
 
     bool modify_librarian(int user_id, QString name, QString address, QString phone, QString login, QString password, int privileges){
@@ -1594,6 +1610,6 @@ static void append_log(QString data){
     QFile writeFile("log.txt");
     if(!writeFile.open(QFile::Append | QFile::Text)) return;
     QTextStream in(&writeFile);
-    in << cur.toString() << ": " << data << "\r";
+    in << cur.toString() << ": " << data << endl;
     writeFile.close();
 }

@@ -798,7 +798,6 @@ void Librarian::createBook(){
     bool bestseller = check->isChecked();
     bool reference = check2->isChecked();
     me.add_book(title, authors, publisher, keywords, year, price, room, level, copies, bestseller, reference);
-    set_status("Book " + title + " created successfully");
     on_button_search_books_clicked();
     closeWidget();
 }

@@ -164,7 +164,6 @@ void Admin::createLibrarian(){
     closeWidget();
     me.add_librarian(name, address, phone, login, password, privileges);
     on_button_search_librarians_clicked();
-    set_status("Librarian " + login + " added successfully");
 }
 
 void Admin::on_button_new_librarian_clicked(){

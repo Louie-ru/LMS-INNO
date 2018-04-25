@@ -14,21 +14,29 @@ void Tester::run_tests() {
     Login::make_database();
     Login::clear_database();
 
-    //qDebug() << "TEST1: " << (test1() ? "OK" : "FAIL");
-    //Login::clear_database();
-    //qDebug() << "TEST2: " << (test2() ? "OK" : "FAIL");
-    //Login::clear_database();
-    //qDebug() << "TEST3: " << (test3() ? "OK" : "FAIL");
-    //Login::clear_database();
-    //qDebug() << "TEST4: " << (test4() ? "OK" : "FAIL");
-    //Login::clear_database();
-    //qDebug() << "TEST5: " << (test5() ? "OK" : "FAIL");
-    //Login::clear_database();
-    //qDebug() << "TEST6: " << (test6() ? "OK" : "FAIL");
-    //Login::clear_database();
+    qDebug() << "TEST1: " << (test1() ? "OK" : "FAIL");
+    Login::clear_database();
+    qDebug() << "TEST2: " << (test2() ? "OK" : "FAIL");
+    Login::clear_database();
+    qDebug() << "TEST3: " << (test3() ? "OK" : "FAIL");
+    Login::clear_database();
+    qDebug() << "TEST4: " << (test4() ? "OK" : "FAIL");
+    Login::clear_database();
+    qDebug() << "TEST5: " << (test5() ? "OK" : "FAIL");
+    Login::clear_database();
+    qDebug() << "TEST6: " << (test6() ? "OK" : "FAIL");
+    Login::clear_database();
     qDebug() << "TEST7: " << (test7() ? "OK" : "FAIL");
     Login::clear_database();
     qDebug() << "TEST8: " << (test8() ? "OK" : "FAIL");
+    Login::clear_database();
+    qDebug() << "TEST9: " << (test9() ? "OK" : "FAIL");
+    Login::clear_database();
+    qDebug() << "TEST10: " << (test10() ? "OK" : "FAIL");
+    Login::clear_database();
+    qDebug() << "TEST11: " << (test10() ? "OK" : "FAIL");
+    Login::clear_database();
+    qDebug() << "TEST12: " << (test10() ? "OK" : "FAIL");
     Login::clear_database();
     sdb.close();
 }
@@ -119,20 +127,45 @@ bool Tester::test7(){
 }
 
 bool Tester::test8(){
+    AdminUser admin1 = Login::login_admin("admin", "admin");
+    return true;
+}
 
+bool Tester::test9(){
+    AdminUser admin1 = Login::login_admin("admin", "admin");
+    return true;
 }
 
 bool Tester::test10(){
     test4();
-
     PatronUser v = Login::login_patron("v.rama", "1");
+    return v.search_books("","Introduction to Algorithms", "", "", 0, 0, 0, 1).size() == 1;
+}
 
-    v.search_books("","","Algorithms to Algorithms", "", 0, 0, 0, 0);
-    return true;
+bool Tester::test11(){
+    test4();
+    PatronUser v = Login::login_patron("v.rama", "1");
+    return v.search_books("","Algorithms", "", "", 0, 0, 0, 1).size() == 2;
+}
+
+bool Tester::test12(){
+    test4();
+    PatronUser v = Login::login_patron("v.rama", "1");
+    return v.search_books("", "", "Algorithms", "", 0, 0, 0, 1).size() == 2;
 }
 
 
-
+int Tester::lines_written(){
+    QFile file("log.txt");
+    int ans = 0;
+    file.open(QIODevice::ReadOnly);
+    QTextStream in(&file);
+    while(!in.atEnd()){
+        in.readLine();
+        ans++;
+    }
+    return ans;
+}
 
 
 
